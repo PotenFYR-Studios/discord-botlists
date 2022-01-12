@@ -1,0 +1,8 @@
+{
+  "topgg": {
+    "apibaseurl": "https://top.gg/api",
+    "websiteurl": "https://top.gg/",
+    "poststatsurl": "https://top.gg/bots/{replace}/stats",
+    "tokenHeadername": "Authorization"
+  }
+}
