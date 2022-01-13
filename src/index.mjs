@@ -1,5 +1,5 @@
 import Handlers from './index'
 
 export default Handlers
-export const Request = Handlers.Request
+export const BotLists = Handlers.BotLists
 export const Utils = Handlers.Utils

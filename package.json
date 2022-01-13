@@ -1,7 +1,7 @@
 {
   "name": "discord-botlists",
   "version": "0.0.1",
-  "description": "",
+  "description": "Multi-Discord-Botlist Management Package with 10+ Botlist Supported with Events and Stats Update Methods",
   "main": "./src/index.js",
   "module": "./src/index.mjs",
   "types": "./typings/index.d.ts",
@@ -19,6 +19,7 @@
   "scripts": {
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
+    "lint:commit": "npm run lint:fix && npm run commit:push",
     "commit": "git-cz",
     "semantic-release": "semantic-release --branches main",
     "commit:push": "git add . && npm run commit && git push",
@@ -26,11 +27,11 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.16.5",
-    "@babel/preset-env": "^7.16.7",
+    "@babel/preset-env": "^7.16.8",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.6.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-import": "^2.25.4",
     "jsdoc": "^3.6.7",
     "jsdoc-babel": "^0.5.0",
     "jsdoc-skyceil": "^2.0.0",
@@ -43,7 +44,7 @@
     }
   },
   "engines": {
-    "node": ">= 16.6.0",
+    "node": ">= 17.0.0",
     "npm": ">=8.0.0"
   },
   "dependencies": {
@@ -57,12 +58,21 @@
   "author": "Sid is Live YT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SidisLiveYT/Jericho-Player.git"
+    "url": "git+https://github.com/SidisLiveYT/discord-botlists.git"
   },
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SidisLiveYT/Jericho-Player/issues"
+    "url": "https://github.com/SidisLiveYT/discord-botlists/issues"
   },
-  "homepage": "https://jericho-player.js.org",
-  "keywords": []
+  "homepage": "https://github.com/SidisLiveYT/discord-botlists",
+  "keywords": [
+    "discord-botlists",
+    "multi-discord-botlists",
+    "top.gg votes",
+    "topgg poster",
+    "botlists votes",
+    "discord.js",
+    "discord.eris",
+    "botlists poster"
+  ]
 }

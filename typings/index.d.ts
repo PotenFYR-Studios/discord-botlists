@@ -1,7 +1,7 @@
 import { AxiosPromise } from 'axios'
 import { WebhooksEvents, Awaitable } from './Instances'
 
-export class Requests extends EventEmitter {
+export class BotLists extends EventEmitter {
   public constructor(
     webhookEndpoint: string,
     botlistData: Object,

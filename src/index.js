@@ -1,7 +1,7 @@
-const Request = require('./Handlers/Request.js')
+const BotLists = require('./Handlers/Request.js')
 const Utils = require('./Utilities/ClassUtils.js')
 
 module.exports = {
-  Request,
+  BotLists,
   Utils,
 }

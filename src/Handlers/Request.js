@@ -7,7 +7,7 @@ const Utils = require('../Utilities/ClassUtils.js')
 
 const CacheObjectkeys = Object.keys(botlistCache)
 
-class Requests extends EventEmitter {
+class BotLists extends EventEmitter {
   constructor(
     webhookEndpoint = undefined,
     botlistData = undefined,
@@ -149,4 +149,4 @@ class Requests extends EventEmitter {
   }
 }
 
-module.exports = Requests
+module.exports = BotLists
