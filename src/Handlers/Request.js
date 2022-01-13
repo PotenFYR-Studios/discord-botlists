@@ -12,10 +12,12 @@ class BotLists extends EventEmitter {
     webhookEndpoint = undefined,
     botlistData = undefined,
     listenerPortNumber = 8080,
+    redirectUrl = 'https://github.com/SidisLiveYT/discord-botlists',
   ) {
     super()
 
     this.webhookEndpoint = webhookEndpoint
+    this.redirectUrl = redirectUrl
     this.botlistData = botlistData ?? botlistCache
     this.listenerPortNumber =
       Number.isNaN(listenerPortNumber) &&
@@ -36,13 +38,20 @@ class BotLists extends EventEmitter {
     ))
   }
 
-  start(webhookEndpoint = undefined) {
+  start(
+    webhookEndpoint = undefined,
+    redirectUrl = 'https://github.com/SidisLiveYT/discord-botlists',
+  ) {
     const apiUrl = `/${
       webhookEndpoint ?? this.webhookEndpoint ?? 'discord-botlists'
     }`
     console.log(
       `Webhook-Server is accepting votes Webhooks at - http://localhost:${this.listenerPortNumber}${apiUrl}`,
     )
+    this.expressApp.get(apiUrl, (request, response) => {
+      response.redirect(redirectUrl ?? this.redirectUrl)
+      return undefined
+    })
     this.expressApp.post(apiUrl, (request, response) => {
       try {
         const AuthParsingResults = this.#parseAuthorization(request)
@@ -53,6 +62,7 @@ class BotLists extends EventEmitter {
             message: 'Invalid authorization',
           })
         }
+
         this.emit(
           'vote',
           AuthParsingResults.siteName,
@@ -60,6 +70,13 @@ class BotLists extends EventEmitter {
           request,
           response,
         )
+
+        response.status(200).send({
+          ok: true,
+          status: 200,
+          message: 'Webhook has been Received',
+        })
+
         return this.expressApp
       } catch (error) {
         return response.status(500).send({
@@ -88,12 +105,12 @@ class BotLists extends EventEmitter {
       CacheObjectkeys.map(async (Caches) => {
         if (
           this.botlistData[Caches] &&
-          this.botlistData[Caches].token &&
+          this.botlistData[Caches].authorizationToken &&
           this.botlistData[Caches].tokenHeadername
         )
           Cached = await this.#poststats(
             botlistCache[Caches].poststatsurl,
-            this.botlistData[Caches].token,
+            this.botlistData[Caches].authorizationToken,
             botId,
             Utils.BodyParser(apiBody, botlistCache[Caches]),
           )
@@ -115,12 +132,12 @@ class BotLists extends EventEmitter {
     )
   }
 
-  async #poststats(url, token, botId, postData) {
+  async #poststats(url, authorizationToken, botId, postData) {
     if (!postData) return undefined
     return await Axios.post(url.replace('{replace}', botId), postData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: token,
+        Authorization: authorizationToken,
       },
     })
   }
@@ -131,7 +148,7 @@ class BotLists extends EventEmitter {
     while (count < CacheObjectkeys.length) {
       if (
         this.botlistData[CacheObjectkeys[count]] &&
-        this.botlistData[CacheObjectkeys[count]].token &&
+        this.botlistData[CacheObjectkeys[count]].authorizationToken &&
         ((this.botlistData[CacheObjectkeys[count]].tokenHeadername &&
           request.get(
             `${this.botlistData[CacheObjectkeys[count]].tokenHeadername}`,
@@ -140,9 +157,10 @@ class BotLists extends EventEmitter {
             request.get(
               `${botlistCache[CacheObjectkeys[count]].tokenHeadername}`,
             )) ??
-          authSecret) === this.botlistData[CacheObjectkeys[count]].token
+          authSecret) ===
+          this.botlistData[CacheObjectkeys[count]].authorizationToken
       )
-        return this.botlistData[CacheObjectkeys[count]]
+        return botlistCache[CacheObjectkeys[count]]
       else ++count
     }
     return false
