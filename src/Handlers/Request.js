@@ -68,7 +68,7 @@ class BotLists extends EventEmitter {
             })
           }
 
-          if (!(request.body && Object.keys(request.body).length > 0)) {
+          if (!(request.body && Object.entries(request.body).length > 0)) {
             return RawBody(request, {}, (error, actualBody) => {
               if (error)
                 return response.status(422).send({
