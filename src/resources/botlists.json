@@ -1,8 +1,16 @@
 {
   "topgg": {
+    "name": "Top.gg",
     "apibaseurl": "https://top.gg/api",
     "websiteurl": "https://top.gg/",
-    "poststatsurl": "https://top.gg/bots/{replace}/stats",
-    "tokenHeadername": "Authorization"
+    "apidocsurl": "https://docs.top.gg/",
+    "poststatsurl": "https://top.gg/api/bots/{replace}/stats",
+    "tokenHeadername": "Authorization",
+    "bodyParams": {
+      "server_count": { "clientName": "servercount", "required": "true" },
+      "shards": { "clientName": "shards", "required": null },
+      "shard_id": { "clientName": "shardId", "required": null },
+      "shard_count": { "clientName": "shardcount", "required": null }
+    }
   }
 }

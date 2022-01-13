@@ -1,19 +1,7 @@
-const Player = require('./Handlers/Player');
-const Utils = require('./Utilities/ClassUtils');
-const VoiceUtils = require('./Utilities/VoiceUtils');
-const {
-  DefaultModesType,
-  DefaultUserDrivenAudioFilters,
-  DefaultModesName,
-} = require('./types/interfaces');
+const Request = require('./Handlers/Request.js')
+const Utils = require('./Utilities/ClassUtils.js')
 
 module.exports = {
-  Player,
+  Request,
   Utils,
-  VoiceUtils,
-  DefaultModesTypes: DefaultModesType,
-  PlayerModesTypes: DefaultModesType,
-  QueueAudioFilters: DefaultUserDrivenAudioFilters,
-  AudioFilters: DefaultUserDrivenAudioFilters,
-  PlayerRepeatModes: DefaultModesName,
-};
+}

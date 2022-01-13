@@ -40,6 +40,7 @@
     "curly": "off",
     "nonblock-statement-body-position": "off",
     "no-else-return": "off",
-    "semi": "off"
+    "semi": "off",
+    "no-console": "off"
   }
 }
