@@ -59,6 +59,7 @@ class BotLists extends EventEmitter {
       apiUrl,
       (request, response) => new Promise((resolve) => {
         try {
+          let bodyJson
           const AuthParsingResults = this.#parseAuthorization(request)
           if (!AuthParsingResults && AuthParsingResults === undefined) {
             return response.status(400).send({
@@ -77,7 +78,7 @@ class BotLists extends EventEmitter {
                   message: 'Malformed Request Received',
                 })
               try {
-                const bodyJson = JSON.parse(actualBody.toString('utf8'))
+                bodyJson = JSON.parse(actualBody.toString('utf8'))
                 this.emit(
                   'vote',
                   AuthParsingResults.name,
@@ -103,11 +104,11 @@ class BotLists extends EventEmitter {
               }
               return false
             })
-          }
+          } else bodyJson = JSON.parse(request.body.toString('utf8'))
           this.emit(
             'vote',
             AuthParsingResults.name,
-            { ...request.body },
+            { ...bodyJson },
             request,
             response,
           )
@@ -118,7 +119,7 @@ class BotLists extends EventEmitter {
             message: 'Webhook has been Received',
           })
 
-          return resolve(request.body)
+          return resolve({ ...bodyJson })
         } catch (error) {
           response.status(500).send({
             ok: false,
