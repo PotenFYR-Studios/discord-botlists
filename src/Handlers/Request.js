@@ -2,6 +2,7 @@ const Axios = require('axios').default
 const Express = require('express')
 const { urlencoded } = require('body-parser')
 const EventEmitter = require('events')
+const RawBody = require('raw-body')
 const botlistCache = require('../resources/botlists.json')
 const Utils = require('../Utilities/ClassUtils.js')
 
@@ -9,15 +10,18 @@ const CacheObjectkeys = Object.keys(botlistCache)
 
 class BotLists extends EventEmitter {
   constructor(
+
     webhookEndpoint = undefined,
     botlistData = undefined,
     listenerPortNumber = 8080,
+    ipAddress = 'localhost',
     redirectUrl = 'https://github.com/SidisLiveYT/discord-botlists',
   ) {
     super()
 
     this.webhookEndpoint = webhookEndpoint
     this.redirectUrl = redirectUrl
+    this.ipAddress = ipAddress
     this.botlistData = botlistData ?? botlistCache
     this.listenerPortNumber =
       Number.isNaN(listenerPortNumber) &&
@@ -38,7 +42,7 @@ class BotLists extends EventEmitter {
     ))
   }
 
-  start(
+  async start(
     webhookEndpoint = undefined,
     redirectUrl = 'https://github.com/SidisLiveYT/discord-botlists',
   ) {
@@ -46,46 +50,87 @@ class BotLists extends EventEmitter {
       webhookEndpoint ?? this.webhookEndpoint ?? 'discord-botlists'
     }`
     console.log(
-      `Webhook-Server is accepting votes Webhooks at - http://localhost:${this.listenerPortNumber}${apiUrl}`,
+      `Webhook-Server is accepting votes Webhooks at - http://${this.ipAddress}:${this.listenerPortNumber}${apiUrl}`,
     )
     this.expressApp.get(apiUrl, (request, response) => {
       response.redirect(redirectUrl ?? this.redirectUrl)
       return undefined
     })
-    this.expressApp.post(apiUrl, (request, response) => {
-      try {
-        const AuthParsingResults = this.#parseAuthorization(request)
-        if (!AuthParsingResults) {
-          return response.status(401).send({
-            ok: false,
-            status: 401,
-            message: 'Invalid authorization',
+    this.expressApp.post(
+      apiUrl,
+      (request, response) => new Promise((resolve) => {
+        try {
+          const AuthParsingResults = this.#parseAuthorization(request)
+          if (!AuthParsingResults && AuthParsingResults === undefined) {
+            return response.status(400).send({
+              ok: false,
+              status: 400,
+              message: 'Invalid/Un-Authorized Authorization token',
+            })
+          }
+
+          if (!(request.body && request.body !== {})) {
+            RawBody(request, (error, actualBody) => {
+              if (error)
+                return response.status(422).send({
+                  ok: false,
+                  status: 422,
+                  message: 'Malformed Request Received',
+                })
+              try {
+                const bodyJson = JSON.parse(actualBody.toString('utf8'))
+                this.emit(
+                  'vote',
+                  AuthParsingResults.name,
+                  { ...bodyJson },
+                  request,
+                  response,
+                )
+
+                response.status(200).send({
+                  ok: true,
+                  status: 200,
+                  message: 'Webhook has been Received',
+                })
+
+                return resolve({ ...bodyJson })
+              } catch (err) {
+                response.status(400).send({
+                  ok: false,
+                  status: 400,
+                  message: 'Invalid Body Received',
+                })
+                resolve(false)
+              }
+              return false
+            })
+          }
+          this.emit(
+            'vote',
+            AuthParsingResults.name,
+            { ...request.body },
+            request,
+            response,
+          )
+
+          response.status(200).send({
+            ok: true,
+            status: 200,
+            message: 'Webhook has been Received',
           })
+
+          return resolve(request.body)
+        } catch (error) {
+          response.status(500).send({
+            ok: false,
+            status: 500,
+            message: 'Internal error',
+          })
+          resolve(false)
         }
-
-        this.emit(
-          'vote',
-          AuthParsingResults.siteName,
-          request.body,
-          request,
-          response,
-        )
-
-        response.status(200).send({
-          ok: true,
-          status: 200,
-          message: 'Webhook has been Received',
-        })
-
-        return this.expressApp
-      } catch (error) {
-        return response.status(500).send({
-          ok: false,
-          status: 500,
-          message: 'Internal error',
-        })
-      }
-    })
+        return false
+      }),
+    )
     return this.expressApp
   }
 
@@ -143,7 +188,6 @@ class BotLists extends EventEmitter {
   }
 
   #parseAuthorization(request) {
-    const authSecret = request.get('Authorization')
     let count = 0
     while (count < CacheObjectkeys.length) {
       if (
@@ -157,7 +201,7 @@ class BotLists extends EventEmitter {
             request.get(
               `${botlistCache[CacheObjectkeys[count]].tokenHeadername}`,
             )) ??
-          authSecret) ===
+          request.get('Authorization')) ===
           this.botlistData[CacheObjectkeys[count]].authorizationToken
       )
         return botlistCache[CacheObjectkeys[count]]

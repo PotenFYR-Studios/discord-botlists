@@ -6,6 +6,7 @@ export class BotLists extends EventEmitter {
     webhookEndpoint: string,
     botlistData: Object,
     listenerPortNumber?: number | void | 8080,
+    ipAddress?: string | number | 'localhost',
     redirectUrl?:
       | string
       | void
@@ -14,6 +15,7 @@ export class BotLists extends EventEmitter {
   public readonly webhookEndpoint: string
   public readonly botlistData: Object
   public readonly redirectUrl: string
+  public readonly ipAddress: string | number | 'localhost'
   public readonly expressApp: any
   public readonly listenerPortNumber: number
   public start(
@@ -22,7 +24,7 @@ export class BotLists extends EventEmitter {
       | string
       | void
       | 'https://github.com/SidisLiveYT/discord-botlists',
-  ): any
+  ): Promise<any>
   public poststats(
     botId: string | number,
     apiBody: {
