@@ -4,17 +4,22 @@ export type Awaitable<T> = T | PromiseLike<T>
 
 export interface WebhooksEvents {
   error: [
-    message: string
+    message: string,
+    extraData: any,
+    timestamp: Date,
+  ],
+  request: [
+    request: string,
+    response: string,
+    timestamp: Date
   ],
   vote: [
     websiteName: string,
     requestBody: Object | void,
-    request: any | void,
-    response: any | void
+    timestamp: Date
   ],
   posted: [
-    websiteName: string,
-    websiteUrl: string,
-    response: AxiosResponse
+    postResponse: AxiosResponse,
+    timestamp: Date
   ]
 }

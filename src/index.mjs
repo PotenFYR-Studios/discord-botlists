@@ -1,5 +1,5 @@
-import Handlers from './index'
+import Requests from './index'
 
-export default Handlers
-export const BotLists = Handlers.BotLists
-export const Utils = Handlers.Utils
+export default Requests
+export const BotLists = Requests.BotLists
+export const botlistJson = Requests.botlistJson

@@ -1,7 +1,7 @@
 const BotLists = require('./Handlers/Request.js')
-const Utils = require('./Utilities/ClassUtils.js')
+const botlistJson = require('./resources/botlists.json')
 
 module.exports = {
   BotLists,
-  Utils,
+  botlistJson,
 }
