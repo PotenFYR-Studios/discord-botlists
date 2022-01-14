@@ -12,7 +12,7 @@
 </p>
 </div>
 
-Multi-Discord-Botlist Management Package with 10+ Botlist Supported with Events and Stats Update Methods and More to Add if you want
+Multi-Discord-Botlist Management Package with 40+ Botlist Supported with Events and Stats Update Methods and More to Add if you want
 
 ## Installation
 
@@ -109,3 +109,10 @@ Botlist.on("posted", (postResponse, timestamp) => {
   // ... call back function work here ...
 });
 ```
+
+## Links
+
+- [Source Code](https://github.com/SidisLiveYT/discord-botlists.git)
+- [GitHub Repo Link](https://github.com/SidisLiveYT/discord-botlists)
+- [NPM Package](https://www.npmjs.com/package/discord-botlists)
+- [Yarn Package](https://yarn.pm/discord-botlists)

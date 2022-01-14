@@ -1,7 +1,7 @@
 {
   "name": "discord-botlists",
   "version": "0.0.1",
-  "description": "Multi-Discord-Botlist Management Package with 10+ Botlist Supported with Events and Stats Update Methods",
+  "description": "Multi-Discord-Botlist Management Package with 40+ Botlist Supported with Events and Stats Update Methods",
   "main": "./src/index.js",
   "module": "./src/index.mjs",
   "types": "./typings/index.d.ts",
@@ -68,6 +68,12 @@
   "homepage": "https://github.com/SidisLiveYT/discord-botlists",
   "keywords": [
     "discord-botlists",
+    "top.gg",
+    "axios",
+    "discord-botlist",
+    "discord",
+    "discord-bots",
+    "discord.react",
     "multi-discord-botlists",
     "top.gg votes",
     "topgg poster",
