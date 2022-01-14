@@ -1,6 +1,6 @@
 {
   "name": "discord-botlists",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Multi-Discord-Botlist Management Package with 40+ Botlist Supported with Events and Stats Update Methods",
   "main": "./src/index.js",
   "module": "./src/index.mjs",
