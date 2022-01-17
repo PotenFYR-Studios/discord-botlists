@@ -35,8 +35,8 @@ $ npm install --save discord-botlists
 // Discord Bot Lists Data from the Client Side to the Official package
 
 /**
- * "authorizationToken" -> Example Value -> "EyTYRbGciOiJIUasdIFAnR5cCI6IasApXVCJ9.eyJsaLPOsadadw423zMTQzMTM5NTc0NTk4HJKSIsImJvdCI6dad.opopqwe89SDHJa08s9aJ=" -> Very Secret Botlist TOken and Bot Specific and unique and need to hide for security
- * "authorizationToken" -> Example Value -> "Discord_Bot_1234OP" -> Self Made jsut to check for vote Webhooks
+ * "authorizationToken" -> Example Value -> "EyTYRbGciOiJIUasdIFAnR5cCI6IasApXVCJ9.eyJsaLPOsadadw423zMTQzMTM5NTc0NTk4HJKSIsImJvdCI6dad" -> Very Secret Botlist TOken and Bot Specific and unique and need to hide for security
+ * "authorizationValue" -> Example Value -> "Discord_Bot_1234OP" -> Self Made jsut to check for vote Webhooks
  **/
 
 var discordBotlistData = {
