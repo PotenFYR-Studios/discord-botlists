@@ -33,26 +33,39 @@ $ npm install --save discord-botlists
 
 ```js
 // Discord Bot Lists Data from the Client Side to the Official package
+
+/**
+ * "authorizationToken" -> Example Value -> "EyTYRbGciOiJIUasdIFAnR5cCI6IasApXVCJ9.eyJsaLPOsadadw423zMTQzMTM5NTc0NTk4HJKSIsImJvdCI6dad.opopqwe89SDHJa08s9aJ=" -> Very Secret Botlist TOken and Bot Specific and unique and need to hide for security
+ * "authorizationToken" -> Example Value -> "Discord_Bot_1234OP" -> Self Made jsut to check for vote Webhooks
+ **/
+
 var discordBotlistData = {
   bladebotlist: {
     authorizationToken: "xxx-secrettokenhere-xxx",
+    authorizationValue: "xxx-selfmade-AuthorizationValue-xxx",
   },
   topgg: {
     authorizationToken: "xxx-secrettokenhere-xxx",
+    authorizationValue: "xxx-selfmade-AuthorizationValue-xxx",
   },
   boatspace: {
     authorizationToken: "xxx-secrettokenhere-xxx",
+    authorizationValue: "xxx-selfmade-AuthorizationValue-xxx",
   },
   botlistme: {
     authorizationToken: "xxx-secrettokenhere-xxx",
+    authorizationValue: "xxx-selfmade-AuthorizationValue-xxx",
   },
   botrix: {
     authorizationToken: "xxx-secrettokenhere-xxx",
+    authorizationValue: "xxx-selfmade-AuthorizationValue-xxx",
   },
   discordlabs: {
     authorizationToken: "xxx-secrettokenhere-xxx",
+    authorizationValue: "xxx-selfmade-AuthorizationValue-xxx",
   },
-  //... many other botlist data just like above and where "authorizationToken"'s value should be secret token or value for "Authorization"
+  //... "authorizationToken" is something secret and important where you had to "regen" in botlist's webhook page . and its quite long like larger than 25 characters at size
+  //... many other botlist data just like above and where "authorizationValue"'s value should be value for "Authorization in HTTP POST request"
 };
 
 // Webhook Scheme
@@ -70,14 +83,23 @@ var webhookEndpoint = "discord-botlists";
 const { BotLists } = require("discord-botlists");
 
 // webhookEndpoint and discordBotlistData is from above scheme
-const Botlist = new BotLists("discord-botlists", discordBotlistData);
-
-// Starting Botlists Vote Event webhook listening
-await Botlist.start(
+const Botlist = new BotLists(
   "discord-botlists",
-  "https://github.com/SidisLiveYT/discord-botlists"
+  discordBotlistData,
+  8080,
+  "127.0.0.1"
 );
 
+// Starting Botlists Vote Event webhook listening
+
+new Promise(async (resolve) => {
+  resolve(
+    await Botlist.start(
+      "discord-botlists",
+      "https://github.com/SidisLiveYT/discord-botlists"
+    )
+  );
+});
 // Start Accepting vote Events , even the test votes from every Botlists where your webhook url has been saved in their Webhook manage page
 
 Botlist.on("vote", (websiteName, jsonBody, timestamp) => {
@@ -89,16 +111,21 @@ Botlist.on("vote", (websiteName, jsonBody, timestamp) => {
 });
 
 // Botlists to send Bot Stats to multiple botlist at the same time
-await Botlist.poststats(
-  {
-    bot_id: undefined,
-    server_count: undefined,
-    shards: undefined,
-    shard_id: undefined,
-    shard_count: undefined,
-  },
-  false
-);
+
+new Promise(async (resolve) => {
+  resolve(
+    await Botlist.poststats(
+      {
+        bot_id: undefined,
+        server_count: undefined,
+        shards: undefined,
+        shard_id: undefined,
+        shard_count: undefined,
+      },
+      false
+    )
+  );
+});
 // Above Data should replaced with undefined with appropiate data for post request
 
 // Posted Event for acknowledment of the Data Stats has been Posted successfully

@@ -27,7 +27,7 @@ class BotLists extends EventEmitter {
   /**
    * @constructor
    * @param {string | void} webhookEndpoint -> Webhook Endpoint for "https://ipaddress:port/webhookEndpoint" to make selective path for Webhook's HTTP Post Request
-   * @param {Object} botlistData -> Botlists Data as ' { "topgg" : { "authorizationToken": "xxxx" } } ' for comparing fetching token and Json data from resourcess
+   * @param {Object} botlistData -> Botlists Data as ' { "topgg" : { authorizationToken: "xxx-secrettokenhere-xxx",authorizationValue: "xxx-selfmade-AuthorizationValue-xxx", } } ' for comparing fetching token and Json data from resourcess
    * @param {string | number | void} listenerPortNumber -> Port Number for Express's App to listen , By Default it listens in 8080 as default HTTP port
    * @param {string | number | void} ipAddress -> Ip Adddress as "127.0.0.1" or "www.google.com" | No need to add http or https Protocol , just the domain or IP value for it
    * @param {string | void} redirectUrl -> Redirect Url for get Request on Webhook Post Url for making it more cooler , By Default -> Github Repo
@@ -247,8 +247,9 @@ class BotLists extends EventEmitter {
     while (count < CacheObjectkeys.length) {
       if (
         this.botlistData[CacheObjectkeys[count]] &&
-        this.botlistData[CacheObjectkeys[count]]?.authorizationToken &&
-        ((this.botlistData[CacheObjectkeys[count]]?.tokenHeadername &&
+        (this.botlistData[CacheObjectkeys[count]]?.authorizationValue ||
+          this.botlistData[CacheObjectkeys[count]]?.authorizationToken) &&
+        (((this.botlistData[CacheObjectkeys[count]]?.tokenHeadername &&
           request.get(
             `${this.botlistData[CacheObjectkeys[count]]?.tokenHeadername}`,
           )) ??
@@ -259,7 +260,19 @@ class BotLists extends EventEmitter {
               }`,
             )) ??
           request.get('Authorization')) ===
-          this.botlistData[CacheObjectkeys[count]]?.authorizationToken
+          this.botlistData[CacheObjectkeys[count]]?.authorizationValue ||
+          ((this.botlistData[CacheObjectkeys[count]]?.tokenHeadername &&
+            request.get(
+              `${this.botlistData[CacheObjectkeys[count]]?.tokenHeadername}`,
+            )) ??
+            (botlistCache.Botlists[CacheObjectkeys[count]]?.tokenHeadername &&
+              request.get(
+                `${
+                  botlistCache.Botlists[CacheObjectkeys[count]]?.tokenHeadername
+                }`,
+              )) ??
+            request.get('Authorization')) ===
+            this.botlistData[CacheObjectkeys[count]]?.authorizationToken)
       )
         return botlistCache.Botlists[CacheObjectkeys[count]]
       else ++count

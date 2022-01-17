@@ -1,6 +1,6 @@
 {
   "name": "discord-botlists",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Multi-Discord-Botlist Management Package with 40+ Botlist Supported with Events and Stats Update Methods",
   "main": "./src/index.js",
   "module": "./src/index.mjs",
@@ -29,7 +29,7 @@
     "@babel/eslint-parser": "^7.16.5",
     "@babel/preset-env": "^7.16.8",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^8.6.0",
+    "eslint": "^8.7.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.4",
     "jsdoc": "^3.6.7",
@@ -68,6 +68,10 @@
   "homepage": "https://github.com/SidisLiveYT/discord-botlists",
   "keywords": [
     "discord-botlists",
+    "discord botlists",
+    "discord botlist",
+    "botlists",
+    "botlist",
     "top.gg",
     "axios",
     "discord-botlist",
