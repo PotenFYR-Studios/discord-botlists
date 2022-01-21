@@ -35,7 +35,7 @@ $ npm install --save discord-botlists
 // Discord Bot Lists Data from the Client Side to the Official package
 
 /**
- * "authorizationToken" -> Example Value -> "EyTYRbGciOiJIUasdIFAnR5cCI6IasApXVCJ9.eyJsaLPOsadadw423zMTQzMTM5NTc0NTk4HJKSIsImJvdCI6dad" -> Very Secret Botlist TOken and Bot Specific and unique and need to hide for security
+ * "authorizationToken" -> Example Value -> "EyTYRbGciOiJIUasdIFAnR5cCI6IasApXVCJ9.eyJsaLPOsadadw423zMTQzMTM5NTc0NTk4HJKSIsImJvdCI6dad" -> Very Secret Botlist Token and Bot Specific and unique and need to hide for security
  * "authorizationValue" -> Example Value -> "Discord_Bot_1234OP" -> Self Made jsut to check for vote Webhooks
  **/
 
@@ -127,6 +127,20 @@ new Promise(async (resolve) => {
   );
 });
 // Above Data should replaced with undefined with appropiate data for post request
+
+// OR Post using AutoPoster on every 82 Seconds
+
+var Interval_Id = Botlist.autoPoster(
+  {
+    bot_id: undefined,
+    server_count: undefined,
+    shards: undefined,
+    shard_id: undefined,
+    shard_count: undefined,
+  },
+  82 * 1000,
+  false
+);
 
 // Posted Event for acknowledment of the Data Stats has been Posted successfully
 Botlist.on("posted", (postResponse, timestamp) => {

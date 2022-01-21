@@ -27,13 +27,28 @@ export class BotLists extends EventEmitter {
       | void
       | 'https://github.com/SidisLiveYT/discord-botlists',
   ): Promise<any>
-  public poststats(apiBody: {
-    bot_id: string | number
-    server_count: number | string
-    shards: Array<string> | void
-    shard_id: number | string | void
-    shard_count: number | string | void
-  }): Promise<AxiosPromise<any>>
+  public poststats(
+    apiBody: {
+      bot_id: string | number
+      server_count: number | string
+      shards: Array<string> | void
+      shard_id: number | string | void
+      shard_count: number | string | void
+    },
+    eventOnPost?: boolean | void,
+    forcePosting?: boolean | void,
+  ): Promise<boolean>
+  public autoPoster(
+    apiBody: {
+      bot_id: string | number
+      server_count: number | string
+      shards: Array<string> | void
+      shard_id: number | string | void
+      shard_count: number | string | void
+    },
+    Timer?: number | void | '82 * 1000',
+    eventOnPost?: boolean | void,
+  ): NodeJS.Timer
 
   public on<K extends keyof WebhooksEvents>(
     event: K,

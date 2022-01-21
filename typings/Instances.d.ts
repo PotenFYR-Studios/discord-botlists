@@ -1,5 +1,3 @@
-import { AxiosResponse } from "axios"
-
 export type Awaitable<T> = T | PromiseLike<T>
 
 export interface WebhooksEvents {
@@ -9,8 +7,9 @@ export interface WebhooksEvents {
     timestamp: Date,
   ],
   request: [
-    request: string,
-    response: string,
+    Usage:  string,
+    request: JSON,
+    response: JSON,
     timestamp: Date
   ],
   vote: [
@@ -19,7 +18,7 @@ export interface WebhooksEvents {
     timestamp: Date
   ],
   posted: [
-    postResponse: AxiosResponse,
+    postResponse: { status_code: number , message: string },
     timestamp: Date
   ]
 }
