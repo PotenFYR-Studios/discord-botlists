@@ -36,6 +36,7 @@ export class BotLists extends EventEmitter {
       shard_count: number | string | void
     },
     eventOnPost?: boolean | void,
+    AxioshttpConfigs?: Object,
     forcePosting?: boolean | void,
   ): Promise<boolean>
   public autoPoster(
@@ -46,6 +47,7 @@ export class BotLists extends EventEmitter {
       shard_id: number | string | void
       shard_count: number | string | void
     },
+    AxioshttpConfigs?: Object,
     Timer?: number | void | '82 * 1000',
     eventOnPost?: boolean | void,
   ): NodeJS.Timer

@@ -76,16 +76,12 @@ class ClassUtils {
         !Array.isArray(requestOptions)
       )
     )
-      return {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      return undefined
+    if (requestOptions !== {}) return undefined
+    else {
+      requestOptions = {
+        ...requestOptions,
       }
-    requestOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      ...requestOptions,
     }
     if (requestOptions?.cookie || requestOptions?.cookies) {
       requestOptions.headers.cookie ??=
@@ -93,7 +89,6 @@ class ClassUtils {
       requestOptions?.cookies ? delete requestOptions?.cookies : undefined
       requestOptions?.cookie ? delete requestOptions?.cookie : undefined
     }
-
     if (requestOptions?.proxy && typeof requestOptions.proxy === 'string') {
       const rawProxyData = new URL(requestOptions?.proxy)
       if (!rawProxyData?.host || !rawProxyData?.port)
@@ -104,7 +99,7 @@ class ClassUtils {
         host: rawProxyData?.host,
         port: parseInt(rawProxyData?.port),
       }
-      return requestOptions
+      return requestOptions !== {} ? requestOptions : undefined
     } else if (
       requestOptions?.proxy?.host &&
       typeof requestOptions?.proxy?.host === 'string' &&
@@ -115,8 +110,17 @@ class ClassUtils {
         host: requestOptions?.proxy?.host,
         port: parseInt(requestOptions?.proxy?.port),
       }
-      return requestOptions
-    } else return requestOptions
+      return requestOptions !== {} ? requestOptions : undefined
+    } else return requestOptions !== {} ? requestOptions : undefined
+  }
+
+  /**
+   * @param {number} milliSeconds Milli-Seconds for wait in Javascript
+   * @returns {Promise<void>} Return undefined
+   */
+  static async sleep(milliSeconds) {
+    if (milliSeconds && milliSeconds <= 0) return undefined
+    return new Promise((resolve) => setTimeout(resolve, milliSeconds))
   }
 }
 module.exports = ClassUtils

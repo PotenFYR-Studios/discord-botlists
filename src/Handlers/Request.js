@@ -60,12 +60,6 @@ class BotLists extends EventEmitter {
         extended: true,
       }),
     )
-    /**
-     * Express App listening on a Particular Port for Ignoring other Invalid Requests | For example containers of Pterodactyl Server
-     */
-    this.expressApp.listen(Number(this.listenerPortNumber), () => console.log(
-      `"discord-botlists" expressApp is Listening at Port: ${this.listenerPortNumber}`,
-    ))
   }
 
   /**
@@ -79,6 +73,12 @@ class BotLists extends EventEmitter {
     webhookEndpoint = undefined,
     redirectUrl = 'https://github.com/SidisLiveYT/discord-botlists',
   ) {
+    /**
+     * Express App listening on a Particular Port for Ignoring other Invalid Requests | For example containers of Pterodactyl Server
+     */
+    this.expressApp.listen(Number(this.listenerPortNumber), () => console.log(
+      `"discord-botlists" expressApp is Listening at Port: ${this.listenerPortNumber}`,
+    ))
     /**
      * @var {apiUrl} -> Apiurl for WebhookEndPoint as for this.expressApp.post() request
      */
@@ -205,6 +205,7 @@ class BotLists extends EventEmitter {
    * @method post() -> Posting Stats of the Current Bot to Multiple Botlists mentioned by
    * @param {postApiBody} apiBody Api-Body for Posting Data as per params for API requirements and strictly for if required
    * @param {boolean | void} eventOnPost What if event to be triggered on Post or should be closed
+   * @param {Object | void} AxioshttpConfigs To Add Proxies to avoid Ratelimit
    * @param {boolean | void} forcePosting Force Posting and ignoring in-built Ratelimit function | Users can face un-expected ratelimit from API
    * @returns {Promise<Boolean>} Booelan Response on success or failure
    */
@@ -212,6 +213,7 @@ class BotLists extends EventEmitter {
   async poststats(
     apiBody = postApiBody,
     eventOnPost = true,
+    AxioshttpConfigs = undefined,
     forcePosting = false,
   ) {
     if (
@@ -232,21 +234,40 @@ class BotLists extends EventEmitter {
     else if (
       !forcePosting &&
       this.#postedStatsTimer &&
-      this.#postedStatsTimer - new Date() <= 82000
+      Math.abs(new Date().getTime() - this.#postedStatsTimer) >= 30 * 1000
+    ) {
+      await Utils.sleep(
+        Math.abs(new Date().getTime() - this.#postedStatsTimer) + 5 * 1000,
+      )
+    } else if (
+      !forcePosting &&
+      this.#postedStatsTimer &&
+      Math.abs(new Date().getTime() - this.#postedStatsTimer) < 82 * 1000
     ) {
       return void this.emit(
         'error',
         `Failure: There is a Cooldown on Bot Stats Post Method | Retry After -> "${
-          (this.#postedStatsTimer - new Date()) / 1000
+          Math.abs(new Date().getTime() - this.#postedStatsTimer) / 1000
         } Seconds"`,
         apiBody,
         new Date(),
       )
     }
+
     apiBody = { ...postApiBody, ...apiBody }
     apiBody.server_count = parseInt(apiBody?.server_count ?? 0)
-    apiBody.shard_count = apiBody?.shard_count ?? undefined
-    apiBody.shard_id = apiBody?.shard_id ?? undefined
+    apiBody.shard_count =
+      apiBody?.shard_count &&
+      typeof apiBody?.shard_count === 'number' &&
+      parseInt(apiBody?.shard_count) > 0
+        ? parseInt(apiBody?.shard_count)
+        : undefined
+    apiBody.shard_id =
+      apiBody?.shard_id &&
+      typeof apiBody?.shard_id === 'string' &&
+      apiBody?.shard_id?.length > 0
+        ? apiBody?.shard_id
+        : undefined
     apiBody.shards =
       apiBody?.shards &&
       Array.isArray(apiBody?.shards) &&
@@ -254,12 +275,8 @@ class BotLists extends EventEmitter {
         ? apiBody?.shards
         : undefined
     const Cached = await this.#poststats(
-      Utils.PostBodyParse(apiBody, botlistCache?.Botlists, this.botlistData),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
+      Utils.PostBodyParse(apiBody, this.botlistData),
+      AxioshttpConfigs ?? undefined,
     )
     if (!Cached) return false
     else if (eventOnPost) this.emit('posted', Cached, new Date())
@@ -269,12 +286,18 @@ class BotLists extends EventEmitter {
   /**
    * @method autoPoster() -> Auto-osting Stats of the Current Bot to Multiple Botlists mentioned
    * @param {postApiBody} apiBody Api-Body for Posting Data as per params for API requirements and strictly for if required
+   * @param {Object | void} AxioshttpConfigs To Add Proxies to avoid Ratelimit
    * @param {number | void} Timer Time in Milli-Seconds to Post at every Interval Gap
    * @param {boolean | void} eventOnPost What if event to be triggered on Post or should be closed
    * @returns {NodeJS.Timer} Node Timer Id to Cancel for further purposes
    */
 
-  autoPoster(apiBody = postApiBody, Timer = 82 * 1000, eventOnPost = true) {
+  autoPoster(
+    apiBody = postApiBody,
+    AxioshttpConfigs = undefined,
+    Timer = 2 * 60 * 1000,
+    eventOnPost = true,
+  ) {
     if (
       !(
         apiBody?.bot_id &&
@@ -294,19 +317,24 @@ class BotLists extends EventEmitter {
       !(
         Timer &&
         !Number.isNaN(Timer) &&
-        parseInt(Timer) > 82000 &&
-        parseInt(Timer) < 24 * 60 * 60 * 1000
+        parseInt(Timer) >= 2 * 60 * 1000 &&
+        parseInt(Timer) <= 24 * 60 * 60 * 1000
       )
     ) {
       return void this.emit(
         'error',
-        'Failure: Invalid Timer Value is Detected | Timer should be less than a Day and greater than 82000 milliseconds and Value should be in Milli-Seconds or leave undefined for defualt Timer Value',
+        'Failure: Invalid Timer Value is Detected | Timer should be less than a Day and greater than 90000 milliseconds and Value should be in Milli-Seconds or leave undefined for defualt Timer Value',
         apiBody,
         new Date(),
       )
     }
     return setInterval(async () => {
-      await this.poststats(apiBody, eventOnPost ?? false)
+      await this.poststats(
+        apiBody,
+        eventOnPost ?? false,
+        AxioshttpConfigs,
+        undefined,
+      )
     }, Timer)
   }
 
@@ -316,21 +344,61 @@ class BotLists extends EventEmitter {
    * @param {Object} AxioshttpConfigs Axios HTTP Post Request Config
    * @returns {Object | void} Returns success and failure data formated or undefined on failure
    */
-  async #poststats(postData, AxioshttpConfigs) {
+  async #poststats(postData, AxioshttpConfigs = undefined) {
     if (!postData) return undefined
     const AxiosResponse = await Axios.post(
       botlistCache?.apiPostUrl,
       postData,
-      Utils.parseHTTPRequestOption(AxioshttpConfigs),
-    )
+      AxioshttpConfigs
+        ? Utils.parseHTTPRequestOption(AxioshttpConfigs)
+        : undefined,
+    ).catch((error) => {
+      this.emit(
+        'request',
+        'Post-Bot-Stats',
+        undefined,
+        error?.message,
+        new Date(),
+      )
+      if (error.response?.status > 200 && error.response?.status < 429) {
+        this.emit(
+          'error',
+          `Received Response Status Error | Status Code -> ${
+            error?.response?.status
+          } Message from API Server : ${error?.message ?? '<Hidden Message>'}`,
+          error?.response?.data ?? error?.message,
+          new Date(),
+        )
+        this.#postedStatsTimer = new Date().getTime()
+      } else if (error?.response?.status === 429) {
+        this.emit(
+          'error',
+          `Received Response Status Error | Status Code -> 429 | Message from API Server : "Ratelimited IP [${
+            error?.response?.data?.ratelimit_ip ?? '127.0.0.1'
+          }] and Retry Post Stats After -> ${
+            parseInt(error?.response?.data?.retry_after) ?? 80
+          } Seconds"`,
+          error?.response?.data ?? error?.message,
+          new Date(),
+        )
+        this.#postedStatsTimer = error?.response?.data?.retry_after
+          ? new Date().getTime() +
+            parseInt(error?.response?.data?.retry_after ?? 0) * 1000
+          : this.#postedStatsTimer
+      }
+      return undefined
+    })
     this.emit('request', 'Post-Bot-Stats', undefined, AxiosResponse, new Date())
-    if (AxiosResponse?.status > 200 && AxiosResponse?.status < 429) {
+    if (!AxiosResponse) return undefined
+    else if (AxiosResponse?.status > 200 && AxiosResponse?.status < 429) {
       this.emit(
         'error',
         `Received Response Status Error | Status Code -> ${
           AxiosResponse?.status
         } Message from API Server : ${
-          AxiosResponse?.data?.message ?? '<Hidden Message>'}`,
+          AxiosResponse?.data?.message ?? '<Hidden Message>'
+        }`,
+        AxiosResponse?.data,
         new Date(),
       )
       this.#postedStatsTimer = new Date().getTime()
@@ -342,6 +410,7 @@ class BotLists extends EventEmitter {
         }] and Retry Post Stats After -> ${
           parseInt(AxiosResponse?.data?.retry_after) ?? 80
         } Seconds"`,
+        AxiosResponse?.data,
         new Date(),
       )
       this.#postedStatsTimer = AxiosResponse?.data?.retry_after
@@ -355,7 +424,6 @@ class BotLists extends EventEmitter {
     ) {
       this.#postedStatsTimer = new Date().getTime()
       return Utils.PostResponseParse(
-        botlistCache.Botlists,
         AxiosResponse?.data?.success ?? [],
         AxiosResponse?.data?.failure ?? [],
       )

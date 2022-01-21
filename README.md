@@ -138,7 +138,7 @@ var Interval_Id = Botlist.autoPoster(
     shard_id: undefined,
     shard_count: undefined,
   },
-  82 * 1000,
+  10 * 60 * 1000,
   false
 );
 
@@ -146,7 +146,6 @@ var Interval_Id = Botlist.autoPoster(
 Botlist.on("posted", (postResponse, timestamp) => {
   console.log("HTTP-Post Response : " + postResponse);
   console.log("Date/Time : " + timestamp);
-
   // ... call back function work here ...
 });
 ```
