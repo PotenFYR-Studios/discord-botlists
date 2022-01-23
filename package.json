@@ -1,6 +1,6 @@
 {
   "name": "discord-botlists",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Multi-Discord-Botlist Management Package with 40+ Botlist Supported with Events and Stats Update Methods",
   "main": "./src/index.js",
   "module": "./src/index.mjs",
@@ -68,7 +68,7 @@
   "bugs": {
     "url": "https://github.com/SidisLiveYT/discord-botlists/issues"
   },
-  "homepage": "https://github.com/SidisLiveYT/discord-botlists",
+  "homepage": "discord-botlists.js.org",
   "keywords": [
     "discord-botlists",
     "discord botlists",

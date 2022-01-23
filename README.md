@@ -21,6 +21,7 @@ Multi-Discord-Botlist Management Package with 40+ Botlist Supported with Events 
 ```sh
 $ npm install --save discord-botlists
 ```
+## [Documentation]("discord-botlists.js.org")
 
 # Features
 
@@ -75,7 +76,7 @@ var webhookEndpoint = "discord-botlists";
 
 ## Point to be Noted :
 
-**Above Object Keys Example from : [Bot-List Json File](https://github.com/SidisLiveYT/discord-botlists/blob/main/src/resources/botlists.json)**
+**discordBotlistData Example from : [discordBotlistData Structured Data](https://github.com/SidisLiveYT/discord-botlists/blob/main/src/resources/global.md) | Where Object-Inner Values get changed with "authorizationToken" and "authorizationValue" Values | Only the name of the main key of the botlist is request like First one was "bladebotlist"**
 
 ## Example Code :
 
