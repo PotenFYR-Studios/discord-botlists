@@ -7,7 +7,7 @@
     "include": [
       "package.json",
       "README.md",
-      "src"
+      "src/Handlers"
     ],
     "includePattern": ".js$",
     "excludePattern": "(node_modules/|docs|tests/)"

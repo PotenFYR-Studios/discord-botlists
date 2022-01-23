@@ -8,7 +8,7 @@ const CacheObjectkeys = Object.keys(botlistCache.Botlists)
  */
 class ClassUtils {
   /**
-   * @method PostBodyParse() -> Class Utils General Private Method
+   * PostBodyParse() -> Class Utils General Private Method
    * @param {Object} defaultApiBodyParams Default API body Params for API Request
    * @param {Object} clientSideBotlistData Botlist Data to be Parsed inf avour of acceptable order
    * @returns {Object} Basic API acceptable ordered Value
@@ -27,7 +27,7 @@ class ClassUtils {
   }
 
   /**
-   * @method PostResponseParse() -> parsing Post Request Reponse of Axios into Structured
+   * PostResponseParse() -> parsing Post Request Reponse of Axios into Structured
    * @param {JSON} SuccessArray Success Botlist Posting Data in Array for several Botlists
    * @param {JSON} FailureArray Failure Botlist Posting Data in Array for several Botlists
    * @returns {Object} Returns Object of Actual Ordered with parsed Data

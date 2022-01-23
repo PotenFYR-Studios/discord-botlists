@@ -63,31 +63,37 @@ class BotLists extends EventEmitter {
   }
 
   /**
-   * @method start() -> Starting Webhook for Vote Event Trigger
+   * start() -> Starting Webhook for Vote Event Trigger
    * @param {string | void} webhookEndpoint Webhook Endpoint for "https://ipaddress:port/webhookEndpoint" to make selective path for Webhook's HTTP Post Request
    * @param {string | void} redirectUrl -> Redirect Url for get Request on Webhook Post Url for making it more cooler , By Default -> Github Repo
+   * @param {boolean | void} eventTrigger ->  Event Trigger for console.log() function | By Default = false
    * @returns {any} Depends on Incomplete Body or Request , it can return false or complete request.body in Json Format
    */
 
   async start(
     webhookEndpoint = undefined,
     redirectUrl = 'https://github.com/SidisLiveYT/discord-botlists',
+    eventTrigger = false,
   ) {
     /**
      * Express App listening on a Particular Port for Ignoring other Invalid Requests | For example containers of Pterodactyl Server
      */
-    this.expressApp.listen(Number(this.listenerPortNumber), () => console.log(
-      `"discord-botlists" expressApp is Listening at Port: ${this.listenerPortNumber}`,
-    ))
+    this.expressApp.listen(Number(this.listenerPortNumber), () => (!eventTrigger
+      ? console.log(
+        `🎬 "discord-botlists" expressApp is Listening at Port: ${this.listenerPortNumber}`,
+      )
+      : undefined))
     /**
      * @var {apiUrl} -> Apiurl for WebhookEndPoint as for this.expressApp.post() request
      */
     const apiUrl = `/${
       webhookEndpoint ?? this.webhookEndpoint ?? 'discord-botlists'
     }`
-    console.log(
-      `Webhook-Server is accepting votes Webhooks at - http://${this.ipAddress}:${this.listenerPortNumber}${apiUrl}`,
-    )
+    !eventTrigger
+      ? console.log(
+        `🎬 Webhook-Server is accepting votes Webhooks at - http://${this.ipAddress}:${this.listenerPortNumber}${apiUrl}`,
+      )
+      : undefined
 
     /**
      * Redirect Any Request to redirectUrl for skipping Error Message
@@ -202,7 +208,7 @@ class BotLists extends EventEmitter {
   }
 
   /**
-   * @method post() -> Posting Stats of the Current Bot to Multiple Botlists mentioned by
+   * post() -> Posting Stats of the Current Bot to Multiple Botlists mentioned by
    * @param {postApiBody} apiBody Api-Body for Posting Data as per params for API requirements and strictly for if required
    * @param {boolean | void} eventOnPost What if event to be triggered on Post or should be closed
    * @param {Object | void} AxioshttpConfigs To Add Proxies to avoid Ratelimit
@@ -284,7 +290,7 @@ class BotLists extends EventEmitter {
   }
 
   /**
-   * @method autoPoster() -> Auto-osting Stats of the Current Bot to Multiple Botlists mentioned
+   * autoPoster() -> Auto-osting Stats of the Current Bot to Multiple Botlists mentioned
    * @param {postApiBody} apiBody Api-Body for Posting Data as per params for API requirements and strictly for if required
    * @param {Object | void} AxioshttpConfigs To Add Proxies to avoid Ratelimit
    * @param {number | void} Timer Time in Milli-Seconds to Post at every Interval Gap

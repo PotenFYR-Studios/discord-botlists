@@ -26,6 +26,7 @@ export class BotLists extends EventEmitter {
       | string
       | void
       | 'https://github.com/SidisLiveYT/discord-botlists',
+    eventTrigger?: boolean,
   ): Promise<any>
   public poststats(
     apiBody: {
