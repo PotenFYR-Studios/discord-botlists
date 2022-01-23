@@ -1,3 +1,4 @@
+```json
 {
   "bladebotlist": {
     "name": "Blade Botlist",
@@ -252,3 +253,4 @@
     "tokenHeadername": "Authorization"
   }
 }
+```
