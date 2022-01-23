@@ -4,12 +4,8 @@
     "dictionaries": ["jsdoc"]
   },
   "source": {
-    "include": [
-      "package.json",
-      "README.md",
-      "src/Handlers"
-    ],
-    "includePattern": ".js$",
+    "include": ["package.json", "README.md", "src/Handlers", "src/resources"],
+    "includePattern": ".\\.(js|txt|json)$",
     "excludePattern": "(node_modules/|docs|tests/)"
   },
   "plugins": ["plugins/markdown"],

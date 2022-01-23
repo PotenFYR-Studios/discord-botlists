@@ -24,7 +24,8 @@
     "semantic-release": "semantic-release --branches main",
     "commit:push": "git add . && npm run commit && git push",
     "docs": "jsdoc node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
-    "test" : "node test/testing.js"
+    "test": "node test/testing.js",
+    "json2js": "node scripts/Json2js.js"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.16.5",
@@ -37,7 +38,8 @@
     "jsdoc-babel": "^0.5.0",
     "jsdoc-skyceil": "^2.0.0",
     "nyc": "^15.1.0",
-    "semantic-release": "^19.0.2"
+    "semantic-release": "^19.0.2",
+    "write-json-safe": "^2.1.0"
   },
   "config": {
     "commitizen": {
