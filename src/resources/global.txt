@@ -1,0 +1,254 @@
+{
+  "bladebotlist": {
+    "name": "Blade Botlist",
+    "websiteurl": "https://bladebotlist.xyz/",
+    "universalPostUrl": "bladebotlist.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "blist": {
+    "name": "B List",
+    "websiteurl": "https://blist.xyz/",
+    "universalPostUrl": "blist.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "boatspace": {
+    "name": "Bot Space",
+    "websiteurl": "https://boatspace.xyz/",
+    "universalPostUrl": "boatspace.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "botlistme": {
+    "name": "BotList [ME]",
+    "websiteurl": "https://botlist.me/",
+    "universalPostUrl": "botlist.me",
+    "tokenHeadername": "Authorization"
+  },
+  "botrix": {
+    "name": "Bot Trix",
+    "websiteurl": "https://botrix.cc/",
+    "universalPostUrl": "botrix.cc",
+    "tokenHeadername": "Authorization"
+  },
+  "discordlabs": {
+    "name": "Discord Lab's Botlist",
+    "websiteurl": "https://bots.discordlabs.org/",
+    "universalPostUrl": "bots.discordlabs.org",
+    "tokenHeadername": "Authorization"
+  },
+  "ondiscord": {
+    "name": "On Discord Botlist",
+    "websiteurl": "https://bots.ondiscord.xyz/",
+    "universalPostUrl": "bots.ondiscord.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "carbonitex": {
+    "name": "Carbonitex BotList",
+    "websiteurl": "https://www.carbonitex.net/discord/bots",
+    "universalPostUrl": "carbonitex.net",
+    "tokenHeadername": "Authorization"
+  },
+  "discord-botlist": {
+    "name": "Discord Botlist [EU]",
+    "websiteurl": "https://discord-botlist.eu/",
+    "universalPostUrl": "discord-botlist.eu",
+    "tokenHeadername": "Authorization"
+  },
+  "discordboats": {
+    "name": "Discord Boats",
+    "websiteurl": "https://discord.boats/",
+    "universalPostUrl": "discord.boats",
+    "tokenHeadername": "Authorization"
+  },
+  "discordbotsgg": {
+    "name": "Discord Bots [GG]",
+    "websiteurl": "https://discord.bots.gg/",
+    "universalPostUrl": "discord.bots.gg",
+    "tokenHeadername": "Authorization"
+  },
+  "rovelstars": {
+    "name": "Discord Rovelstars Botlist",
+    "websiteurl": "https://discord.rovelstars.com/",
+    "universalPostUrl": "discord.rovelstars.com",
+    "tokenHeadername": "Authorization"
+  },
+  "discordbotlist": {
+    "name": "Discord BotList [COM]",
+    "websiteurl": "https://discordbotlist.com/",
+    "universalPostUrl": "discordbotlist.com",
+    "tokenHeadername": "Authorization"
+  },
+  "discordbotsapp": {
+    "name": "Discord Bots [APP]",
+    "websiteurl": "https://discordbots.app/",
+    "universalPostUrl": "discordbots.app",
+    "tokenHeadername": "Authorization"
+  },
+  "discordbotsco": {
+    "name": "Discord Bots [CO]",
+    "websiteurl": "https://discordbots.co/",
+    "universalPostUrl": "discordbots.co",
+    "tokenHeadername": "Authorization"
+  },
+  "discordextremelist": {
+    "name": "Discord Extremelist Botlist",
+    "websiteurl": "https://discordextremelist.xyz/",
+    "universalPostUrl": "discordextremelist.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "discordlistspace": {
+    "name": "Discord List [SPACE]",
+    "websiteurl": "https://discordlist.space/",
+    "universalPostUrl": "discordlist.space",
+    "tokenHeadername": "Authorization"
+  },
+  "discordlistology": {
+    "name": "Discord Listology Botlist",
+    "websiteurl": "https://discordlistology.com/",
+    "universalPostUrl": "discordlistology.com",
+    "tokenHeadername": "Authorization"
+  },
+  "discordscom": {
+    "name": "Discords [COM]",
+    "websiteurl": "https://discords.com/bots/",
+    "universalPostUrl": "discords.com",
+    "tokenHeadername": "Authorization"
+  },
+  "discordservices": {
+    "name": "Discord Services [NET]",
+    "websiteurl": "https://discordservices.net/",
+    "universalPostUrl": "discordservices.net",
+    "tokenHeadername": "Authorization"
+  },
+  "discordz": {
+    "name": "Discordz [XYZ]",
+    "websiteurl": "https://discordz.xyz/",
+    "universalPostUrl": "discordz.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "disforge": {
+    "name": "DisForge [COM]",
+    "websiteurl": "https://disforge.com/bots",
+    "universalPostUrl": "disforge.com",
+    "tokenHeadername": "Authorization"
+  },
+  "fateslist": {
+    "name": "Fates List",
+    "websiteurl": "https://fateslist.xyz/",
+    "universalPostUrl": "fateslist.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "infinitybotlist": {
+    "name": "Infinity Botlist",
+    "websiteurl": "https://infinitybotlist.com/",
+    "universalPostUrl": "infinitybotlist.com",
+    "tokenHeadername": "Authorization"
+  },
+  "motiondevelopment": {
+    "name": "Motion Development Botlist",
+    "websiteurl": "https://www.motiondevelopment.top/",
+    "universalPostUrl": "motiondevelopment.top",
+    "tokenHeadername": "Authorization"
+  },
+  "paradisebots": {
+    "name": "Paradise Bots",
+    "websiteurl": "https://paradisebots.net/",
+    "universalPostUrl": "paradisebots.net",
+    "tokenHeadername": "Authorization"
+  },
+  "radarbotdirectory": {
+    "name": "Radar Bot Directory",
+    "websiteurl": "https://radarbotdirectory.xyz/",
+    "universalPostUrl": "radarbotdirectory.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "space-bot-list": {
+    "name": "Space Botlist",
+    "websiteurl": "https://space-bot-list.xyz/",
+    "universalPostUrl": "space-bot-list.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "stellarbotlist": {
+    "name": "Stellar Botlist",
+    "websiteurl": "https://stellarbotlist.com/",
+    "universalPostUrl": "stellarbotlist.com",
+    "tokenHeadername": "Authorization"
+  },
+  "topgg": {
+    "name": "Top.gg",
+    "websiteurl": "https://top.gg/",
+    "universalPostUrl": "top.gg",
+    "tokenHeadername": "Authorization"
+  },
+  "vcodes": {
+    "name": "Vcodes Botlist",
+    "websiteurl": "https://vcodes.xyz/",
+    "universalPostUrl": "vcodes.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "voidbots": {
+    "name": "Void Bots [NET]",
+    "websiteurl": "https://voidbots.net/",
+    "universalPostUrl": "voidbots.net",
+    "tokenHeadername": "Authorization"
+  },
+  "wonderbotlist": {
+    "name": "Wonder Botlist",
+    "websiteurl": "https://wonderbotlist.com/",
+    "universalPostUrl": "wonderbotlist.com",
+    "tokenHeadername": "Authorization"
+  },
+  "yabl": {
+    "name": "Yabl Botlist [XYZ]",
+    "websiteurl": "https://yabl.xyz/",
+    "universalPostUrl": "yabl.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "botlistco": {
+    "name": "Botlist [CO]",
+    "websiteurl": "https://botlist.co/platforms/discord",
+    "universalPostUrl": "botlist.co",
+    "tokenHeadername": "Authorization"
+  },
+  "thereisabotforthat": {
+    "name": "There is a Bot for that [COM]",
+    "websiteurl": "https://thereisabotforthat.com/",
+    "universalPostUrl": "thereisabotforthat.com",
+    "tokenHeadername": "Authorization"
+  },
+  "topcord": {
+    "name": "Topcord Botlist [XYZ]",
+    "websiteurl": "https://topcord.xyz/",
+    "universalPostUrl": "topcord.xyz",
+    "tokenHeadername": "Authorization"
+  },
+  "discordbotworld": {
+    "name": "Discord Bot [WORLD]",
+    "websiteurl": "https://discordbot.world/",
+    "universalPostUrl": "discordbot.world",
+    "tokenHeadername": "Authorization"
+  },
+  "hydrogenbots": {
+    "name": "Hydrogen Bots",
+    "websiteurl": "https://hydrogenbots.club/",
+    "universalPostUrl": "hydrogenbots.club",
+    "tokenHeadername": "Authorization"
+  },
+  "listcord": {
+    "name": "Listcord [COM]",
+    "websiteurl": "https://listcord.com/",
+    "universalPostUrl": "listcord.com",
+    "tokenHeadername": "Authorization"
+  },
+  "listmybots": {
+    "name": "List my Bots",
+    "websiteurl": "https://listmybots.com/",
+    "universalPostUrl": "listmybots.com",
+    "tokenHeadername": "Authorization"
+  },
+  "nooderco": {
+    "name": "Nooder [CO]",
+    "websiteurl": "https://nooder.co/",
+    "universalPostUrl": "nooder.co",
+    "tokenHeadername": "Authorization"
+  }
+}
