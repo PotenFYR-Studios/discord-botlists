@@ -1,6 +1,6 @@
 {
   "name": "discord-botlists",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Multi-Discord-Botlist Management Package with 40+ Botlist Supported with Events and Stats Update Methods",
   "main": "./src/index.js",
   "module": "./src/index.mjs",
@@ -34,7 +34,7 @@
     "eslint": "^8.7.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.4",
-    "jsdoc": "^3.6.9",
+    "jsdoc": "^3.6.10",
     "jsdoc-babel": "^0.5.0",
     "jsdoc-skyceil": "^2.0.0",
     "nyc": "^15.1.0",

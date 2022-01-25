@@ -21,6 +21,7 @@ Multi-Discord-Botlist Management Package with 40+ Botlist Supported with Events 
 ```sh
 $ npm install --save discord-botlists
 ```
+
 ## [Documentation]("discord-botlists.js.org")
 
 # Features
@@ -123,13 +124,16 @@ new Promise(async (resolve) => {
         shard_id: undefined,
         shard_count: undefined,
       },
-      false
+      false,
+      undefined,
+      true,
+      true
     )
   );
 });
 // Above Data should replaced with undefined with appropiate data for post request
 
-// OR Post using AutoPoster on every 82 Seconds
+// OR Post using AutoPoster on every 2 * 60 * 1000 Milli-Seconds
 
 var Interval_Id = Botlist.autoPoster(
   {
@@ -139,13 +143,23 @@ var Interval_Id = Botlist.autoPoster(
     shard_id: undefined,
     shard_count: undefined,
   },
+  undefined,
   10 * 60 * 1000,
-  false
+  false,
+  true
 );
 
 // Posted Event for acknowledment of the Data Stats has been Posted successfully
-Botlist.on("posted", (postResponse, timestamp) => {
-  console.log("HTTP-Post Response : " + postResponse);
+Botlist.on("posted", (formatedResponse, timestamp) => {
+  console.log("SuccessRate or Failure Rate : " + formatedResponse);
+  console.log("Date/Time : " + timestamp);
+  // ... call back function work here ...
+});
+
+// Handle Error Event to Ignore Un-Handled Error on Console and avoid Application Crash
+Botlist.on("error", (message, extraData, timestamp) => {
+  console.log("Error Message : " + message);
+  console.log("Related Data with Error : " + extraData);
   console.log("Date/Time : " + timestamp);
   // ... call back function work here ...
 });

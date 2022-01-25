@@ -26,7 +26,7 @@ export class BotLists extends EventEmitter {
       | string
       | void
       | 'https://github.com/SidisLiveYT/discord-botlists',
-    eventTrigger?: boolean,
+    eventTrigger?: boolean | 'true',
   ): Promise<any>
   public poststats(
     apiBody: {
@@ -39,6 +39,7 @@ export class BotLists extends EventEmitter {
     eventOnPost?: boolean | void,
     AxioshttpConfigs?: Object,
     forcePosting?: boolean | void,
+    IgnoreErrors?: boolean | 'true',
   ): Promise<boolean>
   public autoPoster(
     apiBody: {
@@ -51,6 +52,7 @@ export class BotLists extends EventEmitter {
     AxioshttpConfigs?: Object,
     Timer?: number | void | '82 * 1000',
     eventOnPost?: boolean | void,
+    IgnoreErrors?: boolean | 'true',
   ): NodeJS.Timer
 
   public on<K extends keyof WebhooksEvents>(
