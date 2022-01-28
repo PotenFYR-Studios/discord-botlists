@@ -583,7 +583,7 @@ class BotLists extends EventEmitter {
       clearTimeout(this.#autoPostedTimerId)
     this.#autoPostedTimerId = setInterval(async () => {
       const Cached = await this.#poststats(
-        this.#autoPostCaches?.apiBody,
+        Utils.PostBodyParse(this.#autoPostCaches?.apiBody, this.botlistData),
         this.#autoPostCaches?.AxioshttpConfigs,
         this.#autoPostCaches?.IgnoreErrors,
       )
