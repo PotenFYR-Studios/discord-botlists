@@ -34,9 +34,9 @@ class BotLists extends EventEmitter {
    * @constructor
    * @param {string | void} webhookEndpoint -> Webhook Endpoint for "https://ipaddress:port/webhookEndpoint" to make selective path for Webhook's HTTP Post Request
    * @param {Object} botlistData -> Botlists Data as ' { "topgg" : { authorizationToken: "xxx-secrettokenhere-xxx",authorizationValue: "xxx-selfmade-AuthorizationValue-xxx", } } ' for comparing fetching token and Json data from resourcess
-   * @param {string | number | void} listenerPortNumber -> Port Number for Express's App to listen , By Default it listens in 8080 as default HTTP port
-   * @param {string | number | void} ipAddress -> Ip Adddress as "127.0.0.1" or "www.google.com" | No need to add http or https Protocol , just the domain or IP value for it
-   * @param {string | void} redirectUrl -> Redirect Url for get Request on Webhook Post Url for making it more cooler , By Default -> Github Repo
+   * @param {string | number | void | "8080"} listenerPortNumber -> Port Number for Express's App to listen , By Default it listens in 8080 as default HTTP port
+   * @param {string | number | void | "localhost"} ipAddress -> Ip Adddress as "127.0.0.1" or "www.google.com" | No need to add http or https Protocol , just the domain or IP value for it
+   * @param {string | void | "https://github.com/SidisLiveYT/discord-botlists"} redirectUrl -> Redirect Url for get Request on Webhook Post Url for making it more cooler , By Default -> Github Repo
    */
   constructor(
     webhookEndpoint = undefined,
@@ -69,8 +69,8 @@ class BotLists extends EventEmitter {
   /**
    * start() -> Starting Webhook for Vote Event Trigger
    * @param {string | void} webhookEndpoint Webhook Endpoint for "https://ipaddress:port/webhookEndpoint" to make selective path for Webhook's HTTP Post Request
-   * @param {string | void} redirectUrl -> Redirect Url for get Request on Webhook Post Url for making it more cooler , By Default -> Github Repo
-   * @param {boolean | void} eventTrigger ->  Event Trigger for console.log() function | By Default = true
+   * @param {string | void | 'https://github.com/SidisLiveYT/discord-botlists'} redirectUrl -> Redirect Url for get Request on Webhook Post Url for making it more cooler , By Default -> Github Repo
+   * @param {boolean | void | true} eventTrigger ->  Event Trigger for console.log() function | By Default = true
    * @returns {any} Depends on Incomplete Body or Request , it can return false or complete request.body in Json Format
    */
 
@@ -214,10 +214,10 @@ class BotLists extends EventEmitter {
   /**
    * post() -> Posting Stats of the Current Bot to Multiple Botlists mentioned by
    * @param {postApiBody} apiBody Api-Body for Posting Data as per params for API requirements and strictly for if required
-   * @param {boolean | void} eventOnPost What if event to be triggered on Post or should be closed
-   * @param {Object | void} AxioshttpConfigs To Add Proxies to avoid Ratelimit
-   * @param {boolean | void} forcePosting Force Posting and ignoring in-built Ratelimit function | Users can face un-expected ratelimit from API
-   * @param {Boolean | void} IgnoreErrors Boolean Value for Ignoring Request Handling Errors
+   * @param {boolean | void | true} eventOnPost What if event to be triggered on Post or should be closed
+   * @param {Object | void } AxioshttpConfigs To Add Proxies to avoid Ratelimit
+   * @param {boolean | void | false} forcePosting Force Posting and ignoring in-built Ratelimit function | Users can face un-expected ratelimit from API
+   * @param {Boolean | void | true} IgnoreErrors Boolean Value for Ignoring Request Handling Errors
    * @returns {Promise<Boolean>} Booelan Response on success or failure
    */
 
@@ -407,7 +407,7 @@ class BotLists extends EventEmitter {
    * @private
    * @param {postApiBody} postData Api-Body for Posting Data as per params for API requirements and strictly for if required
    * @param {Object} AxioshttpConfigs Axios HTTP Post Request Config
-   * @param {Boolean | void} IgnoreErrors Boolean Value for Ignoring Request Handling Errors
+   * @param {Boolean | void | false} IgnoreErrors Boolean Value for Ignoring Request Handling Errors
    * @returns {Object | void} Returns success and failure data formated or undefined on failure
    */
   async #poststats(

@@ -28,10 +28,10 @@
     "json2js": "node scripts/Json2js.js"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.16.5",
+    "@babel/eslint-parser": "^7.17.0",
     "@babel/preset-env": "^7.16.11",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^8.7.0",
+    "eslint": "^8.11.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.4",
     "jsdoc": "^3.6.10",
@@ -51,10 +51,10 @@
     "npm": ">=8.0.0"
   },
   "dependencies": {
-    "axios": "^0.25.0",
-    "body-parser": "^1.19.1",
-    "express": "^4.17.2",
-    "raw-body": "^2.4.2"
+    "axios": "^0.26.1",
+    "body-parser": "^1.19.2",
+    "express": "^4.17.3",
+    "raw-body": "^2.5.1"
   },
   "directories": {
     "example": "example"
