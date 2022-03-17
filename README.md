@@ -24,6 +24,8 @@ $ npm install --save discord-botlists
 
 ## [Documentation]("discord-botlists.js.org")
 
+## [Bot-List Notices](./src/resources/notices.md)
+
 # Features
 
 - Upvote/Vote Events Support 🚗

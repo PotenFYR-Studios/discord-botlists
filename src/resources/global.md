@@ -1,9 +1,9 @@
 ```json
 {
   "bladebotlist": {
-    "name": "Blade Botlist",
-    "websiteurl": "https://bladebotlist.xyz/",
-    "universalPostUrl": "bladebotlist.xyz",
+    "name": "Blade List",
+    "websiteurl": "https://bladelist.gg/",
+    "universalPostUrl": "bladelist.gg",
     "tokenHeadername": "Authorization"
   },
   "blist": {
@@ -67,7 +67,7 @@
     "tokenHeadername": "Authorization"
   },
   "rovelstars": {
-    "name": "Discord Rovelstars Botlist",
+    "name": "Rovel Discord List",
     "websiteurl": "https://discord.rovelstars.com/",
     "universalPostUrl": "discord.rovelstars.com",
     "tokenHeadername": "Authorization"
