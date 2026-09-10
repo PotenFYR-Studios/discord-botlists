@@ -109,7 +109,7 @@ describe('post body builder', () => {
 
 describe('webhook ingestion', () => {
   test('emits normalized vote events with zero delay', async () => {
-    const client = new Botlists();
+    const client = new Botlists({ webhook: { secret: 'test-secret' } });
     const received: unknown[] = [];
     client.on('vote', (vote: unknown) => received.push(vote));
 
@@ -123,7 +123,7 @@ describe('webhook ingestion', () => {
   });
 
   test('parses discordbotlist.com vote shape', async () => {
-    const client = new Botlists();
+    const client = new Botlists({ webhook: { secret: 'test-secret' } });
     let voter = '';
     client.on('vote', (vote: { voterId: string }) => {
       voter = vote.voterId;
@@ -134,7 +134,7 @@ describe('webhook ingestion', () => {
   });
 
   test('test webhook payloads emit the test event', () => {
-    const client = new Botlists();
+    const client = new Botlists({ webhook: { secret: 'test-secret' } });
     let sawTest = false;
     client.on('test', () => {
       sawTest = true;
@@ -147,13 +147,13 @@ describe('webhook ingestion', () => {
 
 describe('http server end to end', () => {
   test('accepts a posted vote over real http', async () => {
-    const client = new Botlists({ webhook: { port: 0, autoStart: false } });
+    const client = new Botlists({ webhook: { port: 0, autoStart: false, secret: 'test-secret' } });
     // port 0 lets the OS pick a free port; read it back from the server.
     const received: unknown[] = [];
     client.on('vote', (v: unknown) => received.push(v));
 
     const { VoteWebhookServer } = await import('../src/webhooks/server.js');
-    const server = new VoteWebhookServer({ port: 0, path: '/hook/top.gg' });
+    const server = new VoteWebhookServer({ port: 0, path: '/hook/top.gg', secret: 'test-secret' });
     server.on('vote', (v: unknown) => received.push(v));
     await server.start();
     const addr = server['server']?.address();
@@ -161,7 +161,7 @@ describe('http server end to end', () => {
 
     const response = await fetch(`http://127.0.0.1:${port}/hook/top.gg`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', authorization: 'test-secret' },
       body: JSON.stringify({ user: '42', bot: '99' }),
     });
     expect(response.status).toBe(200);

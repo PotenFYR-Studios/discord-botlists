@@ -287,6 +287,74 @@ app.post('/webhooks/:list', (req, res) => {
       ],
     },
     {
+      slug: 'webhook-security',
+      title: 'Webhook security',
+      blurb: 'How the server rejects fake votes, floods and brute force.',
+      category: 'Core Concepts',
+      blocks: [
+        {
+          type: 'text',
+          content:
+            'Anyone who discovers your webhook URL could POST fake votes. The server defends against that with secure defaults: secrets are required, per-IP rate limiting and brute-force lockout are always on, and HMAC payload signing is supported per list.',
+        },
+        {
+          type: 'code',
+          lang: 'ts',
+          title: 'security options',
+          content: `const lists = new Botlists({
+  webhook: {
+    port: 8080,
+    secret: {
+      'top.gg': 'shared-secret-for-topgg',
+      'botlist.me': 'another-secret',
+    },
+    security: {
+      // HMAC-SHA256 signing keys per list. when present, requests from that
+      // list must carry a valid signature in x-signature-256 /
+      // x-hub-signature-256 / x-signature.
+      hmac: { 'top.gg': 'webhook-signing-key' },
+
+      // per ip rate limit (default 30/min). extra requests get 429.
+      rateLimit: { max: 30, windowMs: 60_000 },
+
+      // ban an ip after N consecutive auth failures (default 10),
+      // for M ms (default 15 minutes). banned ips get 403.
+      banAfterFailures: 10,
+      banDurationMs: 15 * 60_000,
+
+      // only these lists may POST at all. others get 403.
+      allowedLists: ['top.gg', 'botlist.me', 'discordbotlist.com'],
+
+      // set true behind nginx/cloudflare so rate limits use the real ip.
+      trustProxy: true,
+
+      // only for local testing: accept unsigned posts.
+      requireSecret: false,
+    },
+  },
+});`,
+        },
+        {
+          type: 'table',
+          headers: ['Threat', 'Defense', 'Response'],
+          rows: [
+            ['Fake votes (no secret)', 'Secret required on every POST', '401'],
+            ['Replayed/forged payloads', 'HMAC-SHA256 signature check', '401'],
+            ['Secret brute force', 'Failure counter per ip', '403 ban after 10'],
+            ['Request floods', 'Per ip token bucket', '429 + Retry-After'],
+            ['Giant payloads', '512 KB body limit', '413'],
+            ['Unlisted sources', 'allowedLists check', '403'],
+          ],
+        },
+        {
+          type: 'note',
+          tone: 'warn',
+          content:
+            'The server throws at start() when requireSecret is true (the default) and no secret was configured. This is intentional: an open webhook endpoint will receive fake votes within hours of going public.',
+        },
+      ],
+    },
+    {
       slug: 'fetching-data',
       title: 'Fetching data',
       blurb: 'fetchBot, fetchVotes, hasVoted, searchBots, widgets.',

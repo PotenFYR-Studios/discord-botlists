@@ -1,23 +1,51 @@
 import { EventEmitter } from 'node:events';
+import { createHmac } from 'node:crypto';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
-import type { BotlistRecord, ParsedWebhook, WebhookOptions } from '../types.js';
+import type { BotlistRecord, ParsedWebhook, WebhookOptions, WebhookSecurityOptions } from '../types.js';
 import { UniversalParser } from '../core/parser.js';
 import { resolveList } from '../core/http.js';
+
+interface RateBucket {
+  count: number;
+  resetAt: number;
+}
+
+interface IpState {
+  rate: RateBucket;
+  authFailures: number;
+  bannedUntil: number;
+}
+
+const DEFAULT_SECURITY: Required<Omit<WebhookSecurityOptions, 'hmac' | 'allowedLists'>> = {
+  requireSecret: true,
+  rateLimit: { max: 30, windowMs: 60_000 },
+  banAfterFailures: 10,
+  banDurationMs: 15 * 60_000,
+  trustProxy: false,
+};
+
+/** headers botlists commonly use for the webhook secret. */
+const SECRET_HEADERS = ['authorization', 'x-webhook-authentication', 'x-webhook-secret'] as const;
+
+/** headers botlists commonly use for HMAC signatures. */
+const SIGNATURE_HEADERS = ['x-signature-256', 'x-hub-signature-256', 'x-signature', 'x-signature-sha256'] as const;
 
 /**
  * VoteWebhookServer: dependency free http server that receives vote, comment
  * and review webhooks from every supported list and re-emits them as typed
  * realtime events on a single EventEmitter. Zero delay, no polling.
  *
+ * Security model (all on by default):
+ *  - POSTs without a valid secret are rejected (401). Set
+ *    security.requireSecret = false only for local testing.
+ *  - Optional per-list HMAC-SHA256 payload verification via security.hmac.
+ *  - Per-IP rate limiting (default 30 req/min) with 429 + Retry-After.
+ *  - Per-IP auth failure tracking: 10 bad secrets in a row bans the ip for
+ *    15 minutes (403 while banned).
+ *  - Optional botlist allowlist so unknown sources never emit events.
+ *
  * Events:
- *  vote      -> UniversalVote, fired for every real vote
- *  comment   -> UniversalComment
- *  review    -> UniversalComment
- *  rating    -> UniversalComment
- *  test      -> UniversalVote, fired for webhook test requests
- *  raw       -> ParsedWebhook, fired for every parsed request
- *  request   -> { method, url, status, listId }, fired for every request
- *  error     -> Error, fired for bad auth or unparsable bodies
+ *  vote | comment | review | rating | test | raw | request | error
  */
 export class VoteWebhookServer extends EventEmitter {
   private readonly port: number;
@@ -27,8 +55,13 @@ export class VoteWebhookServer extends EventEmitter {
   private readonly debug: boolean;
   private readonly parser = new UniversalParser();
   private readonly secrets: Record<string, string>;
+  private readonly security: WebhookSecurityOptions;
+  private readonly requireSecret: boolean;
+  private readonly hmacKeys: Record<string, string>;
+  private readonly ipState = new Map<string, IpState>();
   private server: Server | null = null;
   private started = false;
+  private sweepTimer: ReturnType<typeof setInterval> | null = null;
 
   public constructor(options: WebhookOptions = {}) {
     super();
@@ -38,12 +71,21 @@ export class VoteWebhookServer extends EventEmitter {
     this.redirectUrl = options.redirectUrl ?? 'https://github.com/PotenFYR-Studios/discord-botlists';
     this.debug = options.debug ?? false;
     this.secrets = typeof options.secret === 'string' ? { '*': options.secret } : (options.secret ?? {});
+    this.security = options.security ?? {};
+    this.requireSecret = this.security.requireSecret ?? DEFAULT_SECURITY.requireSecret;
+    this.hmacKeys = this.security.hmac ?? {};
     if (options.autoStart) void this.start();
   }
 
   /** start listening. resolves once the socket is live. */
   public async start(): Promise<void> {
     if (this.started) return;
+    if (this.requireSecret && !Object.keys(this.secrets).length) {
+      throw new Error(
+        '[discord-botlists] refusing to start the webhook server without a secret. ' +
+          'Pass webhook.secret (string or per-list record) or set security.requireSecret = false for local testing.',
+      );
+    }
     const server = createServer((req, res) => void this.handle(req, res));
     await new Promise<void>((resolve, reject) => {
       server.once('error', reject);
@@ -51,10 +93,15 @@ export class VoteWebhookServer extends EventEmitter {
     });
     this.server = server;
     this.started = true;
+    // periodic sweep so forgotten ip states do not leak memory.
+    this.sweepTimer = setInterval(() => this.sweep(), 5 * 60_000);
+    this.sweepTimer.unref?.();
     if (this.debug) console.log(`[discord-botlists] webhook server listening on ${this.host}:${this.port}${this.path}`);
   }
 
   public stop(): Promise<void> {
+    if (this.sweepTimer) clearInterval(this.sweepTimer);
+    this.sweepTimer = null;
     if (!this.server) return Promise.resolve();
     const server = this.server;
     this.server = null;
@@ -70,7 +117,10 @@ export class VoteWebhookServer extends EventEmitter {
     return `http://${this.host}:${this.port}${this.path}`;
   }
 
-  /** feed an express/fastify handler into the parser without a socket. */
+  /**
+   * feed an express/fastify handler into the parser without a socket.
+   * bypasses rate limiting and bans: your framework does that.
+   */
   public ingest(
     listQuery: string,
     body: unknown,
@@ -78,12 +128,24 @@ export class VoteWebhookServer extends EventEmitter {
   ): ParsedWebhook | null {
     const list = resolveList(listQuery);
     if (!list) return null;
+    if (this.requireSecret && !Object.keys(this.secrets).length) {
+      throw new Error('[discord-botlists] ingest() called without a configured secret');
+    }
+    const raw = body === undefined || body === null ? '' : JSON.stringify(body);
+    if (list && this.hmacKeys[list.id]) {
+      const headers = normalizeHeaders(options.headers ?? {});
+      if (!this.verifyHmac(list.id, raw, headers)) {
+        this.emit('error', new Error(`hmac verification failed for ${list.id}`));
+        return null;
+      }
+    }
     return this.parseAndEmit(list, body, options.isTest === true);
   }
 
   private async handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const url = (req.url ?? '/').split('?')[0] ?? '/';
     const method = (req.method ?? 'GET').toUpperCase();
+    const ip = clientIp(req, this.security.trustProxy === true);
 
     if (!url.startsWith(this.path)) {
       res.writeHead(404, { 'content-type': 'application/json' });
@@ -104,25 +166,64 @@ export class VoteWebhookServer extends EventEmitter {
       return;
     }
 
+    // banned ip short-circuits before any body reading.
+    const state = this.stateFor(ip);
+    if (state.bannedUntil > Date.now()) {
+      const retry = Math.ceil((state.bannedUntil - Date.now()) / 1000);
+      res.writeHead(403, { 'content-type': 'application/json', 'retry-after': String(retry) });
+      res.end(JSON.stringify({ ok: false, error: 'temporarily banned' }));
+      this.emit('request', { method, url, status: 403, listId: null });
+      return;
+    }
+
+    // per ip rate limit.
+    const rl = this.security.rateLimit ?? DEFAULT_SECURITY.rateLimit;
+    if (state.rate.resetAt <= Date.now()) {
+      state.rate = { count: 0, resetAt: Date.now() + rl.windowMs };
+    }
+    state.rate.count++;
+    if (state.rate.count > rl.max) {
+      const retry = Math.ceil((state.rate.resetAt - Date.now()) / 1000);
+      res.writeHead(429, { 'content-type': 'application/json', 'retry-after': String(retry) });
+      res.end(JSON.stringify({ ok: false, error: 'rate limited' }));
+      this.emit('request', { method, url, status: 429, listId: null });
+      return;
+    }
+
     const list = this.identifyList(req);
-    const raw = await readBody(req);
+    let raw = '';
+    try {
+      raw = await readBody(req);
+    } catch {
+      res.writeHead(413, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'payload too large' }));
+      this.emit('request', { method, url, status: 413, listId: null });
+      return;
+    }
     let body: unknown = null;
     try {
       body = raw ? JSON.parse(raw) : null;
     } catch {
-      this.emit('error', new Error(`invalid json from ${list?.id ?? 'unknown list'}`));
       res.writeHead(400, { 'content-type': 'application/json' });
       res.end(JSON.stringify({ ok: false, error: 'invalid json' }));
+      this.emit('error', new Error(`invalid json from ${ip} (${list?.id ?? 'unknown list'})`));
       return;
     }
 
-    if (!this.authorize(list, req, body)) {
-      this.emit('error', new Error(`unauthorized webhook from ${list?.id ?? 'unknown list'}`));
-      this.emit('request', { method, url, status: 401, listId: list?.id ?? null });
-      res.writeHead(401, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ ok: false, error: 'unauthorized' }));
+    const auth = this.authorize(list, req, raw, body);
+    if (!auth.ok) {
+      state.authFailures++;
+      if (state.authFailures >= (this.security.banAfterFailures ?? DEFAULT_SECURITY.banAfterFailures)) {
+        state.bannedUntil = Date.now() + (this.security.banDurationMs ?? DEFAULT_SECURITY.banDurationMs);
+        state.authFailures = 0;
+      }
+      this.emit('error', new Error(`${auth.reason} from ${ip} (${list?.id ?? 'unknown list'})`));
+      this.emit('request', { method, url, status: auth.status, listId: list?.id ?? null });
+      res.writeHead(auth.status, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: auth.reason }));
       return;
     }
+    state.authFailures = 0;
 
     const isTest = detectTest(list, body);
     const parsed = this.parseAndEmit(list ?? UNKNOWN_LIST, body, isTest);
@@ -153,19 +254,73 @@ export class VoteWebhookServer extends EventEmitter {
       const list = safeResolve(param);
       if (list) return list;
     }
-    // 3. still unknown: caller gets a generic record so events keep flowing.
     return null;
   }
 
-  private authorize(list: BotlistRecord | null, req: IncomingMessage, body: unknown): boolean {
+  private authorize(
+    list: BotlistRecord | null,
+    req: IncomingMessage,
+    rawBody: string,
+    body: unknown,
+  ): { ok: true } | { ok: false; reason: string; status: number } {
+    // optional allowlist: only named lists may post.
+    const allow = this.security.allowedLists;
+    if (allow && list && !allow.includes(list.id)) {
+      return { ok: false, reason: 'list not allowed', status: 403 };
+    }
+
     const secret = list ? this.secrets[list.id] ?? this.secrets['*'] : this.secrets['*'];
-    if (!secret) return true;
-    const header = req.headers.authorization ?? req.headers['x-webhook-authentication'] ?? req.headers.authorization;
-    if (typeof header === 'string' && safeEqual(header, secret)) return true;
+    const hmacKey = list ? this.hmacKeys[list.id] : undefined;
+
+    // hmac verification takes precedence when a key exists for this list.
+    if (hmacKey) {
+      const headers = normalizeHeaders(req.headers);
+      if (this.verifyHmac(list?.id ?? '', rawBody, headers)) return { ok: true };
+      return { ok: false, reason: 'invalid signature', status: 401 };
+    }
+
+    // no secret configured for anything: requireSecret decides.
+    if (!secret) {
+      return this.requireSecret
+        ? { ok: false, reason: 'no secret configured', status: 503 }
+        : { ok: true };
+    }
+
+    const headers = normalizeHeaders(req.headers);
+    // some lists sign instead of sharing a secret; accept common signatures too.
+    if (list && this.verifySignatureHex(list.id, rawBody, headers, secret)) return { ok: true };
+
+    for (const name of SECRET_HEADERS) {
+      const value = headers[name];
+      if (typeof value === 'string' && safeEqual(value, secret)) return { ok: true };
+      // "Authorization: Bearer <secret>" and "Basic" forms.
+      if (typeof value === 'string') {
+        const bare = value.replace(/^(?:Bearer|Basic)\s+/i, '').trim();
+        if (bare && safeEqual(bare, secret)) return { ok: true };
+      }
+    }
     // some lists put the secret in the body instead of a header.
     if (typeof body === 'object' && body !== null) {
       const record = body as Record<string, unknown>;
-      if (typeof record['secret'] === 'string' && safeEqual(record['secret'], secret)) return true;
+      if (typeof record['secret'] === 'string' && safeEqual(record['secret'], secret)) return { ok: true };
+    }
+    return { ok: false, reason: 'unauthorized', status: 401 };
+  }
+
+  /** hmac-sha256(raw body) matched against any common signature header. */
+  private verifyHmac(listId: string, rawBody: string, headers: Record<string, string>): boolean {
+    const key = this.hmacKeys[listId];
+    if (!key) return false;
+    return this.verifySignatureHex(listId, rawBody, headers, key);
+  }
+
+  private verifySignatureHex(listId: string, rawBody: string, headers: Record<string, string>, key: string): boolean {
+    const expected = createHmac('sha256', key).update(rawBody).digest('hex');
+    for (const name of SIGNATURE_HEADERS) {
+      const value = headers[name];
+      if (typeof value !== 'string' || !value) continue;
+      const bare = value.replace(/^sha256=/i, '').trim();
+      if (safeEqualHex(bare, expected)) return true;
     }
     return false;
   }
@@ -184,6 +339,44 @@ export class VoteWebhookServer extends EventEmitter {
     this.emit(event, payload);
     return parsed;
   }
+
+  private stateFor(ip: string): IpState {
+    let state = this.ipState.get(ip);
+    if (!state) {
+      state = { rate: { count: 0, resetAt: Date.now() + (this.security.rateLimit ?? DEFAULT_SECURITY.rateLimit).windowMs }, authFailures: 0, bannedUntil: 0 };
+      this.ipState.set(ip, state);
+    }
+    return state;
+  }
+
+  private sweep(): void {
+    const now = Date.now();
+    for (const [ip, state] of this.ipState) {
+      if (state.bannedUntil < now && state.rate.resetAt < now && state.authFailures === 0) {
+        this.ipState.delete(ip);
+      }
+    }
+  }
+}
+
+function normalizeHeaders(headers: IncomingMessage['headers'] | Record<string, string | string[] | undefined>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(headers)) {
+    if (value === undefined) continue;
+    out[key.toLowerCase()] = Array.isArray(value) ? value.join(', ') : value;
+  }
+  return out;
+}
+
+function clientIp(req: IncomingMessage, trustProxy: boolean): string {
+  if (trustProxy) {
+    const forwarded = req.headers['x-forwarded-for'];
+    if (typeof forwarded === 'string' && forwarded) return forwarded.split(',')[0].trim();
+    if (Array.isArray(forwarded) && forwarded.length) return forwarded[0].trim();
+    const real = req.headers['x-real-ip'];
+    if (typeof real === 'string') return real;
+  }
+  return req.socket.remoteAddress ?? 'unknown';
 }
 
 const UNKNOWN_LIST: BotlistRecord = {
@@ -242,6 +435,10 @@ function safeEqual(a: string, b: string): boolean {
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return diff === 0;
+}
+
+function safeEqualHex(a: string, b: string): boolean {
+  return a.length === b.length && safeEqual(a.toLowerCase(), b.toLowerCase());
 }
 
 /** top.gg v1 style test events and generic test payloads. */

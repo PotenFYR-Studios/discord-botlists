@@ -166,6 +166,35 @@ export interface BotlistsOptions {
   startupStatusCheck?: boolean;
 }
 
+export interface WebhookSecurityOptions {
+  /**
+   * refuse POSTs when no secret matches. when false, unsigned requests are
+   * accepted (dangerous, only for local testing). default true.
+   */
+  requireSecret?: boolean;
+  /**
+   * HMAC-SHA256 signing keys per list id. when present, a request from that
+   * list must carry a valid signature in one of the common signature headers
+   * (x-signature-256, x-hub-signature-256, x-signature) or a matching
+   * authorization scheme (sha256=<hex>). plain secret matching still works
+   * for lists that do not sign payloads.
+   */
+  hmac?: Record<string, string>;
+  /** per ip rate limit. default 30 requests per minute. */
+  rateLimit?: { max: number; windowMs: number };
+  /** block an ip after this many consecutive auth failures. default 10. */
+  banAfterFailures?: number;
+  /** how long a banned ip stays banned in ms. default 15 minutes. */
+  banDurationMs?: number;
+  /** trust x-forwarded-for for client ip resolution (behind nginx etc). default false. */
+  trustProxy?: boolean;
+  /**
+   * allowlist of botlist ids allowed to POST. default: every list with a
+   * webhook hint plus 'unknown'. requests from other lists are rejected.
+   */
+  allowedLists?: string[];
+}
+
 export interface WebhookOptions {
   /** port for the built-in http server, default 8080. */
   port?: number;
@@ -175,6 +204,8 @@ export interface WebhookOptions {
   host?: string;
   /** expected Authorization secret, checked when set. */
   secret?: string | Record<string, string>;
+  /** security hardening options. secure defaults. */
+  security?: WebhookSecurityOptions;
   /** redirect target for GET on the webhook path. */
   redirectUrl?: string;
   /** start the server immediately on construction. */
