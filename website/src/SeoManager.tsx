@@ -19,6 +19,20 @@ const META: Record<string, { title: string; description: string }> = {
 export default function SeoManager() {
   const location = useLocation();
   useEffect(() => {
+    // custom domain: swap canonical/og:url to the live origin automatically.
+    const GH = 'https://potenfyr-studios.github.io';
+    if (!window.location.origin.startsWith(GH)) {
+      for (const selector of ['link[rel="canonical"]', 'meta[property="og:url"]']) {
+        const tag = document.querySelector(selector);
+        if (tag) {
+          const current = tag.getAttribute('href') ?? tag.getAttribute('content') ?? '';
+          if (current.startsWith(GH)) {
+            const updated = current.replace(GH, window.location.origin);
+            tag.setAttribute(selector.startsWith('link') ? 'href' : 'content', updated);
+          }
+        }
+      }
+    }
     const base = location.pathname.split('/').slice(0, 2).join('/') || '/';
     const meta = META[base] ?? META['/'];
     document.title = meta.title;

@@ -1,3 +1,8 @@
+# Deploys the docs website.
+# Default domain: https://potenfyr-studios.github.io/discord-botlists/
+# Custom domain : drop a website/CNAME file containing your domain (e.g. docs.potenfyr.in),
+#                 set the domain in repo Settings > Pages, and the build switches to root-base
+#                 automatically (vite.config.ts detects CNAME) and ships dist/CNAME.
 name: Deploy website to GitHub Pages
 
 on:
