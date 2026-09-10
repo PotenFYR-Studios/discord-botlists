@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.json --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prebuild": "bun ../scripts/gen-version.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

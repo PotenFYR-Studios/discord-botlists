@@ -104,11 +104,14 @@ export default function Home() {
           </div>
 
           {/* install command with copy feel */}
-          <div className="mx-auto mt-10 flex max-w-md items-center justify-between rounded-xl border border-white/10 bg-black/50 px-5 py-3.5 font-mono text-sm backdrop-blur">
-            <span>
-              <span className="text-accent">$</span> npm install @potenfyrstudios/discord-botlists
+          <div className="mx-auto mt-10 flex max-w-2xl flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 overflow-hidden rounded-xl border border-white/10 bg-black/50 px-5 py-3.5 font-mono text-sm backdrop-blur">
+              <span className="shrink-0 text-accent">$</span>
+              <code className="truncate text-slate-200">npm install @potenfyrstudios/discord-botlists</code>
+            </div>
+            <span className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-center font-mono text-xs text-slate-400 backdrop-blur">
+              {formatNumber(live.downloads)} dl/mo
             </span>
-            <span className="text-slate-500">[{formatNumber(live.downloads)} dl/mo]</span>
           </div>
         </div>
       </section>
@@ -142,14 +145,22 @@ export default function Home() {
       </section>
 
       {/* CODE + FLOW */}
-      <section className="mx-auto grid max-w-6xl gap-8 px-6 pb-20 lg:grid-cols-2">
+      <section className="mx-auto grid max-w-6xl items-start gap-8 px-6 pb-20 lg:grid-cols-[3fr_2fr]">
         <div>
           <h2 className="mb-4 text-3xl font-bold text-white">Ship it in 60 seconds</h2>
           <p className="mb-6 text-slate-400">
             Construct, post, listen. The SDK handles per-list formats, auth headers, retries and
             webhook parsing for you.
           </p>
-          <div className="code-block text-left">{CODE}</div>
+          <div className="overflow-hidden rounded-xl border border-white/10">
+            <div className="flex items-center justify-between border-b border-white/10 bg-[#161a23] px-4 py-2">
+              <span className="font-mono text-xs text-slate-500">quickstart.ts</span>
+              <span className="font-mono text-xs text-slate-600">ts</span>
+            </div>
+            <pre className="max-h-[34rem] overflow-auto bg-[#0d1017] p-4 text-left text-[13px] leading-relaxed">
+              <code className="font-mono text-slate-300">{CODE}</code>
+            </pre>
+          </div>
         </div>
 
         {/* architecture flow */}

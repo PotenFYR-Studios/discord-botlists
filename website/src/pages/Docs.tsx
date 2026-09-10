@@ -1,47 +1,47 @@
 import { Link } from 'react-router-dom';
-import { DOC_VERSIONS, LATEST_VERSION } from '../docs';
+import { CURRENT_DOC, LATEST_VERSION } from '../docs/content';
 
 const SCENARIOS = [
   {
     icon: '🗳️',
     title: 'Reward voters instantly',
     body: 'Give a role or currency the second someone votes on any list.',
-    route: '/docs/v2.0.0/realtime-events',
+    route: `/docs/${LATEST_VERSION}/realtime-events`,
     snippet: "lists.on('vote', (v) => addRole(v.voterId));",
   },
   {
     icon: '📊',
     title: 'Post stats everywhere',
     body: 'One call, every list, each with its exact wire format and auth header.',
-    route: '/docs/v2.0.0/posting-stats',
+    route: `/docs/${LATEST_VERSION}/posting-stats`,
     snippet: 'await lists.postStats({ serverCount: 120 });',
   },
   {
     icon: '🔎',
     title: 'Read bot data from any list',
     body: 'Normalized UniversalBot shape from every list response, raw kept.',
-    route: '/docs/v2.0.0/universal-parser',
+    route: `/docs/${LATEST_VERSION}/universal-parser`,
     snippet: "await lists.fetchBot('top.gg', id);",
   },
   {
     icon: '🩺',
     title: 'Know when a list dies',
     body: 'Hourly probes with latency, and dead lists auto-pruned from the registry.',
-    route: '/docs/v2.0.0/status-checking',
+    route: `/docs/${LATEST_VERSION}/status-checking`,
     snippet: 'await lists.checkAndReportStatus();',
   },
   {
     icon: '🧵',
     title: 'Shard aware posting',
     body: 'Per-shard counts, shard totals and per-shard arrays, mapped per list.',
-    route: '/docs/v2.0.0/posting-stats',
+    route: `/docs/${LATEST_VERSION}/posting-stats`,
     snippet: 'await lists.postStats({ shards: [21, 21] });',
   },
   {
     icon: '🛠️',
     title: 'Add your own list',
     body: 'Self-hosted list? One record and it works with everything.',
-    route: '/docs/v2.0.0/custom-lists',
+    route: `/docs/${LATEST_VERSION}/custom-lists`,
     snippet: 'new Botlists({ lists: [myList] });',
   },
 ];
@@ -112,7 +112,7 @@ function FlowDiagram() {
 }
 
 export default function Docs() {
-  const latest = DOC_VERSIONS[0];
+  const latest = CURRENT_DOC;
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">
       <div className="mb-4 flex flex-wrap items-center gap-3">

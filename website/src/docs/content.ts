@@ -1,3 +1,4 @@
+import { CURRENT_VERSION } from './version.generated';
 export interface DocSection {
   slug: string;
   title: string;
@@ -22,9 +23,9 @@ export interface DocVersion {
   sections: DocSection[];
 }
 
-const V2: DocVersion = {
-  version: '2.0.0',
-  label: 'v2.0.0 (latest)',
+const CURRENT: DocVersion = {
+  version: CURRENT_VERSION,
+  label: `v${CURRENT_VERSION} (latest)`,
   sections: [
     {
       slug: 'introduction',
@@ -51,7 +52,7 @@ const V2: DocVersion = {
           type: 'note',
           tone: 'info',
           content:
-            'Version 2.0.0 is a complete rewrite. The old express based class from 1.x is gone; see the migration section if you are coming from v1.',
+            `v${CURRENT_VERSION} is a complete rewrite. The old express based class from 1.x is gone; see the migration section if you are coming from v1.`,
         },
       ],
     },
@@ -543,5 +544,12 @@ await lists.checkAndReportStatus();`,
   ],
 };
 
-export const DOC_VERSIONS: DocVersion[] = [V2];
-export const LATEST_VERSION = V2.version;
+export const CURRENT_DOC: DocVersion = CURRENT;
+
+/**
+ * Versioned docs, discord.js style: the current version's content lives in
+ * CURRENT. When the package version changes, scripts/snapshot-docs.mjs
+ * freezes this content into DOC_VERSIONS as an immutable archive.
+ */
+export const DOC_VERSIONS: DocVersion[] = [CURRENT];
+export const LATEST_VERSION = CURRENT_VERSION;

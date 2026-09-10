@@ -1,12 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { DOC_VERSIONS, LATEST_VERSION, type DocBlock, type DocSection } from '../docs';
+import { DOC_VERSIONS, LATEST_VERSION, type DocBlock, type DocSection } from '../docs/content';
 
 const CATEGORY_ORDER = ['Getting Started', 'Core Concepts', 'Guides', 'API Reference'] as const;
 
 export default function VersionedDocs() {
-  const { version = LATEST_VERSION } = useParams();
+  const { version } = useParams();
   const navigate = useNavigate();
+
+  // unknown / retired versions (e.g. the old v2.0.0 URLs) redirect to the
+  // current docs instead of rendering a blank page.
+  const known = DOC_VERSIONS.some((d) => d.version === version);
+  useEffect(() => {
+    if (version !== undefined && !known) navigate(`/docs/${LATEST_VERSION}`, { replace: true });
+  }, [version, known, navigate]);
+
   const doc = DOC_VERSIONS.find((d) => d.version === version) ?? DOC_VERSIONS[0];
   const [query, setQuery] = useState('');
   const [activeSlug, setActiveSlug] = useState(doc.sections[0].slug);
@@ -133,12 +141,7 @@ function Block({ block }: { block: DocBlock }) {
     case 'h3':
       return <h3 className="pt-3 text-xl font-bold text-white">{block.content}</h3>;
     case 'code':
-      return (
-        <div>
-          {block.title && <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-slate-500">{block.title}</p>}
-          <pre className="code-block whitespace-pre">{block.content}</pre>
-        </div>
-      );
+      return <CodeBlock title={block.title} content={block.content} lang={block.lang} />;
     case 'table':
       return (
         <div className="overflow-x-auto rounded-xl border border-white/10">
@@ -188,4 +191,31 @@ function Block({ block }: { block: DocBlock }) {
         </div>
       );
   }
+}
+
+
+function CodeBlock({ title, content, lang }: { title?: string; content: string; lang: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard?.writeText(content).then(
+      () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      },
+      () => undefined,
+    );
+  };
+  return (
+    <div className="overflow-hidden rounded-xl border border-white/10">
+      <div className="flex items-center justify-between border-b border-white/10 bg-[#161a23] px-4 py-2">
+        <span className="font-mono text-xs text-slate-500">{title ?? lang}</span>
+        <button onClick={copy} className="text-xs text-slate-400 transition hover:text-accent">
+          {copied ? 'copied!' : 'copy'}
+        </button>
+      </div>
+      <pre className="max-h-[32rem] overflow-auto bg-[#0d1017] p-4 text-sm leading-relaxed">
+        <code className="font-mono text-slate-300">{content}</code>
+      </pre>
+    </div>
+  );
 }
