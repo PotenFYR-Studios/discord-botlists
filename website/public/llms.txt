@@ -1,6 +1,6 @@
 # discord-botlists
 
-> Universal multi-botlist SDK for Discord bots. Post stats to 30+ verified live botlists, receive realtime vote webhooks, and parse any botlist API into one normalized shape. Zero dependencies, MIT licensed, TypeScript-first. Works with discord.js, Eris, Oceanic, any framework, or none.
+> Universal multi-botlist SDK for Discord bots. Post stats to 30+ verified live botlists, receive realtime vote webhooks, and parse any botlist API into one normalized shape. Zero dependencies, Apache-2.0 with Commons Clause, TypeScript-first. Works with discord.js, Eris, Oceanic, any framework, or none.
 
 ## Install
 

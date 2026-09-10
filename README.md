@@ -410,6 +410,10 @@ PRs welcome. Please:
 
 [Apache-2.0 + Commons Clause](LICENSE) | Free to fork, modify, use, and build around - but not to sell as a product. Botlist names and trademarks belong to their respective owners. See [NOTICE.md](NOTICE.md).
 
+---
+
+Built by **[PotenFYR Studios](https://github.com/PotenFYR-Studios)** · [potenfyr.in](https://potenfyr.in) · Part of the **PotenFYR Studios** open-source ecosystem.
+
 <div align="center">
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:f97316,50:ec4899,100:8b5cf6&height=180&section=footer&text=PotenFYR%20Studios&fontSize=30&fontColor=ffffff&fontAlignY=70&desc=discord-botlists%20%C2%B7%20MIT%20%C2%B7%20built%20for%20bot%20developers&descSize=14&descAlignY=82&animation=twinkling" width="100%" alt="footer"/>

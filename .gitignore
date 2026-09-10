@@ -8,3 +8,8 @@ coverage/
 *.log
 website/dist/
 website/node_modules/
+
+# --- PotenFYR Studios: baseline hygiene ---
+Thumbs.db
+logs/
+.idea/
