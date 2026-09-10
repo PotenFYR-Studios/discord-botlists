@@ -19,7 +19,7 @@ export default function Status() {
   const [filter, setFilter] = useState<string>('all');
 
   useEffect(() => {
-    fetch('/discord-botlists/status.json')
+    fetch('status.json')
       .then((r) => r.json())
       .then(setBoard)
       .catch(() => setBoard(null));

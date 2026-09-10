@@ -1,0 +1,38 @@
+name: Release
+
+# Conventional Commits in, changelog release out.
+# push to main -> draft release with categorized changelog.
+# publishing the draft (or any published release) triggers npm publish.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  draft-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: release-drafter/release-drafter@v6
+        with:
+          config-name: release-drafter.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Sync package.json version with latest tag
+        if: github.ref == 'refs/heads/main'
+        run: |
+          LATEST=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')
+          CURRENT=$(node -p "require('./package.json').version")
+          if [ -n "$LATEST" ] && [ "$LATEST" != "$CURRENT" ]; then
+            npm version "$LATEST" --no-git-tag-version --allow-same-version
+            git config user.name "potenfyr-bot"
+            git config user.email "bot@potenfyr.in"
+            git add package.json
+            git diff --cached --quiet || git commit -m "chore(release): sync version to $LATEST [skip ci]"
+            git push || true
+          fi

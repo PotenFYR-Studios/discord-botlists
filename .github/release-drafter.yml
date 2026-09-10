@@ -1,0 +1,45 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+version-resolver:
+  major:
+    labels: ['breaking', 'major']
+  minor:
+    labels: ['feature', 'minor', 'enhancement']
+  patch:
+    labels: ['bugfix', 'patch', 'fix', 'chore', 'docs']
+  default: patch
+categories:
+  - title: '🚀 Features'
+    labels: ['feature', 'enhancement']
+  - title: '🐛 Bug Fixes'
+    labels: ['bugfix', 'fix']
+  - title: '📜 Botlist Registry'
+    labels: ['list-request', 'list-status']
+  - title: '📖 Documentation'
+    labels: ['docs']
+  - title: '🧹 Chores'
+    labels: ['chore']
+exclude:
+  labels: ['skip-changelog']
+autolabeler:
+  - label: 'docs'
+    files: ['*.md', 'website/**']
+  - label: 'list-request'
+    files: ['scripts/snapshot/**', 'src/data/**']
+  - label: 'chore'
+    title: ['/^chore/i']
+  - label: 'feature'
+    title: ['/^feat/i']
+  - label: 'bugfix'
+    title: ['/^fix/i']
+template: |
+  ## What changed
+
+  $CHANGES
+
+  **npm**: `npm install discord-botlists@$RESOLVED_VERSION`
+
+  **Full changelog**: https://github.com/PotenFYR-Studios/discord-botlists/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+replacers:
+  - search: '/-(?=\d)/g'
+    replace: ' '

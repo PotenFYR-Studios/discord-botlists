@@ -1,5 +1,10 @@
 name: Publish npm
 
+# Trusted publishing (OIDC): configure a trusted publisher on npmjs.com for
+# this package pointing at .github/workflows/npm-publish.yml in this repo,
+# then every published GitHub release publishes to npm with zero tokens.
+# Docs: https://docs.npmjs.com/trusted-publishers
+
 on:
   release:
     types: [published]
@@ -8,7 +13,7 @@ on:
       dry_run:
         description: Run publish in dry-run mode
         required: false
-        default: 'false'
+        default: 'true'
 
 permissions:
   contents: read
@@ -17,41 +22,40 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: npm
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - run: bun install --frozen-lockfile
+      - name: Install
+        run: bun install --frozen-lockfile
       - name: Typecheck
         run: bun run lint
       - name: Unit tests
         run: bun run test
       - name: Build
         run: bun run build
-      - name: Verify no secrets in package
+      - name: Verify pack contents
+        run: npm pack --dry-run
+      - name: Guard against secrets in the tarball
         run: |
-          cd dist
-          ! grep -rE "(sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,}|DBL_[A-Z_]+=.)" . || (echo "possible secret found" && exit 1)
-      - name: Read version
-        id: ver
-        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+          ! grep -rEq "(sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,}|eyJ[a-zA-Z0-9._-]{30,})" dist/ || (echo "possible secret in dist" && exit 1)
       - name: Check version not already published
         if: github.event_name == 'release'
         run: |
-          VERSION="${{ steps.ver.outputs.version }}"
+          VERSION="$(node -p "require('./package.json').version")"
           if npm view "discord-botlists@$VERSION" version >/dev/null 2>&1; then
             echo "version $VERSION already published, skipping"
             echo "SKIP=true" >> "$GITHUB_ENV"
           fi
-      - name: Publish (trusted, provenance)
+      - name: Publish (trusted publishing, OIDC, provenance)
         if: env.SKIP != 'true' && github.event_name == 'release'
         run: npm publish --provenance --access public
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Publish dry run (manual)
-        if: github.event_name == 'workflow_dispatch'
-        run: npm publish --dry-run --access public
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Dry run (manual dispatch)
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true'
+        run: npm publish --dry-run --provenance --access public
