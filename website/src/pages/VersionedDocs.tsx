@@ -19,6 +19,13 @@ export default function VersionedDocs() {
   const [query, setQuery] = useState('');
   const [activeSlug, setActiveSlug] = useState(doc.sections[0].slug);
 
+  // keep the selected section valid when the version changes or a search
+  // filters the current section away.
+  const validSlugs = useMemo(() => new Set(doc.sections.map((x) => x.slug)), [doc]);
+  useEffect(() => {
+    if (!validSlugs.has(activeSlug)) setActiveSlug(doc.sections[0].slug);
+  }, [validSlugs, activeSlug, doc]);
+
   const filtered = useMemo(() => {
     if (!query.trim()) return doc.sections;
     const q = query.toLowerCase();

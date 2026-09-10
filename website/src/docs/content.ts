@@ -89,6 +89,51 @@ pnpm add @potenfyrstudios/discord-botlists`,
       ],
     },
     {
+      slug: 'frameworks',
+      title: 'Framework support',
+      blurb: 'discord.js, Eris, Oceanic, anything else, or no framework at all.',
+      category: 'Getting Started',
+      blocks: [
+        {
+          type: 'text',
+          content:
+            'The SDK has no framework lock-in. Pass any client object that exposes a guilds collection and it reads server and shard counts automatically. Or skip the client entirely and hand over the numbers yourself.',
+        },
+        {
+          type: 'table',
+          headers: ['Framework', 'How to use', 'Auto collection'],
+          rows: [
+            ['discord.js', "new Botlists({ client })", 'guilds.cache.size, shard data'],
+            ['Eris', "new Botlists({ client })", 'guilds Map size'],
+            ['Oceanic', "new Botlists({ client })", 'guilds Map size'],
+            ['Other frameworks', "new Botlists({ statsProvider })", 'you provide it'],
+            ['No framework', "new Botlists({ statsProvider }) or explicit stats", 'you provide it'],
+          ],
+        },
+        {
+          type: 'code',
+          lang: 'ts',
+          title: 'statsProvider: full control, any framework or none',
+          content: `const lists = new Botlists({
+  statsProvider: async () => ({
+    serverCount: shardManager.totalGuilds,
+    shardCount: shardManager.shardCount,
+    shards: shardManager.perShardCounts,
+  }),
+});
+
+// or per call, no constructor changes
+await lists.postStats({ serverCount: myGuildCount });`,
+        },
+        {
+          type: 'note',
+          tone: 'tip',
+          content:
+            'Everything except auto stats collection (webhooks, parser, status checks, posting) never touches your client object - it is plain HTTP and Node builtins.',
+        },
+      ],
+    },
+    {
       slug: 'setup',
       title: 'Setup and tokens',
       blurb: 'Constructing Botlists and providing tokens.',
@@ -131,7 +176,8 @@ const lists = new Botlists({
           headers: ['Option', 'Type', 'Default', 'Description'],
           rows: [
             ['botId', 'string', 'client.user.id', 'Your bot application id'],
-            ['client', 'BotClientLike', 'null', 'discord.js or Eris client for auto stats'],
+            ['client', 'BotClientLike', 'null', 'discord.js, Eris or Oceanic client for auto stats'],
+            ['statsProvider', 'StatsProvider', 'null', 'Provide stats yourself: any framework or none'],
             ['tokens', 'Record<string,string>', 'env DBL_*', 'Per list tokens, overrides env'],
             ['authHeaders', 'Record<string,string>', 'per list default', 'Override the auth header name per list'],
             ['lists', 'BotlistRecord[]', '[]', 'Add custom or self-hosted lists'],

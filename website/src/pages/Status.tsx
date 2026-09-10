@@ -16,13 +16,20 @@ interface Board {
 
 export default function Status() {
   const [board, setBoard] = useState<Board | null>(null);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
 
   useEffect(() => {
     fetch('status.json')
       .then((r) => r.json())
-      .then(setBoard)
-      .catch(() => setBoard(null));
+      .then((d) => {
+        setBoard(d);
+        setLoading(false);
+      })
+      .catch(() => {
+        setBoard(null);
+        setLoading(false);
+      });
   }, []);
 
   const entries = board?.entries.filter((e) => filter === 'all' || e.state === filter) ?? [];
@@ -118,6 +125,11 @@ export default function Status() {
             </table>
           </div>
         </>
+      ) : loading ? (
+        <div className="mt-10 flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-card p-10 text-slate-400">
+          <span className="h-3 w-3 animate-pulse rounded-full bg-accent" />
+          Loading status board...
+        </div>
       ) : (
         <div className="mt-10 rounded-2xl border border-white/10 bg-card p-10 text-center text-slate-400">
           Status data has not been generated yet. Run <code className="text-accent">bun scripts/status-sync.ts</code> or

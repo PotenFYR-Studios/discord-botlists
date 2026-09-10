@@ -25,7 +25,7 @@ const FEATURES = [
   {
     icon: '🧩',
     title: 'Zero dependencies',
-    body: 'Node fetch, node:http and EventEmitter only. Works on Node 18+ and Bun with discord.js, Eris or no client at all.',
+    body: 'Node fetch, node:http and EventEmitter only. Works on Node 18+ and Bun with discord.js, Eris, Oceanic or no client at all.',
   },
   {
     icon: '🔐',

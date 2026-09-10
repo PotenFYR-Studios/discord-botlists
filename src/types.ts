@@ -142,11 +142,19 @@ export interface StatusBoard {
   summary: { live: number; deprecated: number; shutdown: number; unknown: number };
 }
 
+/** stats provider for full control over any framework or none. */
+export type StatsProvider = () => StatsPayload | Promise<StatsPayload>;
+
 export interface BotlistsOptions {
   /** bot id: defaults to client.user.id when a client is given. */
   botId?: string;
-  /** discord.js or Eris client, enables auto stats collection. */
+  /** discord.js, Eris, Oceanic or any client with a guilds collection. Optional. */
   client?: BotClientLike;
+  /**
+   * full control: provide stats yourself, works with every framework or none.
+   * overrides client auto collection.
+   */
+  statsProvider?: StatsProvider;
   /** tokens per list id, merged over env vars. */
   tokens?: Record<string, string>;
   /** fallback bot token header names per list id. */

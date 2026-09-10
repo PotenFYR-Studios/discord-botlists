@@ -7,6 +7,7 @@ import type {
   PostReport,
   PostResult,
   StatsPayload,
+  StatsProvider,
   StatusBoard,
   UniversalBot,
 } from './types.js';
@@ -45,6 +46,7 @@ export class Botlists extends EventEmitter {
   private readonly fetchOptions: BotlistsOptions['fetchOptions'];
   private readonly disableStatusCheck: boolean;
   private readonly startupStatusCheck: boolean;
+  private readonly statsProvider: StatsProvider | null;
   private statusBoard: StatusBoard | null = null;
   private autoTimer: ReturnType<typeof setInterval> | null = null;
   private lastPostAt = 0;
@@ -59,6 +61,7 @@ export class Botlists extends EventEmitter {
     this.fetchOptions = options.fetchOptions;
     this.disableStatusCheck = options.disableStatusCheck ?? false;
     this.startupStatusCheck = options.startupStatusCheck ?? false;
+    this.statsProvider = options.statsProvider ?? null;
     this.http = new Http(options.fetchOptions);
 
     this.webhook = new VoteWebhookServer(options.webhook ?? {});
@@ -303,15 +306,19 @@ export class Botlists extends EventEmitter {
     this.autoTimer = null;
   }
 
-  /** auto collect stats from the discord.js / Eris client. */
+  /**
+   * merge order: explicit args > statsProvider (any framework / none) >
+   * auto collection from a discord.js, Eris or Oceanic client.
+   */
   private async resolveStats(stats?: Partial<StatsPayload>): Promise<StatsPayload> {
+    const provided = this.statsProvider ? await this.statsProvider() : null;
     const payload: StatsPayload = {
-      serverCount: stats?.serverCount ?? this.client ? collectServerCount(this.client) : 0,
-      shardId: stats?.shardId,
-      shardCount: stats?.shardCount ?? collectShardCount(this.client),
-      shards: stats?.shards ?? collectShards(this.client),
-      users: stats?.users,
-      voiceConnections: stats?.voiceConnections,
+      serverCount: stats?.serverCount ?? provided?.serverCount ?? collectServerCount(this.client),
+      shardId: stats?.shardId ?? provided?.shardId,
+      shardCount: stats?.shardCount ?? provided?.shardCount ?? collectShardCount(this.client),
+      shards: stats?.shards ?? provided?.shards ?? collectShards(this.client),
+      users: stats?.users ?? provided?.users,
+      voiceConnections: stats?.voiceConnections ?? provided?.voiceConnections,
     };
     return payload;
   }

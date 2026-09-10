@@ -170,3 +170,38 @@ describe('http server end to end', () => {
     client.stopWebhooks();
   });
 });
+
+describe('framework support', () => {
+  test('discord.js style collection', async () => {
+    const client = new Botlists({
+      client: { user: { id: '1' }, guilds: { size: 42 } },
+    });
+    const stats = await client['resolveStats']();
+    expect(stats.serverCount).toBe(42);
+  });
+
+  test('oceanic/eris style Map', async () => {
+    const guilds = new Map();
+    guilds.set('a', 1);
+    guilds.set('b', 2);
+    guilds.set('c', 3);
+    const client = new Botlists({ client: { user: { id: '1' }, guilds } });
+    const stats = await client['resolveStats']();
+    expect(stats.serverCount).toBe(3);
+  });
+
+  test('no framework at all: explicit stats still post', async () => {
+    const client = new Botlists();
+    const stats = await client['resolveStats']({ serverCount: 7 });
+    expect(stats.serverCount).toBe(7);
+  });
+
+  test('statsProvider works for any framework or none', async () => {
+    const client = new Botlists({
+      statsProvider: () => ({ serverCount: 123, shardCount: 4 }),
+    });
+    const stats = await client['resolveStats']();
+    expect(stats.serverCount).toBe(123);
+    expect(stats.shardCount).toBe(4);
+  });
+});

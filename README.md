@@ -40,7 +40,32 @@ bun add @potenfyrstudios/discord-botlists
 pnpm add @potenfyrstudios/discord-botlists
 ```
 
-Requirements: Node.js 18+ or Bun 1.1+. No peer dependencies. discord.js and Eris are optional; pass your `client` and the SDK reads server and shard counts from it.
+Requirements: Node.js 18+ or Bun 1.1+. No peer dependencies.
+
+**Works with every Discord framework, or none at all:**
+
+| Framework | Auto stats collection |
+| --- | --- |
+| discord.js | pass `client` - reads `guilds.cache.size`, shard info |
+| Eris | pass `client` - reads the guilds Map |
+| Oceanic | pass `client` - reads the guilds Map |
+| Seycla, Drizzle, bytecode frameworks | pass `client` if it exposes `guilds` |
+| Anything else / no framework | use `statsProvider` or pass stats explicitly |
+
+```ts
+// framework-less usage: stats provided by you
+const lists = new Botlists({
+  statsProvider: () => ({
+    serverCount: shardManager.totalGuilds,
+    shardCount: shardManager.shardCount,
+  }),
+});
+
+// or per call
+await lists.postStats({ serverCount: myGuildCount });
+```
+
+The webhook server, parser, status checks and every other feature are framework independent - they use plain HTTP and Node builtins.
 
 ## Quick start
 
