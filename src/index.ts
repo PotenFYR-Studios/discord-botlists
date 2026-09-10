@@ -18,6 +18,8 @@ import { ConsoleReport } from './status/report.js';
 import { VoteWebhookServer } from './webhooks/server.js';
 
 export { BotlistsError, ConsoleReport };
+export { UniversalParser } from './core/parser.js';
+export { StatusChecker } from './status/checker.js';
 
 /**
  * Botlists: the main entry point.
