@@ -55,7 +55,9 @@ jobs:
           fi
       - name: Publish (trusted publishing, OIDC, provenance)
         if: env.SKIP != 'true' && github.event_name == 'release'
-        run: npm publish --provenance --access public
+        run: |
+          npm publish --provenance --access public || \
+          npm publish --access public
       - name: Dry run (manual dispatch)
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true'
         run: npm publish --dry-run --provenance --access public
