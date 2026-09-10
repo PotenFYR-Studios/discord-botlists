@@ -49,7 +49,7 @@ jobs:
         if: github.event_name == 'release'
         run: |
           VERSION="$(node -p "require('./package.json').version")"
-          if npm view "@potenfyr-studios/discord-botlists@$VERSION" version >/dev/null 2>&1; then
+          if npm view "@potenfyrstudios/discord-botlists@$VERSION" version >/dev/null 2>&1; then
             echo "version $VERSION already published, skipping"
             echo "SKIP=true" >> "$GITHUB_ENV"
           fi

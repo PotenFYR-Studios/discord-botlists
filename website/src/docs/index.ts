@@ -65,9 +65,9 @@ const V2: DocVersion = {
           type: 'code',
           lang: 'bash',
           title: 'pick your package manager',
-          content: `npm install @potenfyr-studios/discord-botlists
-bun add @potenfyr-studios/discord-botlists
-pnpm add @potenfyr-studios/discord-botlists`,
+          content: `npm install @potenfyrstudios/discord-botlists
+bun add @potenfyrstudios/discord-botlists
+pnpm add @potenfyrstudios/discord-botlists`,
         },
         {
           type: 'table',
@@ -98,7 +98,7 @@ pnpm add @potenfyr-studios/discord-botlists`,
           lang: 'ts',
           title: 'the usual setup',
           content: `import { Client } from 'discord.js';
-import { Botlists } from '@potenfyr-studios/discord-botlists';
+import { Botlists } from '@potenfyrstudios/discord-botlists';
 
 const client = new Client({ intents: ['Guilds'] });
 
@@ -328,7 +328,7 @@ lists.viewBotUrl('top.gg'); // listing page url`,
         {
           type: 'code',
           lang: 'ts',
-          content: `import { UniversalParser } from '@potenfyr-studios/discord-botlists';
+          content: `import { UniversalParser } from '@potenfyrstudios/discord-botlists';
 
 const parser = new UniversalParser();
 const bot = parser.parseBot(listRecord, rawApiResponse);

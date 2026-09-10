@@ -43,7 +43,7 @@ const LISTS_MARQUEE = [
 ];
 
 const CODE = `import { Client } from 'discord.js';
-import { Botlists } from '@potenfyr-studios/discord-botlists';
+import { Botlists } from '@potenfyrstudios/discord-botlists';
 
 const client = new Client({ intents: ['Guilds'] });
 
@@ -106,7 +106,7 @@ export default function Home() {
           {/* install command with copy feel */}
           <div className="mx-auto mt-10 flex max-w-md items-center justify-between rounded-xl border border-white/10 bg-black/50 px-5 py-3.5 font-mono text-sm backdrop-blur">
             <span>
-              <span className="text-accent">$</span> npm install @potenfyr-studios/discord-botlists
+              <span className="text-accent">$</span> npm install @potenfyrstudios/discord-botlists
             </span>
             <span className="text-slate-500">[{formatNumber(live.downloads)} dl/mo]</span>
           </div>

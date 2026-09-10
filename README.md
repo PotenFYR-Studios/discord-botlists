@@ -2,8 +2,8 @@
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:8b5cf6,50:ec4899,100:f97316&height=220&section=header&text=discord-botlists&fontSize=52&fontColor=ffffff&fontAlignY=34&desc=Votes%20%C2%B7%20Stats%20%C2%B7%20Webhooks%20%C2%B7%20Every%20botlist%2C%20one%20SDK&descSize=18&descAlignY=55&animation=twinkling" width="100%" alt="discord-botlists banner"/>
 
-[![npm version](https://img.shields.io/npm/v/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyr-studios/discord-botlists)
-[![npm downloads](https://img.shields.io/npm/dt/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyr-studios/discord-botlists)
+[![npm version](https://img.shields.io/npm/v/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
+[![npm downloads](https://img.shields.io/npm/dt/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
 [![CI](https://img.shields.io/github/actions/workflow/status/PotenFYR-Studios/discord-botlists/ci.yml?style=for-the-badge&logo=githubactions&label=CI&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/actions/workflows/ci.yml)
 [![status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/PotenFYR-Studios/discord-botlists/main/.status/shield.json&style=for-the-badge&labelColor=1c1e26)](#live-status)
 [![license](https://img.shields.io/badge/license-MIT-8b5cf6.svg?style=for-the-badge&labelColor=1c1e26)](LICENSE)
@@ -11,7 +11,7 @@
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=18&pause=1200&color=8B5CF6&center=true&vCenter=true&width=760&lines=Post+stats+to+every+botlist+with+one+call;Realtime+votes%2C+comments+and+reviews;One+parser+for+every+API+shape;Dead+lists+auto-pruned+by+hourly+status+sync;Zero+dependencies+%C2%B7+Fully+typed+%C2%B7+MIT)](https://github.com/PotenFYR-Studios/discord-botlists)
 
-[Documentation Website](https://potenfyr-studios.github.io/discord-botlists/) | [npm](https://www.npmjs.com/package/@potenfyr-studios/discord-botlists) | [Status Board](#live-status)
+[Documentation Website](https://potenfyr-studios.github.io/discord-botlists/) | [npm](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists) | [Status Board](#live-status)
 
 </div>
 
@@ -33,11 +33,11 @@ Posting your bot's stats to every list and handling every list's webhook format 
 ## Installation
 
 ```bash
-npm install @potenfyr-studios/discord-botlists
+npm install @potenfyrstudios/discord-botlists
 # or
-bun add @potenfyr-studios/discord-botlists
+bun add @potenfyrstudios/discord-botlists
 # or
-pnpm add @potenfyr-studios/discord-botlists
+pnpm add @potenfyrstudios/discord-botlists
 ```
 
 Requirements: Node.js 18+ or Bun 1.1+. No peer dependencies. discord.js and Eris are optional; pass your `client` and the SDK reads server and shard counts from it.
@@ -46,7 +46,7 @@ Requirements: Node.js 18+ or Bun 1.1+. No peer dependencies. discord.js and Eris
 
 ```ts
 import { Client } from 'discord.js';
-import { Botlists } from '@potenfyr-studios/discord-botlists';
+import { Botlists } from '@potenfyrstudios/discord-botlists';
 
 const client = new Client({ intents: ['Guilds'] });
 
@@ -343,7 +343,7 @@ PRs welcome. Please:
 ## Links
 
 - [Documentation website](https://potenfyr-studios.github.io/discord-botlists/) (Vite + React + TS, deployed via GitHub Pages)
-- [npm package](https://www.npmjs.com/package/@potenfyr-studios/discord-botlists)
+- [npm package](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
 - [PotenFYR Studios](https://github.com/PotenFYR-Studios) | [Website](https://potenfyr.in) | [Discord](https://discord.com/invite/zUaN2FPBec)
 
 ## License
