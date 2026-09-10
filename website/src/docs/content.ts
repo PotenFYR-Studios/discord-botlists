@@ -667,5 +667,5 @@ import { ARCHIVED_VERSIONS } from './versions/index.js';
 
 export const CURRENT_DOC: DocVersion = CURRENT;
 
-export const DOC_VERSIONS: DocVersion[] = [CURRENT_DOC, ...ARCHIVED_VERSIONS];
+export const DOC_VERSIONS: DocVersion[] = [CURRENT_DOC, ...ARCHIVED_VERSIONS.filter((v) => v.version !== CURRENT_VERSION)];
 export const LATEST_VERSION = CURRENT_VERSION;

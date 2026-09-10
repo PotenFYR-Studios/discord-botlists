@@ -19,16 +19,22 @@ const META: Record<string, { title: string; description: string }> = {
 export default function SeoManager() {
   const location = useLocation();
   useEffect(() => {
-    // custom domain: swap canonical/og:url to the live origin automatically.
+    // custom domain: swap every absolute url to the live origin automatically.
     const GH = 'https://potenfyr-studios.github.io';
     if (!window.location.origin.startsWith(GH)) {
-      for (const selector of ['link[rel="canonical"]', 'meta[property="og:url"]']) {
+      const selectors = [
+        'link[rel="canonical"]',
+        'meta[property="og:url"]',
+        'meta[property="og:image"]',
+        'meta[name="twitter:image"]',
+      ];
+      for (const selector of selectors) {
         const tag = document.querySelector(selector);
+        const attr = selector.startsWith('link') ? 'href' : 'content';
         if (tag) {
           const current = tag.getAttribute('href') ?? tag.getAttribute('content') ?? '';
           if (current.startsWith(GH)) {
-            const updated = current.replace(GH, window.location.origin);
-            tag.setAttribute(selector.startsWith('link') ? 'href' : 'content', updated);
+            tag.setAttribute(attr, current.replace(GH, window.location.origin));
           }
         }
       }
