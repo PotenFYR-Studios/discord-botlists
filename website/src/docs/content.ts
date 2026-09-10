@@ -658,12 +658,14 @@ await lists.checkAndReportStatus();`,
   ],
 };
 
+/**
+ * Versioned docs, discord.js style: CURRENT is always the shipped version's
+ * content. Older versions are frozen in ./versions/ and merged in below so
+ * every released version stays readable forever.
+ */
+import { ARCHIVED_VERSIONS } from './versions/index.js';
+
 export const CURRENT_DOC: DocVersion = CURRENT;
 
-/**
- * Versioned docs, discord.js style: the current version's content lives in
- * CURRENT. When the package version changes, scripts/snapshot-docs.mjs
- * freezes this content into DOC_VERSIONS as an immutable archive.
- */
-export const DOC_VERSIONS: DocVersion[] = [CURRENT];
+export const DOC_VERSIONS: DocVersion[] = [CURRENT_DOC, ...ARCHIVED_VERSIONS];
 export const LATEST_VERSION = CURRENT_VERSION;

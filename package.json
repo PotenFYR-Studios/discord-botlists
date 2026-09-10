@@ -1,6 +1,6 @@
 {
   "name": "@potenfyrstudios/discord-botlists",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "description": "Universal multi-botlist SDK for Discord bots: post stats to 30+ verified live lists, realtime vote webhooks, ratings and a universal data parser with full TypeScript types",
   "type": "module",
   "main": "./dist/index.js",

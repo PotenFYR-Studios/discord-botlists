@@ -16,6 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route index element={<Home />} />
           <Route path="docs" element={<Docs />} />
           <Route path="docs/:version" element={<VersionedDocs />} />
+          <Route path="docs/:version/:section" element={<VersionedDocs />} />
           <Route path="status" element={<Status />} />
         </Route>
       </Routes>
