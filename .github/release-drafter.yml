@@ -1,5 +1,7 @@
 name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
+# first release baseline: with no previous tags the resolver starts from 1.0.0
+version-template: '$MAJOR.$MINOR.$PATCH'
 version-resolver:
   major:
     labels: ['breaking', 'major']
