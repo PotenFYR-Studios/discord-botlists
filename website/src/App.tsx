@@ -38,7 +38,7 @@ export default function App() {
               </NavLink>
             ))}
             <a
-              href="https://www.npmjs.com/package/discord-botlists"
+              href="https://www.npmjs.com/package/@potenfyr-studios/discord-botlists"
               className="ml-3 rounded-lg bg-gradient-to-r from-accent to-accent-2 px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
             >
               npm install
@@ -58,7 +58,7 @@ export default function App() {
                 {n.label}
               </Link>
             ))}
-            <a href="https://www.npmjs.com/package/discord-botlists" className="mt-2 block rounded-lg bg-accent px-3 py-2.5 text-center font-semibold text-white">
+            <a href="https://www.npmjs.com/package/@potenfyr-studios/discord-botlists" className="mt-2 block rounded-lg bg-accent px-3 py-2.5 text-center font-semibold text-white">
               npm install
             </a>
           </div>
@@ -70,7 +70,7 @@ export default function App() {
           <Link to="/docs" className="hover:text-accent">Docs</Link>
           <Link to="/status" className="hover:text-accent">Status</Link>
           <a href="https://github.com/PotenFYR-Studios/discord-botlists" className="hover:text-accent">GitHub</a>
-          <a href="https://www.npmjs.com/package/discord-botlists" className="hover:text-accent">npm</a>
+          <a href="https://www.npmjs.com/package/@potenfyr-studios/discord-botlists" className="hover:text-accent">npm</a>
           <a href="https://potenfyr.in" className="hover:text-accent">PotenFYR.in</a>
         </div>
         <p>

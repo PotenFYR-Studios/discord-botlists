@@ -15,7 +15,7 @@ export function useLiveData(): LiveData {
     let cancelled = false;
 
     // npm downloads (last month)
-    fetch('https://api.npmjs.org/downloads/point/last-month/discord-botlists')
+    fetch('https://api.npmjs.org/downloads/point/last-month/@potenfyr-studios%2Fdiscord-botlists')
       .then((r) => r.json())
       .then((d) => {
         if (!cancelled && typeof d.downloads === 'number') {
@@ -25,7 +25,7 @@ export function useLiveData(): LiveData {
       .catch(() => undefined);
 
     // latest npm version
-    fetch('https://registry.npmjs.org/discord-botlists/latest')
+    fetch('https://registry.npmjs.org/@potenfyr-studios%2Fdiscord-botlists/latest')
       .then((r) => r.json())
       .then((d) => {
         if (!cancelled && d.version) {

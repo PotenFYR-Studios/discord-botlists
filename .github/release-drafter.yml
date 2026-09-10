@@ -37,7 +37,7 @@ template: |
 
   $CHANGES
 
-  **npm**: `npm install discord-botlists@$RESOLVED_VERSION`
+  **npm**: `npm install @potenfyr-studios/discord-botlists@$RESOLVED_VERSION`
 
   **Full changelog**: https://github.com/PotenFYR-Studios/discord-botlists/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
 replacers:
