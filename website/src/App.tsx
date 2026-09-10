@@ -74,7 +74,7 @@ export default function App() {
           <a href="https://potenfyr.in" className="hover:text-accent">PotenFYR.in</a>
         </div>
         <p>
-          Built by <a className="text-accent hover:underline" href="https://github.com/PotenFYR-Studios">PotenFYR Studios</a> · MIT License
+          Built by <a className="text-accent hover:underline" href="https://github.com/PotenFYR-Studios">PotenFYR Studios</a> · Apache-2.0 + Commons Clause
         </p>
         <p className="mt-1 text-xs text-slate-600">Botlist names and trademarks belong to their respective owners.</p>
       </footer>

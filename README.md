@@ -6,10 +6,10 @@
 [![npm downloads](https://img.shields.io/npm/dt/@potenfyrstudios/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
 [![CI](https://img.shields.io/github/actions/workflow/status/PotenFYR-Studios/discord-botlists/ci.yml?style=for-the-badge&logo=githubactions&label=CI&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/actions/workflows/ci.yml)
 [![status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/PotenFYR-Studios/discord-botlists/main/.status/shield.json&style=for-the-badge&labelColor=1c1e26)](#live-status)
-[![license](https://img.shields.io/badge/license-MIT-8b5cf6.svg?style=for-the-badge&labelColor=1c1e26)](LICENSE)
+[![license](https://img.shields.io/badge/license-Apache--2.0%20%2B%20Commons%20Clause-8b5cf6.svg?style=for-the-badge&labelColor=1c1e26)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join%20us-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=1c1e26)](https://discord.com/invite/zUaN2FPBec)
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=18&pause=1200&color=8B5CF6&center=true&vCenter=true&width=760&lines=Post+stats+to+every+botlist+with+one+call;Realtime+votes%2C+comments+and+reviews;One+parser+for+every+API+shape;Dead+lists+auto-pruned+by+hourly+status+sync;Zero+dependencies+%C2%B7+Fully+typed+%C2%B7+MIT)](https://github.com/PotenFYR-Studios/discord-botlists)
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=18&pause=1200&color=8B5CF6&center=true&vCenter=true&width=760&lines=Post+stats+to+every+botlist+with+one+call;Realtime+votes%2C+comments+and+reviews;One+parser+for+every+API+shape;Dead+lists+auto-pruned+by+hourly+status+sync;Zero+dependencies+%C2%B7+Fully+typed+%C2%B7+Apache--2.0+%2B+Commons+Clause)](https://github.com/PotenFYR-Studios/discord-botlists)
 
 [Documentation Website](https://potenfyr-studios.github.io/discord-botlists/) | [npm](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists) | [Status Board](#live-status)
 
@@ -408,7 +408,7 @@ PRs welcome. Please:
 
 ## License
 
-[MIT](LICENSE) | Botlist names and trademarks belong to their respective owners. See [NOTICE.md](NOTICE.md).
+[Apache-2.0 + Commons Clause](LICENSE) | Free to fork, modify, use, and build around - but not to sell as a product. Botlist names and trademarks belong to their respective owners. See [NOTICE.md](NOTICE.md).
 
 <div align="center">
 
