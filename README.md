@@ -2,8 +2,8 @@
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:8b5cf6,50:ec4899,100:f97316&height=220&section=header&text=discord-botlists&fontSize=52&fontColor=ffffff&fontAlignY=34&desc=Votes%20%C2%B7%20Stats%20%C2%B7%20Webhooks%20%C2%B7%20Every%20botlist%2C%20one%20SDK&descSize=18&descAlignY=55&animation=twinkling" width="100%" alt="discord-botlists banner"/>
 
-[![npm version](https://img.shields.io/npm/v/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
-[![npm downloads](https://img.shields.io/npm/dt/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
+[![npm version](https://img.shields.io/npm/v/@potenfyrstudios/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
+[![npm downloads](https://img.shields.io/npm/dt/@potenfyrstudios/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
 [![CI](https://img.shields.io/github/actions/workflow/status/PotenFYR-Studios/discord-botlists/ci.yml?style=for-the-badge&logo=githubactions&label=CI&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/actions/workflows/ci.yml)
 [![status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/PotenFYR-Studios/discord-botlists/main/.status/shield.json&style=for-the-badge&labelColor=1c1e26)](#live-status)
 [![license](https://img.shields.io/badge/license-MIT-8b5cf6.svg?style=for-the-badge&labelColor=1c1e26)](LICENSE)
