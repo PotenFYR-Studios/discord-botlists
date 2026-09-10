@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary SEO -->
+    <title>discord-botlists: One SDK for every Discord botlist | Votes, Stats, Webhooks</title>
+    <meta name="title" content="discord-botlists: One SDK for every Discord botlist" />
+    <meta name="description" content="Post stats to 30+ verified live Discord botlists, receive realtime vote webhooks with zero delay, and parse any botlist's data into one universal shape. Zero dependencies, full TypeScript, Node 18+ and Bun." />
+    <meta name="keywords" content="discord botlist, discord-botlists, top.gg, discordbotlist, botlist api, vote webhook, discord bot stats, discord.js, eris, botblock, npm sdk" />
+    <meta name="author" content="PotenFYR Studios" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <link rel="canonical" href="https://potenfyr-studios.github.io/discord-botlists/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="discord-botlists" />
+    <meta property="og:url" content="https://potenfyr-studios.github.io/discord-botlists/" />
+    <meta property="og:title" content="discord-botlists: One SDK for every Discord botlist" />
+    <meta property="og:description" content="Realtime vote webhooks, universal data parser and stats posting for 30+ Discord botlists. Zero dependencies, fully typed." />
+    <meta property="og:image" content="https://potenfyr-studios.github.io/discord-botlists/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="discord-botlists: One SDK for every Discord botlist" />
+    <meta name="twitter:description" content="Realtime vote webhooks, universal parser and stats posting for 30+ Discord botlists." />
+    <meta name="twitter:image" content="https://potenfyr-studios.github.io/discord-botlists/og-image.png" />
+
+    <!-- Structured data: software app -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "discord-botlists",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Node.js 18+, Bun",
+      "description": "Universal multi-botlist SDK for Discord bots: realtime vote webhooks, stats posting and a universal parser for 30+ botlists.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Organization", "name": "PotenFYR Studios", "url": "https://potenfyr.in" },
+      "softwareVersion": "2.0.0",
+      "license": "https://opensource.org/licenses/MIT"
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Which Discord botlists does discord-botlists support?",
+          "acceptedAnswer": { "@type": "Answer", "text": "33 verified live lists including top.gg, discordbotlist.com, discord.bots.gg, botlist.me, discords.com, voidbots.net, vcodes.xyz and radarcord.net. Dead lists are pruned automatically by hourly status checks." }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I receive realtime vote events for my Discord bot?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Call startWebhooks() and point each list dashboard at your webhook URL with the list id appended. Votes arrive as typed events on one EventEmitter with zero polling delay." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does discord-botlists work without discord.js?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The SDK has zero dependencies and works standalone on Node 18+ and Bun. discord.js and Eris are optional and only used to auto collect server and shard counts." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is discord-botlists free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, MIT licensed and free forever. It is installable from npm as discord-botlists." }
+        }
+      ]
+    }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,57 @@
+name: Publish npm
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Run publish in dry-run mode
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Typecheck
+        run: bun run lint
+      - name: Unit tests
+        run: bun run test
+      - name: Build
+        run: bun run build
+      - name: Verify no secrets in package
+        run: |
+          cd dist
+          ! grep -rE "(sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{20,}|DBL_[A-Z_]+=.)" . || (echo "possible secret found" && exit 1)
+      - name: Read version
+        id: ver
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Check version not already published
+        if: github.event_name == 'release'
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          if npm view "discord-botlists@$VERSION" version >/dev/null 2>&1; then
+            echo "version $VERSION already published, skipping"
+            echo "SKIP=true" >> "$GITHUB_ENV"
+          fi
+      - name: Publish (trusted, provenance)
+        if: env.SKIP != 'true' && github.event_name == 'release'
+        run: npm publish --provenance --access public
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish dry run (manual)
+        if: github.event_name == 'workflow_dispatch'
+        run: npm publish --dry-run --access public
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

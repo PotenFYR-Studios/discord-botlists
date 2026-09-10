@@ -1,92 +1,76 @@
 {
   "name": "discord-botlists",
-  "version": "1.0.8",
-  "description": "Multi-Discord-Botlist Management Package with 40+ Botlist Supported with Events and Stats Update Methods",
-  "main": "./src/index.js",
-  "module": "./src/index.mjs",
-  "types": "./typings/index.d.ts",
-  "files": [
-    "src",
-    "typings"
-  ],
+  "version": "2.0.0",
+  "description": "Universal multi-botlist SDK for Discord bots: post stats to 30+ verified live lists, realtime vote webhooks, ratings and a universal data parser with full TypeScript types",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "./*": "./*",
     ".": {
-      "require": "./src/index.js",
-      "import": "./src/index.mjs"
-    }
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./webhooks": {
+      "types": "./dist/webhooks/server.d.ts",
+      "import": "./dist/webhooks/server.js",
+      "require": "./dist/webhooks/server.js"
+    },
+    "./lists": {
+      "types": "./dist/data/lists.d.ts",
+      "import": "./dist/data/lists.js",
+      "require": "./dist/data/lists.js"
+    },
+    "./package.json": "./package.json"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "NOTICE.md"
+  ],
+  "sideEffects": false,
   "scripts": {
-    "lint": "eslint ./src",
-    "lint:fix": "eslint ./src --fix",
-    "lint:commit": "npm run lint:fix && npm run commit:push",
-    "commit": "git-cz",
-    "semantic-release": "semantic-release --branches main",
-    "commit:push": "git add . && npm run commit && git push",
-    "docs": "jsdoc node_modules/.bin/jsdoc --configure .jsdoc.json --verbose",
-    "test": "node test/testing.js",
-    "json2js": "node scripts/Json2js.js"
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "tsc --noEmit",
+    "test": "bun test test/",
+    "test:node": "node --test test/node/",
+    "prepublishOnly": "npm run lint && npm run build"
   },
-  "devDependencies": {
-    "@babel/eslint-parser": "^7.17.0",
-    "@babel/preset-env": "^7.16.11",
-    "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^8.14.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.26.0",
-    "jsdoc": "^3.6.10",
-    "jsdoc-babel": "^0.5.0",
-    "jsdoc-skyceil": "^2.0.0",
-    "nyc": "^15.1.0",
-    "semantic-release": "^19.0.2",
-    "write-json-safe": "^2.1.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "engines": {
-    "node": ">= 17.0.0",
-    "npm": ">=8.0.0"
-  },
-  "dependencies": {
-    "axios": "^0.27.2",
-    "body-parser": "^1.20.0",
-    "express": "^4.18.0",
-    "raw-body": "^2.5.1"
-  },
-  "directories": {
-    "example": "example"
-  },
-  "author": "Sid is Live YT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SidisLiveYT/discord-botlists.git"
-  },
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/SidisLiveYT/discord-botlists/issues"
-  },
-  "homepage": "discord-botlists.js.org",
   "keywords": [
     "discord-botlists",
-    "discord botlists",
     "discord botlist",
-    "botlists",
     "botlist",
     "top.gg",
-    "axios",
-    "discord-botlist",
-    "discord",
-    "discord-bots",
-    "discord.react",
-    "multi-discord-botlists",
-    "top.gg votes",
-    "topgg poster",
-    "botlists votes",
+    "topgg",
+    "discordbotlist",
+    "votes",
+    "vote webhook",
     "discord.js",
-    "discord.eris",
-    "botlists poster"
-  ]
+    "eris",
+    "stats poster",
+    "botblock",
+    "discord"
+  ],
+  "author": "PotenFYR Studios",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PotenFYR-Studios/discord-botlists.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PotenFYR-Studios/discord-botlists/issues"
+  },
+  "homepage": "https://potenfyr.in",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "bun-types": "^1.4.2",
+    "typescript": "^5.9.3"
+  }
 }

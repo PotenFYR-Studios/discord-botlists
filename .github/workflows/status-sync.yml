@@ -1,0 +1,54 @@
+name: Status sync
+
+# Probes every list hourly, refreshes the README status table and website
+# status.json on main, and opens a PR ONLY when a list turns deprecated or
+# shutdown (so registry changes are always human reviewed).
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Probe all lists
+        id: probe
+        run: bun scripts/status-sync.ts
+      - name: Commit status refresh (live data only)
+        run: |
+          git config user.name "potenfyr-bot"
+          git config user.email "bot@potenfyr.in"
+          git add .status/status.json .status/STATUS.md README.md website/src/data/status.json
+          git diff --cached --quiet && echo "no changes" && exit 0
+          git commit -m "chore(status): refresh botlist status board"
+          git push
+      - name: Open PR for deprecated or shutdown lists
+        if: steps.probe.outputs.pr_needed == 'true'
+        run: |
+          DEAD="${{ steps.probe.outputs.dead_lists }}"
+          PREFIX="status/registry-update-$(date +%Y%m%d%H)"
+          git checkout -b "$PREFIX"
+          # mark dead lists in the generated registry so consumers stop posting
+          bun scripts/mark-dead.ts $DEAD
+          git add src/data/lists.generated.ts
+          git commit -m "fix(registry): mark dead lists: $DEAD" || true
+          git push origin "$PREFIX"
+          gh pr create \
+            --title "fix(registry): mark dead lists: $DEAD" \
+            --body "Automated status sync detected these lists as deprecated or shutdown: $DEAD
+
+            Details in .status/STATUS.md. Merge to stop posting stats to them." \
+            --base main --head "$PREFIX"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

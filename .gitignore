@@ -1,6 +1,10 @@
-.idea/
-.vscode/
-lib/
 node_modules/
-.nyc_output/
-test/
+dist/
+coverage/
+*.env
+.env*
+!.env.example
+.DS_Store
+*.log
+website/dist/
+website/node_modules/

@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-surface text-slate-200 antialiased;
+}
+
+.code-block {
+  @apply rounded-xl border border-white/10 bg-card p-4 text-sm font-mono text-slate-300 overflow-x-auto;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #8b5cf6, #ec4899, #f97316);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glow-card {
+  @apply rounded-2xl border border-white/10 bg-card/80 p-6 backdrop-blur transition;
+}
+.glow-card:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+}
