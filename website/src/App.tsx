@@ -17,7 +17,7 @@ export default function App() {
       <header className="sticky top-0 z-50 border-b border-white/10 bg-surface/70 backdrop-blur-xl">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-2.5 font-bold" onClick={() => setOpen(false)}>
-            <img src="/discord-botlists/favicon.svg" alt="" className="h-7 w-7" />
+            <img src="/favicon.png" alt="discord-botlists logo" className="h-7 w-7" />
             <span>
               discord<span className="gradient-text">-botlists</span>
             </span>
