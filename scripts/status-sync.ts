@@ -21,7 +21,7 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const OUT_DIR = `${ROOT}.status`;
 const README = `${ROOT}README.md`;
 const WEBSITE_DATA = `${ROOT}website/src/data/status.json`;
-const SITE_URL = process.env.SITE_URL ?? 'https://potenfyr-studios.github.io/discord-botlists/';
+const SITE_URL = process.env.SITE_URL ?? 'https://botlists.docs.potenfyr.in/';
 
 const begin = new Date();
 const client = new Botlists();
