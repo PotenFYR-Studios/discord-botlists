@@ -6,7 +6,7 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -24,7 +24,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Sync package.json version with latest tag
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
         run: |
           LATEST=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')
           CURRENT=$(node -p "require('./package.json').version")

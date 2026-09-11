@@ -49,6 +49,6 @@ jobs:
             --body "Automated status sync detected these lists as deprecated or shutdown: $DEAD
 
             Details in .status/STATUS.md. Merge to stop posting stats to them." \
-            --base main --head "$PREFIX"
+            --base master --head "$PREFIX"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

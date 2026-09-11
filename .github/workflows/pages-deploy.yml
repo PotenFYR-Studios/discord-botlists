@@ -7,7 +7,7 @@ name: Deploy website to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - website/**
       - .status/status.json
