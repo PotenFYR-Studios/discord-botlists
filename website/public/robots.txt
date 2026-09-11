@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://potenfyr-studios.github.io/discord-botlists/sitemap.xml
+Sitemap: https://botlists.docs.potenfyr.in/sitemap.xml
 
 # AI / answer-engine crawlers: explicitly welcome (2026 GEO best practice)
 User-agent: GPTBot
@@ -28,4 +28,4 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-# LLM guidance: https://potenfyr-studios.github.io/discord-botlists/llms.txt
+# LLM guidance: https://botlists.docs.potenfyr.in/llms.txt

@@ -18,9 +18,9 @@ Node.js 18+ or Bun 1.1+. Zero runtime dependencies.
 
 ## Docs
 
-- Documentation: https://potenfyr-studios.github.io/discord-botlists/#/docs
-- API reference: https://potenfyr-studios.github.io/discord-botlists/#/docs/1.0.0
-- Status board: https://potenfyr-studios.github.io/discord-botlists/#/status
+- Documentation: https://botlists.docs.potenfyr.in/#/docs
+- API reference: https://botlists.docs.potenfyr.in/#/docs/1.0.0
+- Status board: https://botlists.docs.potenfyr.in/#/status
 
 ## Links
 
