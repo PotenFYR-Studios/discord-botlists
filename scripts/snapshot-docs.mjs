@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Freezes the current docs content into website/src/docs/versions/<version>.ts
+ * Freezes the current docs content into docs/src/docs/versions/<version>.ts
  * Run this BEFORE bumping package.json when cutting a release, so the old
  * version stays readable in the version dropdown forever.
  *
@@ -16,8 +16,8 @@ if (!version) {
 }
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const contentPath = `${root}website/src/docs/content.ts`;
-const outDir = `${root}website/src/docs/versions`;
+const contentPath = `${root}docs/src/docs/content.ts`;
+const outDir = `${root}docs/src/docs/versions`;
 const indexPath = `${outDir}/index.ts`;
 
 let content = readFileSync(contentPath, 'utf8');

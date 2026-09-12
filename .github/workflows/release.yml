@@ -1,7 +1,7 @@
 name: Release
 
 # Conventional Commits in, changelog release out.
-# push to main -> draft release with categorized changelog.
+# push to master -> draft release with categorized changelog.
 # publishing the draft (or any published release) triggers npm publish.
 
 on:
@@ -17,7 +17,7 @@ jobs:
   draft-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: release-drafter/release-drafter@v6
         with:
           config-name: release-drafter.yml

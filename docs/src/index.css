@@ -1,0 +1,323 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --line: rgba(139, 92, 246, 0.16);
+  --line-light: rgba(255, 255, 255, 0.08);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(56px + 24px);
+}
+
+body {
+  @apply bg-surface text-ink2 antialiased overflow-x-hidden;
+}
+
+/* canonical dot-pattern backdrop (SPEC 5.13) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(139, 92, 246, 0.22) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(750px circle at 50% 0%, white, transparent 75%);
+  mask-image: radial-gradient(750px circle at 50% 0%, white, transparent 75%);
+}
+
+::selection {
+  background: rgba(139, 92, 246, 0.45);
+  color: #fff;
+}
+
+/* links: violet family (SPEC 3) */
+a {
+  transition: color 0.15s;
+}
+
+/* display gradient text: canonical 120deg pastel (SPEC 3) */
+.grad-text {
+  background: linear-gradient(120deg, #c4b5fd, #f9a8d4 50%, #fdba74);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* vivid 90deg variant: LANDING PAGE ONLY (SPEC appendix: botlists divergence) */
+.grad-text-vivid {
+  background: linear-gradient(90deg, #a78bfa, #ec4899 55%, #f97316);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* navbar brand trailing gradient dot */
+.brand-dot {
+  background: linear-gradient(120deg, #c4b5fd, #f9a8d4 50%, #fdba74);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* mono micro-label (SPEC 3) */
+.mono-label {
+  @apply font-mono uppercase;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #9aa0b4;
+}
+
+/* buttons (SPEC 5.3) */
+.btn-primary {
+  @apply inline-flex items-center gap-2 rounded-full font-bold text-white;
+  padding: 12px 26px;
+  font-size: 0.9em;
+  line-height: 1;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899 55%, #f97316);
+  box-shadow: 0 4px 24px rgba(236, 72, 153, 0.35);
+  transition: transform 0.16s, box-shadow 0.16s, background 0.16s;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(236, 72, 153, 0.45);
+}
+.btn-ghost {
+  @apply inline-flex items-center gap-2 rounded-full font-semibold text-ink;
+  padding: 12px 26px;
+  font-size: 0.9em;
+  line-height: 1;
+  border: 1px solid var(--line-light);
+  background: rgba(255, 255, 255, 0.03);
+  transition: transform 0.16s, background 0.16s, border-color 0.16s;
+}
+.btn-ghost:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(139, 92, 246, 0.45);
+}
+
+/* glass card with border-beam hover (SPEC 5.5) */
+.glass-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 18px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line-light);
+  border-radius: 14px;
+  backdrop-filter: blur(8px);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s, background 0.18s;
+}
+.glass-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 24px rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.45);
+}
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--beam-angle, 0deg),
+    transparent 70%,
+    rgba(139, 92, 246, 0.5) 82%,
+    rgba(236, 72, 153, 0.5) 90%,
+    transparent
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+.glass-card:hover::before {
+  opacity: 1;
+  animation: beam-spin 2.6s linear infinite;
+}
+@property --beam-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes beam-spin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+/* icon tile inside cards (SPEC 5.5 anatomy) */
+.icon-tile {
+  @apply flex items-center justify-center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-light);
+  font-size: 1.15rem;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.glass-card:hover .icon-tile {
+  transform: scale(1.08);
+  box-shadow: 0 0 18px rgba(139, 92, 246, 0.25);
+}
+
+/* stat tile (SPEC 5.6, CSS flavor) */
+.stat-tile {
+  @apply rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-center backdrop-blur-md;
+  transition: transform 0.16s;
+}
+.stat-tile:hover {
+  transform: translateY(-2px);
+}
+
+/* tables (SPEC 5.7) */
+.spec-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9em;
+  background: #151828;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.spec-table th {
+  padding: 9px 14px;
+  background: #1a1e32;
+  color: #e8eaf2;
+  font-weight: 620;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.spec-table td {
+  padding: 9px 14px;
+  color: #b9bfd4;
+  border-bottom: 1px solid var(--line-light);
+}
+.spec-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.spec-table tbody tr:hover {
+  background: rgba(139, 92, 246, 0.06);
+}
+
+/* code blocks + copy button (SPEC 5.8) */
+pre.spec-pre {
+  position: relative;
+  padding: 14px 16px 26px;
+  background: #151828;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 28px rgba(0, 0, 0, 0.4);
+  overflow-x: auto;
+}
+pre.spec-pre code {
+  font-family: 'Fira Code', ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.84em;
+  line-height: 1.65;
+  color: #dfe2ef;
+}
+.spec-pre::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-family: 'Fira Code', ui-monospace, monospace;
+  font-size: 0.62em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6a7089;
+}
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9aa0b4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-light);
+  border-radius: 6px;
+  padding: 3px 9px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+pre:hover .copy-btn,
+.copy-btn:focus-visible {
+  opacity: 1;
+}
+.copy-btn:hover {
+  color: #fff;
+  border-color: rgba(139, 92, 246, 0.5);
+}
+.copy-btn.ok {
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+/* inline code */
+code.inline {
+  font-family: 'Fira Code', ui-monospace, monospace;
+  font-size: 0.85em;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid var(--line);
+  color: #d8ccfe;
+  border-radius: 6px;
+  padding: 0.12em 0.4em;
+}
+
+/* focus ring (SPEC 8) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+}
+
+/* scrollbars (SPEC 2.1) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #232840 transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #232840;
+  border-radius: 3px;
+}
+
+/* marquee (landing only) */
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* reduced motion (SPEC 7, mandatory) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

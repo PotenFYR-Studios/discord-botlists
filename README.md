@@ -2,16 +2,22 @@
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:8b5cf6,50:ec4899,100:f97316&height=220&section=header&text=discord-botlists&fontSize=52&fontColor=ffffff&fontAlignY=34&desc=Votes%20%C2%B7%20Stats%20%C2%B7%20Webhooks%20%C2%B7%20Every%20botlist%2C%20one%20SDK&descSize=18&descAlignY=55&animation=twinkling" width="100%" alt="discord-botlists banner"/>
 
-[![npm version](https://img.shields.io/npm/v/@potenfyrstudios/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
-[![npm downloads](https://img.shields.io/npm/dt/@potenfyrstudios/discord-botlists.svg?style=for-the-badge&logo=npm&labelColor=1c1e26)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
-[![CI](https://img.shields.io/github/actions/workflow/status/PotenFYR-Studios/discord-botlists/ci.yml?style=for-the-badge&logo=githubactions&label=CI&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/actions/workflows/ci.yml)
-[![status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/PotenFYR-Studios/discord-botlists/main/.status/shield.json&style=for-the-badge&labelColor=1c1e26)](#live-status)
-[![license](https://img.shields.io/badge/license-Apache--2.0%20%2B%20Commons%20Clause-8b5cf6.svg?style=for-the-badge&labelColor=1c1e26)](LICENSE)
+[![npm](https://img.shields.io/npm/v/@potenfyrstudios/discord-botlists.svg?style=for-the-badge&logo=npm&logoColor=white&labelColor=1c1e26&color=8b5cf6)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
+[![npm downloads](https://img.shields.io/npm/dt/@potenfyrstudios/discord-botlists.svg?style=for-the-badge&logo=npm&logoColor=white&labelColor=1c1e26&color=ec4899)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
+[![Website](https://img.shields.io/badge/docs-botlists.docs.potenfyr.in-8b5cf6?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=1c1e26)](https://botlists.docs.potenfyr.in)
 [![Discord](https://img.shields.io/badge/Discord-Join%20us-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=1c1e26)](https://discord.com/invite/zUaN2FPBec)
+[![GitHub](https://img.shields.io/badge/GitHub-PotenFYR--Studios-181717?style=for-the-badge&logo=github&logoColor=white&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists)
+[![Profile views](https://komarev.com/ghpvc/?username=PotenFYR-Studios-discord-botlists&color=ec4899&style=for-the-badge&label=PROFILE+VIEWS&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists)
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=18&pause=1200&color=8B5CF6&center=true&vCenter=true&width=760&lines=Post+stats+to+every+botlist+with+one+call;Realtime+votes%2C+comments+and+reviews;One+parser+for+every+API+shape;Dead+lists+auto-pruned+by+hourly+status+sync;Zero+dependencies+%C2%B7+Fully+typed+%C2%B7+Apache--2.0+%2B+Commons+Clause)](https://github.com/PotenFYR-Studios/discord-botlists)
+[![CI](https://img.shields.io/github/actions/workflow/status/PotenFYR-Studios/discord-botlists/ci.yml?branch=master&style=flat-square&logo=githubactions&label=CI&color=2ea043&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/actions/workflows/ci.yml)
+[![status](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/PotenFYR-Studios/discord-botlists/master/.status/shield.json&style=flat-square&labelColor=1c1e26)](#live-status)
+[![license](https://img.shields.io/badge/license-Apache--2.0%20%2B%20Commons%20Clause-8b5cf6.svg?style=flat-square&labelColor=1c1e26)](LICENSE)
 
-[Documentation Website](https://potenfyr-studios.github.io/discord-botlists/) | [npm](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists) | [Status Board](#live-status)
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&pause=1200&color=8B5CF6&center=true&vCenter=true&width=800&lines=Post+stats+to+every+botlist+with+one+call;Realtime+votes%2C+comments+and+reviews;One+parser+for+every+API+shape;Zero+dependencies+%C2%B7+fully+typed)](https://github.com/PotenFYR-Studios/discord-botlists)
+
+**`@potenfyrstudios/discord-botlists`**: the universal multi-botlist SDK for Discord bots: post stats to 33 verified live lists, get votes in realtime, parse every API into one shape.
+
+[Docs](https://botlists.docs.potenfyr.in) · [Examples](https://botlists.docs.potenfyr.in/examples) · [npm](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists) · [Issues](https://github.com/PotenFYR-Studios/discord-botlists/issues) · [Live status](#live-status)
 
 </div>
 
@@ -21,14 +27,14 @@
 
 Posting your bot's stats to every list and handling every list's webhook format yourself is weeks of glue code. This package does all of it with zero runtime dependencies:
 
-- **Stats posting** to 30+ verified live lists, each with its correct wire format, auth header and endpoint, learned from every list's own docs plus the BotBlock directory. Dead lists are pruned automatically by the hourly status sync.
+- **Stats posting** to 33 verified live lists, each with its correct wire format, auth header and endpoint, learned from every list's own docs plus the BotBlock directory. Dead lists are pruned automatically by the hourly status sync.
 - **Realtime vote, comment and review events** through a built-in webhook server. No polling, no delay, no express dependency.
 - **Universal parser** that normalizes any list's bot data into one `UniversalBot` object so you never juggle `server_count` vs `guildCount` vs `guilds` vs `count` again.
-- **Status tracking**: automated hourly probes detect deprecated or shut down lists, with latency and HTTP state, synced into this README and the website.
+- **Status tracking**: automated hourly probes detect deprecated or shut down lists, with latency and HTTP state, synced into this README and the docs site.
 - **Fully typed**: strict TypeScript, generic event emitter, autocomplete for every option.
 - **Lightweight**: zero dependencies, works on Node 18+ and Bun.
 
-> Documentation is duplicated on the [website](https://potenfyr-studios.github.io/discord-botlists/) with live examples. This README is the same content, maintained in sync.
+> The full documentation lives at **[botlists.docs.potenfyr.in](https://botlists.docs.potenfyr.in)**: [API reference](https://botlists.docs.potenfyr.in/docs/1.0.1/api-reference), [examples](https://botlists.docs.potenfyr.in/examples) and the [live status board](https://botlists.docs.potenfyr.in/status). This README mirrors the same content.
 
 ## Installation
 
@@ -49,7 +55,7 @@ Requirements: Node.js 18+ or Bun 1.1+. No peer dependencies.
 | discord.js | pass `client` - reads `guilds.cache.size`, shard info |
 | Eris | pass `client` - reads the guilds Map |
 | Oceanic | pass `client` - reads the guilds Map |
-| Seycla, Drizzle, bytecode frameworks | pass `client` if it exposes `guilds` |
+| Any other client | pass `client` if it exposes `guilds` |
 | Anything else / no framework | use `statsProvider` or pass stats explicitly |
 
 ```ts
@@ -88,7 +94,7 @@ const lists = new Botlists({
   },
 });
 
-client.on('ready', async () => {
+client.once('ready', async () => {
   // 1. post stats to every list you gave a token for
   const report = await lists.postStats();
   console.log(`posted to ${report.posted} lists`);
@@ -110,22 +116,7 @@ lists.on('review', (review) => {
 client.login(process.env.DISCORD_TOKEN);
 ```
 
-Point each botlist's webhook URL at `https://your-domain:8080/discord-botlists/<list-id>` and votes arrive as typed events instantly. The full API of every supported list, per list env variable names and more live examples are in the [docs website](https://potenfyr-studios.github.io/discord-botlists/).
-
-## Repository activity
-
-<div align="center">
-
-[![Stars](https://img.shields.io/github/stars/PotenFYR-Studios/discord-botlists?style=for-the-badge&logo=github&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/stargazers)
-[![Forks](https://img.shields.io/github/forks/PotenFYR-Studios/discord-botlists?style=for-the-badge&logo=github&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/network/members)
-[![Issues](https://img.shields.io/github/issues/PotenFYR-Studios/discord-botlists?style=for-the-badge&logo=github&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/issues)
-[![Release](https://img.shields.io/github/v/release/PotenFYR-Studios/discord-botlists?style=for-the-badge&logo=github&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/releases)
-
-[![Last commit](https://img.shields.io/github/last-commit/PotenFYR-Studios/discord-botlists/main?style=flat-square&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/commits/main)
-![Repo size](https://img.shields.io/github/repo-size/PotenFYR-Studios/discord-botlists?style=flat-square&labelColor=1c1e26)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/PotenFYR-Studios/discord-botlists?style=flat-square&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists/commits/main)
-
-</div>
+Point each botlist's webhook URL at `https://your-domain:8080/discord-botlists/<list-id>` and votes arrive as typed events instantly. Per-list wire formats, env variable names and more live examples: [docs](https://botlists.docs.potenfyr.in/docs) · [examples](https://botlists.docs.potenfyr.in/examples).
 
 ## Full API
 
@@ -138,7 +129,7 @@ Point each botlist's webhook URL at `https://your-domain:8080/discord-botlists/<
 | `postViaBotBlock(stats?)` | `Promise<PostReport>` | One request to botblock.org that fans out to all lists. |
 | `startWebhooks(port?)` | `Promise<string>` | Start the realtime webhook server, returns its address. |
 | `stopWebhooks()` | `Promise<void>` | Stop the webhook server. |
-| `ingestWebhook(list, body)` | `void` | Feed a webhook body from your own express/fastify app. |
+| `ingestWebhook(list, body, isTest?)` | `void` | Feed a webhook body from your own express/fastify app. |
 | `fetchBot(list, botId?)` | `Promise<UniversalBot>` | Fetch and normalize a bot from one list. |
 | `fetchVotes(list, botId?)` | `Promise<number \| null>` | Current vote count on one list. |
 | `hasVoted(list, userId)` | `Promise<boolean \| null>` | Check if a user voted (lists that expose it). |
@@ -151,6 +142,8 @@ Point each botlist's webhook URL at `https://your-domain:8080/discord-botlists/<
 | `stopAutoPost()` | `void` | Stop the auto poster. |
 
 A list can be referenced by id (`'top.gg'`), name (`'Discord Bots'`), hostname (`'discord.bots.gg'`) or shorthand (`'topgg'`, `'voidbots'`, `'radarcord'`).
+
+Also exported: `UniversalParser`, `StatusChecker`, `ConsoleReport`, `BotlistsError`, `EVENTS`, and the subpath exports `@potenfyrstudios/discord-botlists/webhooks` (`VoteWebhookServer`) and `/lists` (the raw registry).
 
 ### Realtime events
 
@@ -260,7 +253,7 @@ const lists = new Botlists({ tokens: { 'top.gg': 'eyJ...' } });
 // 3. mixed: env is the base, the map overrides per key
 ```
 
-`list.tokenEnvKey` tells you the env name for every list at runtime.
+`list.tokenEnvKey` tells you the env name for every list at runtime. See [.env.example](.env.example) for the full key list.
 
 ### Posting stats, including shards
 
@@ -281,13 +274,13 @@ await lists.postStatsTo('radarcord', { serverCount: 100 });
 await lists.postViaBotBlock({ serverCount: 100 });
 ```
 
-Every list gets its correct body shape automatically: `server_count` for top.gg, `guildCount` for discord.bots.gg, `guilds` for discordbotlist.com, `servers` for disforge, and so on for all 30+.
+Every list gets its correct body shape automatically: `server_count` for top.gg, `guildCount` for discord.bots.gg, `guilds` for discordbotlist.com, `servers` for disforge, and so on for all 33.
 
 ### Rate limit safety
 
-- Posts are throttled with a 250 ms gap per list and retried on 429/5xx honouring `Retry-After`.
+- Posts are throttled with a 250 ms gap per list; HTTP layer retries 408/429/5xx with backoff, and strict requests honour `Retry-After` (≤ 30 s) once before failing.
 - BotBlock mode sends one request total (their own limit is 1 per 120 s, the SDK will not retry it faster).
-- Status probes use 8 parallel HEAD requests max, browser UA, per run.
+- Status probes use 8 parallel HEAD requests max (GET fallback for hosts that reject HEAD), browser UA, board cached 5 minutes.
 - `fetchBot`/`searchBots` add your token only when required, public endpoints stay unauthenticated.
 
 ### Custom / self-hosted lists
@@ -321,7 +314,7 @@ top.gg | discordbotlist.com | discord.bots.gg | botlist.me | discords.com | void
 
 Each record carries: endpoint URLs, wire field names, shard field names, auth header, widget and view URLs, webhook format hint and env var key.
 
-Missing a list? [Open an issue](https://github.com/PotenFYR-Studios/discord-botlists/issues/new?template=list-request.md) with its name, API docs link and a maintainer contact: live lists get added within days.
+Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discord-botlists/issues/new?template=list_request.yml) with its name, API docs link and a maintainer contact: live lists get added within days.
 
 ## Live status
 
@@ -330,39 +323,39 @@ Last sync: **2026-09-12** | 🟢 33 live | 🟡 0 deprecated | 🔴 0 shutdown |
 
 | List | Status | Latency | HTTP | Last checked (UTC) |
 | --- | --- | --- | --- | --- |
-| [Blist](https://blist.xyz/) | 🟢 live | 88 ms | 200 | 2026-09-12 10:35 |
-| [Botlist.Co](https://botlist.co/platforms/discord) | 🟢 live | 708 ms | 200 | 2026-09-12 10:35 |
-| [Botlist.me](https://botlist.me/) | 🟢 live | 477 ms | 200 | 2026-09-12 10:35 |
-| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 557 ms | 200 | 2026-09-12 10:35 |
-| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 411 ms | 200 | 2026-09-12 10:35 |
-| [Bots Database](https://botsdatabase.com/) | 🟢 live | 65 ms | 200 | 2026-09-12 10:35 |
-| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 282 ms | 200 | 2026-09-12 10:35 |
-| [Cybralist](https://cybralist.com/) | 🟢 live | 400 ms | 200 | 2026-09-12 10:35 |
-| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 331 ms | 200 | 2026-09-12 10:35 |
-| [discord.place](https://discord.place/bots) | 🟢 live | 97 ms | 200 | 2026-09-12 10:35 |
-| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 1427 ms | 200 | 2026-09-12 10:35 |
-| [Discord Services](https://discord.services/) | 🟢 live | 529 ms | 403 | 2026-09-12 10:35 |
-| [Discord Bot World](https://discordbot.world/) | 🟢 live | 397 ms | 200 | 2026-09-12 10:35 |
-| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 220 ms | 200 | 2026-09-12 10:35 |
-| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live | 1212 ms | 200 | 2026-09-12 10:35 |
-| [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live | 668 ms | 200 | 2026-09-12 10:35 |
-| [dlist.gg](https://discordlist.gg/) | 🟢 live | 173 ms | 200 | 2026-09-12 10:35 |
-| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 66 ms | 200 | 2026-09-12 10:35 |
-| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 239 ms | 200 | 2026-09-12 10:35 |
-| [Disforge](https://disforge.com/bots) | 🟢 live | 494 ms | 200 | 2026-09-12 10:35 |
-| [DisQ](https://disq.ink/) | 🟢 live | 950 ms | 200 | 2026-09-12 10:35 |
-| [DList.Space](https://dlist.space/) | 🟢 live | 98 ms | 200 | 2026-09-12 10:35 |
-| [JustDiscord](https://justdiscord.org/) | 🟢 live | 270 ms | 200 | 2026-09-12 10:35 |
-| [MotionDevelopment](https://www.motiondevelopment.top/) | 🟢 live | 352 ms | 200 | 2026-09-12 10:35 |
-| [Omniplex](https://omniplex.gg/) | 🟢 live | 995 ms | 200 | 2026-09-12 10:35 |
-| [Radarcord](https://radarcord.net/) | 🟢 live | 1143 ms | 200 | 2026-09-12 10:35 |
-| [Space Bot List](https://space-bot-list.xyz/) | 🟢 live | 48 ms | 200 | 2026-09-12 10:35 |
-| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 533 ms | 200 | 2026-09-12 10:35 |
-| [Discord Bot List](https://top.gg/) | 🟢 live | 135 ms | 403 | 2026-09-12 10:35 |
-| [TopCord](https://topcord.xyz/) | 🟢 live | 65 ms | 200 | 2026-09-12 10:35 |
-| [vCodes](https://vcodes.xyz) | 🟢 live | 229 ms | 200 | 2026-09-12 10:35 |
-| [Void Bots](https://voidbots.net/) | 🟢 live | 226 ms | 200 | 2026-09-12 10:35 |
-| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 107 ms | 200 | 2026-09-12 10:35 |
+| [Blist](https://blist.xyz/) | 🟢 live | 2441 ms | 200 | 2026-09-12 09:22 |
+| [Botlist.Co](https://botlist.co/platforms/discord) | 🟢 live | 1093 ms | 200 | 2026-09-12 09:22 |
+| [Botlist.me](https://botlist.me/) | 🟢 live | 868 ms | 200 | 2026-09-12 09:22 |
+| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 699 ms | 200 | 2026-09-12 09:22 |
+| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 1635 ms | 200 | 2026-09-12 09:22 |
+| [Bots Database](https://botsdatabase.com/) | 🟢 live | 318 ms | 200 | 2026-09-12 09:22 |
+| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 1049 ms | 200 | 2026-09-12 09:22 |
+| [Cybralist](https://cybralist.com/) | 🟢 live | 561 ms | 200 | 2026-09-12 09:22 |
+| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 638 ms | 200 | 2026-09-12 09:22 |
+| [discord.place](https://discord.place/bots) | 🟢 live | 296 ms | 403 | 2026-09-12 09:22 |
+| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 1574 ms | 200 | 2026-09-12 09:22 |
+| [Discord Services](https://discord.services/) | 🟢 live | 573 ms | 403 | 2026-09-12 09:22 |
+| [Discord Bot World](https://discordbot.world/) | 🟢 live | 827 ms | 200 | 2026-09-12 09:22 |
+| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 312 ms | 200 | 2026-09-12 09:22 |
+| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live | 898 ms | 200 | 2026-09-12 09:22 |
+| [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live | 881 ms | 200 | 2026-09-12 09:22 |
+| [dlist.gg](https://discordlist.gg/) | 🟢 live | 499 ms | 200 | 2026-09-12 09:22 |
+| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 445 ms | 200 | 2026-09-12 09:22 |
+| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 1155 ms | 200 | 2026-09-12 09:22 |
+| [Disforge](https://disforge.com/bots) | 🟢 live | 2157 ms | 200 | 2026-09-12 09:22 |
+| [DisQ](https://disq.ink/) | 🟢 live | 1291 ms | 200 | 2026-09-12 09:22 |
+| [DList.Space](https://dlist.space/) | 🟢 live | 269 ms | 200 | 2026-09-12 09:22 |
+| [JustDiscord](https://justdiscord.org/) | 🟢 live | 869 ms | 200 | 2026-09-12 09:22 |
+| [MotionDevelopment](https://www.motiondevelopment.top/) | 🟢 live | 1902 ms | 200 | 2026-09-12 09:22 |
+| [Omniplex](https://omniplex.gg/) | 🟢 live | 1156 ms | 200 | 2026-09-12 09:22 |
+| [Radarcord](https://radarcord.net/) | 🟢 live | 1703 ms | 200 | 2026-09-12 09:22 |
+| [Space Bot List](https://space-bot-list.xyz/) | 🟢 live | 379 ms | 200 | 2026-09-12 09:22 |
+| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 980 ms | 200 | 2026-09-12 09:22 |
+| [Discord Bot List](https://top.gg/) | 🟢 live | 605 ms | 200 | 2026-09-12 09:22 |
+| [TopCord](https://topcord.xyz/) | 🟢 live | 382 ms | 200 | 2026-09-12 09:22 |
+| [vCodes](https://vcodes.xyz) | 🟢 live | 1372 ms | 200 | 2026-09-12 09:22 |
+| [Void Bots](https://voidbots.net/) | 🟢 live | 703 ms | 200 | 2026-09-12 09:22 |
+| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 493 ms | 200 | 2026-09-12 09:22 |
 <!-- STATUS:END -->
 
 The table above is regenerated hourly by [scripts/status-sync.ts](scripts/status-sync.ts) (workflow: `status-sync.yml`). A list is marked:
@@ -378,10 +371,10 @@ When a list turns deprecated or shutdown, the workflow **opens a pull request** 
 ```bash
 bun install
 bun test                    # unit tests, no network
-bun run test:live           # live integration, reads .env
+bun scripts/test-live.ts    # live integration, reads .env (optional)
 ```
 
-For the live test: `cp .env.example .env`, fill in tokens for the lists you use (all optional), and run `bun run test:live`. It fetches real data, posts real stats (server count 1) and simulates a vote webhook, printing PASS/FAIL per action. Lists without tokens are skipped, nothing hard fails.
+For the live test: `cp .env.example .env`, fill in tokens for the lists you use (all optional), and run `bun scripts/test-live.ts`. It fetches real data, posts real stats (server count 1) and simulates a vote webhook, printing PASS/FAIL per action. Lists without tokens are skipped, nothing hard fails.
 
 ## Registry maintenance
 
@@ -394,28 +387,33 @@ bun test   # verify nothing broke
 
 ## Contributing
 
-PRs welcome. Please:
+PRs welcome; see [CONTRIBUTING.md](CONTRIBUTING.md) for setup, commands and conventions. In short:
 
 1. Add or fix list data in `scripts/snapshot/build_lists.py` (manual overrides), not the generated file.
 2. Run `bun test` and `bun run lint`.
 3. Keep the zero-dependency promise: no new runtime deps.
 
-## Links
+Found a vulnerability? Please report privately: see [SECURITY.md](SECURITY.md).
 
-- [Documentation website](https://potenfyr-studios.github.io/discord-botlists/) (Vite + React + TS, deployed via GitHub Pages)
+## Docs & links
+
+- [Documentation site](https://botlists.docs.potenfyr.in) (this repo's `docs/`, deployed via GitHub Pages)
+- [API reference](https://botlists.docs.potenfyr.in/docs/1.0.1/api-reference) · [Examples](https://botlists.docs.potenfyr.in/examples) · [Status board](https://botlists.docs.potenfyr.in/status)
 - [npm package](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
 - [PotenFYR Studios](https://github.com/PotenFYR-Studios) | [Website](https://potenfyr.in) | [Discord](https://discord.com/invite/zUaN2FPBec)
 
 ## License
 
-[Apache-2.0 + Commons Clause](LICENSE) | Free to fork, modify, use, and build around - but not to sell as a product. Botlist names and trademarks belong to their respective owners. See [NOTICE.md](NOTICE.md).
+Licensed under the **Apache License 2.0 with the Commons Clause**: free to fork, modify, use, and build around; not to be sold as a product. See [LICENSE](LICENSE); the LICENSE file is authoritative. Botlist names and trademarks belong to their respective owners; see [NOTICE.md](NOTICE.md).
 
 ---
 
-Built by **[PotenFYR Studios](https://github.com/PotenFYR-Studios)** · [potenfyr.in](https://potenfyr.in) · Part of the **PotenFYR Studios** open-source ecosystem.
+Built by **[PotenFYR Studios](https://github.com/PotenFYR-Studios)** · [potenfyr.in](https://potenfyr.in) · Part of the PotenFYR Studios open-source ecosystem.
 
+<!-- markdownlint-disable -->
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:f97316,50:ec4899,100:8b5cf6&height=180&section=footer&text=PotenFYR%20Studios&fontSize=30&fontColor=ffffff&fontAlignY=70&desc=discord-botlists%20%C2%B7%20MIT%20%C2%B7%20built%20for%20bot%20developers&descSize=14&descAlignY=82&animation=twinkling" width="100%" alt="footer"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:f97316,50:ec4899,100:8b5cf6&height=120&section=footer&text=Made%20with%20%E2%9D%A4%EF%B8%8F%20by%20PotenFYR%20Studios&fontSize=22&fontColor=ffffff&animation=twinkling" width="100%" alt="footer"/>
 
 </div>
+<!-- markdownlint-enable -->

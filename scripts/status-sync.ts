@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * Status sync: probes every botlist, writes the status board to
- * .status/status.json + STATUS.md, patches README.md and the website,
+ * .status/status.json + STATUS.md, patches README.md and the docs site,
  * and outputs GitHub Actions step outputs.
  *
  * PR policy: a pull request is opened ONLY when a list is detected as
@@ -20,7 +20,7 @@ import { StatusChecker } from '../src/status/checker.js';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const OUT_DIR = `${ROOT}.status`;
 const README = `${ROOT}README.md`;
-const WEBSITE_DATA = `${ROOT}website/src/data/status.json`;
+const WEBSITE_DATA = `${ROOT}docs/src/data/status.json`;
 const SITE_URL = process.env.SITE_URL ?? 'https://botlists.docs.potenfyr.in/';
 
 const begin = new Date();
@@ -32,7 +32,7 @@ const dead = board.entries.filter((e) => e.state === 'shutdown' || e.state === '
 console.log(`live=${board.summary.live} deprecated=${board.summary.deprecated} shutdown=${board.summary.shutdown} unknown=${board.summary.unknown}`);
 
 mkdirSync(OUT_DIR, { recursive: true });
-mkdirSync(`${ROOT}website/src/data`, { recursive: true });
+mkdirSync(`${ROOT}docs/src/data`, { recursive: true });
 
 const payload = {
   generatedAt: board.generatedAt,

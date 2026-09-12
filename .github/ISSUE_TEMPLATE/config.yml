@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://botlists.docs.potenfyr.in
+    about: API reference, guides and examples before filing an issue.
+  - name: PotenFYR Studios Discord
+    url: https://discord.com/invite/zUaN2FPBec
+    about: Quick community help with setup and usage.

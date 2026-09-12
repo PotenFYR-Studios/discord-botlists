@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest an idea or improvement for the SDK
+labels: [enhancement]
+assignees:
+  - SidisLiveYT
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before requesting, check the [docs](https://botlists.docs.potenfyr.in) and [existing issues](https://github.com/PotenFYR-Studios/discord-botlists/issues?q=is%3Aissue+label%3Aenhancement).
+        Two hard project constraints to keep in mind: **zero runtime dependencies** and **no breaking API changes without a major version**.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what currently blocks it?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What should the API look like or behave like? Code sketch welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints acknowledged
+      options:
+        - label: This can be implemented with zero runtime dependencies
+        - label: This does not require a breaking change to the existing API
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context

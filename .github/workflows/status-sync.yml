@@ -1,6 +1,6 @@
 name: Status sync
 
-# Probes every list hourly, refreshes the README status table and website
+# Probes every list hourly, refreshes the README status table and docs site
 # status.json on main, and opens a PR ONLY when a list turns deprecated or
 # shutdown (so registry changes are always human reviewed).
 
@@ -17,7 +17,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
@@ -29,14 +29,17 @@ jobs:
         run: |
           git config user.name "potenfyr-bot"
           git config user.email "bot@potenfyr.in"
-          git add .status/status.json .status/STATUS.md README.md website/src/data/status.json
+          git add .status/status.json .status/STATUS.md README.md docs/src/data/status.json
           git diff --cached --quiet && echo "no changes" && exit 0
           git commit -m "chore(status): refresh botlist status board"
           git push
       - name: Open PR for deprecated or shutdown lists
         if: steps.probe.outputs.pr_needed == 'true'
+        env:
+          # first-party value written by scripts/status-sync.ts (list ids only)
+          DEAD: ${{ steps.probe.outputs.dead_lists }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          DEAD="${{ steps.probe.outputs.dead_lists }}"
           PREFIX="status/registry-update-$(date +%Y%m%d%H)"
           git checkout -b "$PREFIX"
           # mark dead lists in the generated registry so consumers stop posting
@@ -50,5 +53,3 @@ jobs:
 
             Details in .status/STATUS.md. Merge to stop posting stats to them." \
             --base master --head "$PREFIX"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,30 @@
+name: Documentation issue
+description: Report wrong, outdated or missing documentation
+labels: [documentation]
+body:
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where is the documentation issue?
+      options:
+        - Docs site (botlists.docs.potenfyr.in)
+        - README.md
+        - Code comments / type docs
+        - llms.txt
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Page or section
+      description: URL or heading, e.g. https://botlists.docs.potenfyr.in/docs/1.0.1/api-reference
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong?
+      description: Quote the incorrect text and, if possible, what it should say (verified against actual behavior).
+    validations:
+      required: true

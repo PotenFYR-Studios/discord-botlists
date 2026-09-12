@@ -1,0 +1,19 @@
+name: Question
+description: Ask how something works (after checking the docs)
+labels: [question]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check the [documentation](https://botlists.docs.potenfyr.in), the [examples](https://botlists.docs.potenfyr.in/examples) and the [Discord server](https://discord.com/invite/zUaN2FPBec) first; most setup questions are answered there.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: What you tried / relevant code
+      render: markdown

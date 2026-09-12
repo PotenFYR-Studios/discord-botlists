@@ -6,8 +6,8 @@ coverage/
 !.env.example
 .DS_Store
 *.log
-website/dist/
-website/node_modules/
+docs/dist/
+docs/node_modules/
 
 # --- PotenFYR Studios: baseline hygiene ---
 Thumbs.db

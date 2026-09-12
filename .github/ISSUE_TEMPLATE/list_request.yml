@@ -1,0 +1,51 @@
+name: Botlist request
+description: Request support for a new botlist, or report a dead one
+labels: [list-request]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The generated registry in `src/data/lists.generated.ts` only contains lists that are alive and documented. New lists need a public API and (ideally) vote webhooks.
+        Dead-list reports are extra useful: the hourly status sync keeps the registry pruned, but a heads-up speeds things up.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Request type
+      options:
+        - Add a new botlist
+        - Report a dead or deprecated list
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: List name
+    validations:
+      required: true
+  - type: input
+    id: website
+    attributes:
+      label: Website URL
+    validations:
+      required: true
+  - type: input
+    id: api-docs
+    attributes:
+      label: API docs URL
+      description: Official documentation for their bot API. "None published" is a valid answer.
+  - type: input
+    id: endpoint
+    attributes:
+      label: Stats posting endpoint (if documented)
+      description: e.g. POST https://example.com/api/bots/:id/stats with body { server_count }
+  - type: checkboxes
+    id: webhooks
+    attributes:
+      label: Vote webhooks
+      options:
+        - label: This list sends vote webhooks
+  - type: textarea
+    id: alive
+    attributes:
+      label: List status / anything else
+      description: "For dead-list reports: what should replace it? For new lists: maintainer contact, auth scheme, anything notable."

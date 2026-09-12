@@ -1,0 +1,25 @@
+name: Security concern
+description: Non-confidential security question or hardening suggestion (exploits must be reported privately)
+labels: [security]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not use this form for exploitable vulnerabilities.**
+        Report those privately via [GitHub security advisories](https://github.com/PotenFYR-Studios/discord-botlists/security/advisories/new); see [SECURITY.md](../blob/master/SECURITY.md).
+        This form is for hardening ideas, documentation of security behavior, and questions about the webhook server's defenses.
+  - type: textarea
+    id: concern
+    attributes:
+      label: Concern or suggestion
+      description: What do you want to discuss or improve? Avoid posting working exploits or real secrets.
+    validations:
+      required: true
+  - type: checkboxes
+    id: disclosure
+    attributes:
+      label: Disclosure confirmation
+      options:
+        - label: This is not an exploitable vulnerability (those go to private reporting)
+    validations:
+      required: true

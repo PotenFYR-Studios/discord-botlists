@@ -1,0 +1,56 @@
+# Builds docs/ (Vite + React, statically emitted per route) and deploys the
+# production artifact to GitHub Pages via the official actions.
+# Custom domain: docs/public/CNAME (botlists.docs.potenfyr.in) is shipped in
+# the artifact automatically; vite.config.ts detects it and switches to a
+# root base.
+name: Deploy docs to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - docs/**
+      - .status/status.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install and build docs
+        working-directory: docs
+        run: |
+          bun install --frozen-lockfile
+          cp ../.status/status.json src/data/status.json 2>/dev/null || true
+          bun run build
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#0b0d14" />
+    <title>Page not found | discord-botlists</title>
+    <meta name="description" content="This discord-botlists documentation page could not be found. Head to the docs home, the live botlist status board, or the GitHub repository." />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+        background: #0b0d14; color: #b9bfd4;
+        font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        padding: 24px; text-align: center;
+      }
+      main { max-width: 34rem; position: relative; z-index: 1; }
+      body::before {
+        content: ""; position: fixed; inset: 0; pointer-events: none;
+        background-image: radial-gradient(rgba(139, 92, 246, 0.22) 1px, transparent 1px);
+        background-size: 26px 26px;
+        -webkit-mask-image: radial-gradient(750px circle at 50% 0%, white, transparent 75%);
+        mask-image: radial-gradient(750px circle at 50% 0%, white, transparent 75%);
+      }
+      .brand { color: #e8eaf2; font-weight: 700; font-size: 1.4rem; text-decoration: none; font-family: "Fira Code", ui-monospace, monospace; }
+      .brand .dot { background: linear-gradient(120deg, #c4b5fd, #f9a8d4 50%, #fdba74); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+      h1 {
+        font-size: 2.6rem; margin: 1.2rem 0 0.4rem;
+        background: linear-gradient(120deg, #c4b5fd, #f9a8d4 50%, #fdba74);
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      }
+      p { color: #9aa0b4; line-height: 1.6; margin: 0 0 1.8rem; }
+      nav { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+      a.button {
+        display: inline-block; padding: 10px 18px; border-radius: 999px; font-size: 0.9rem; font-weight: 600;
+        text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.08); color: #e8eaf2; background: rgba(255, 255, 255, 0.03);
+      }
+      a.button.primary {
+        background: linear-gradient(135deg, #8b5cf6, #ec4899 55%, #f97316); border-color: transparent;
+        color: #fff; box-shadow: 0 4px 24px rgba(236, 72, 153, 0.35);
+      }
+      a.button:hover { border-color: rgba(139, 92, 246, 0.5); }
+      footer { margin-top: 2.5rem; font-size: 0.75rem; color: #6a7089; }
+      footer a { color: #9aa0b4; text-decoration: none; }
+      footer a:hover { color: #c4b5fd; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="brand" href="/">discord-botlists<span class="dot">.</span></a>
+      <h1>404: page not found</h1>
+      <p>This page does not exist. Documentation, examples and the status board all live on their own routes.</p>
+      <nav>
+        <a class="button primary" href="/">Docs home</a>
+        <a class="button" href="/docs/">Documentation</a>
+        <a class="button" href="/status/">Botlist status board</a>
+        <a class="button" href="https://github.com/PotenFYR-Studios/discord-botlists">GitHub repository</a>
+        <a class="button" href="https://github.com/PotenFYR-Studios/discord-botlists/issues">Report an issue</a>
+      </nav>
+      <footer>Part of <a href="https://potenfyr.in">PotenFYR Studios</a></footer>
+    </main>
+  </body>
+</html>
