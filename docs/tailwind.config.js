@@ -26,7 +26,6 @@ export default {
       animation: {
         shimmer: 'shimmer 2.5s linear infinite',
         marquee: 'marquee 30s linear infinite',
-        'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
       },
       keyframes: {
         shimmer: {
@@ -36,10 +35,6 @@ export default {
         marquee: {
           from: { transform: 'translateX(0)' },
           to: { transform: 'translateX(-50%)' },
-        },
-        'pulse-glow': {
-          '0%, 100%': { opacity: '0.6' },
-          '50%': { opacity: '1' },
         },
       },
     },

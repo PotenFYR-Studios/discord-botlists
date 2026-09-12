@@ -134,7 +134,7 @@ export default function Status() {
         </>
       ) : loading ? (
         <div className="glass-card mt-10 items-center text-center !p-10 text-muted">
-          <span className="mx-auto mb-3 block h-3 w-3 animate-pulse rounded-full bg-accent" />
+          <span className="mx-auto mb-3 block h-3 w-3 rounded-full bg-accent" />
           Loading status board...
         </div>
       ) : (

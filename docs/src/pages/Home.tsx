@@ -76,7 +76,7 @@ export default function Home() {
     <main>
       {/* HERO: glow orbs + vivid 90deg display gradient are landing-only (SPEC 5.14, appendix) */}
       <section className="relative overflow-hidden pb-16 pt-[72px] text-center">
-        <div className="pointer-events-none absolute -top-48 left-1/2 h-[30rem] w-[52rem] -translate-x-1/2 rounded-full blur-3xl animate-pulse-glow" style={{ background: 'rgba(139, 92, 246, 0.18)' }} />
+        <div className="pointer-events-none absolute -top-48 left-1/2 h-[30rem] w-[52rem] -translate-x-1/2 rounded-full blur-3xl" style={{ background: 'rgba(139, 92, 246, 0.18)' }} />
         <div className="pointer-events-none absolute -left-32 top-40 h-[31rem] w-[31rem] rounded-full blur-3xl" style={{ background: 'rgba(236, 72, 153, 0.15)' }} />
         <div className="pointer-events-none absolute -right-32 top-64 h-[26rem] w-[26rem] rounded-full blur-3xl" style={{ background: 'rgba(6, 182, 212, 0.12)' }} />
 
