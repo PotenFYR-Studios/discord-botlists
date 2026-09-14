@@ -230,6 +230,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_DISCORDSERVICES",
     webhook: null,
     supports: { post: true, get: true, widget: false, webhook: false },
+    status: 'shutdown',
   },
   {
     id: "discordbot.world",
