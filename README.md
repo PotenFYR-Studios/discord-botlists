@@ -323,39 +323,39 @@ Last sync: **2026-09-15** | 🟢 33 live | 🟡 0 deprecated | 🔴 0 shutdown |
 
 | List | Status | Latency | HTTP | Last checked (UTC) |
 | --- | --- | --- | --- | --- |
-| [Blist](https://blist.xyz/) | 🟢 live | 206 ms | 200 | 2026-09-15 09:58 |
-| [Botlist.Co](https://botlist.co/platforms/discord) | 🟢 live | 560 ms | 200 | 2026-09-15 09:58 |
-| [Botlist.me](https://botlist.me/) | 🟢 live | 472 ms | 200 | 2026-09-15 09:58 |
-| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 373 ms | 200 | 2026-09-15 09:58 |
-| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 655 ms | 200 | 2026-09-15 09:58 |
-| [Bots Database](https://botsdatabase.com/) | 🟢 live | 264 ms | 200 | 2026-09-15 09:58 |
-| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 214 ms | 200 | 2026-09-15 09:58 |
-| [Cybralist](https://cybralist.com/) | 🟢 live | 550 ms | 200 | 2026-09-15 09:58 |
-| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 479 ms | 200 | 2026-09-15 09:58 |
-| [discord.place](https://discord.place/bots) | 🟢 live | 393 ms | 200 | 2026-09-15 09:58 |
-| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 1306 ms | 200 | 2026-09-15 09:58 |
-| [Discord Services](https://discord.services/) | 🟢 live | 249 ms | 200 | 2026-09-15 09:58 |
-| [Discord Bot World](https://discordbot.world/) | 🟢 live | 1062 ms | 200 | 2026-09-15 09:58 |
-| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 661 ms | 200 | 2026-09-15 09:58 |
-| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live | 1203 ms | 200 | 2026-09-15 09:58 |
-| [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live | 505 ms | 200 | 2026-09-15 09:58 |
-| [dlist.gg](https://discordlist.gg/) | 🟢 live | 203 ms | 200 | 2026-09-15 09:58 |
-| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 249 ms | 200 | 2026-09-15 09:58 |
-| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 316 ms | 200 | 2026-09-15 09:58 |
-| [Disforge](https://disforge.com/bots) | 🟢 live | 1205 ms | 200 | 2026-09-15 09:58 |
-| [DisQ](https://disq.ink/) | 🟢 live | 1097 ms | 200 | 2026-09-15 09:58 |
-| [DList.Space](https://dlist.space/) | 🟢 live | 157 ms | 200 | 2026-09-15 09:58 |
-| [JustDiscord](https://justdiscord.org/) | 🟢 live | 548 ms | 200 | 2026-09-15 09:58 |
-| [MotionDevelopment](https://www.motiondevelopment.top/) | 🟢 live | 341 ms | 200 | 2026-09-15 09:58 |
-| [Omniplex](https://omniplex.gg/) | 🟢 live | 1240 ms | 200 | 2026-09-15 09:58 |
-| [Radarcord](https://radarcord.net/) | 🟢 live | 834 ms | 200 | 2026-09-15 09:58 |
-| [Space Bot List](https://space-bot-list.xyz/) | 🟢 live | 264 ms | 200 | 2026-09-15 09:58 |
-| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 725 ms | 200 | 2026-09-15 09:58 |
-| [Discord Bot List](https://top.gg/) | 🟢 live | 158 ms | 403 | 2026-09-15 09:58 |
-| [TopCord](https://topcord.xyz/) | 🟢 live | 264 ms | 200 | 2026-09-15 09:58 |
-| [vCodes](https://vcodes.xyz) | 🟢 live | 590 ms | 200 | 2026-09-15 09:58 |
-| [Void Bots](https://voidbots.net/) | 🟢 live | 234 ms | 200 | 2026-09-15 09:58 |
-| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 164 ms | 200 | 2026-09-15 09:58 |
+| [Blist](https://blist.xyz/) | 🟢 live | 40 ms | 200 | 2026-09-15 14:54 |
+| [Botlist.Co](https://botlist.co/platforms/discord) | 🟢 live | 738 ms | 200 | 2026-09-15 14:54 |
+| [Botlist.me](https://botlist.me/) | 🟢 live | 308 ms | 200 | 2026-09-15 14:54 |
+| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 382 ms | 200 | 2026-09-15 14:54 |
+| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 309 ms | 200 | 2026-09-15 14:54 |
+| [Bots Database](https://botsdatabase.com/) | 🟢 live | 27 ms | 200 | 2026-09-15 14:54 |
+| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 435 ms | 200 | 2026-09-15 14:54 |
+| [Cybralist](https://cybralist.com/) | 🟢 live | 411 ms | 200 | 2026-09-15 14:54 |
+| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 422 ms | 200 | 2026-09-15 14:54 |
+| [discord.place](https://discord.place/bots) | 🟢 live | 322 ms | 200 | 2026-09-15 14:54 |
+| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 1120 ms | 200 | 2026-09-15 14:54 |
+| [Discord Services](https://discord.services/) | 🟢 live | 290 ms | 200 | 2026-09-15 14:54 |
+| [Discord Bot World](https://discordbot.world/) | 🟢 live | 957 ms | 200 | 2026-09-15 14:54 |
+| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 221 ms | 200 | 2026-09-15 14:54 |
+| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live | 1213 ms | 200 | 2026-09-15 14:54 |
+| [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live | 6584 ms | 200 | 2026-09-15 14:54 |
+| [dlist.gg](https://discordlist.gg/) | 🟢 live | 473 ms | 200 | 2026-09-15 14:54 |
+| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 145 ms | 200 | 2026-09-15 14:54 |
+| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 529 ms | 200 | 2026-09-15 14:54 |
+| [Disforge](https://disforge.com/bots) | 🟢 live | 2670 ms | 200 | 2026-09-15 14:54 |
+| [DisQ](https://disq.ink/) | 🟢 live | 979 ms | 200 | 2026-09-15 14:54 |
+| [DList.Space](https://dlist.space/) | 🟢 live | 92 ms | 200 | 2026-09-15 14:54 |
+| [JustDiscord](https://justdiscord.org/) | 🟢 live | 559 ms | 200 | 2026-09-15 14:54 |
+| [MotionDevelopment](https://www.motiondevelopment.top/) | 🟢 live | 345 ms | 200 | 2026-09-15 14:54 |
+| [Omniplex](https://omniplex.gg/) | 🟢 live | 1026 ms | 200 | 2026-09-15 14:54 |
+| [Radarcord](https://radarcord.net/) | 🟢 live | 3378 ms | 200 | 2026-09-15 14:54 |
+| [Space Bot List](https://space-bot-list.xyz/) | 🟢 live | 2232 ms | 200 | 2026-09-15 14:54 |
+| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 470 ms | 200 | 2026-09-15 14:54 |
+| [Discord Bot List](https://top.gg/) | 🟢 live | 24 ms | 403 | 2026-09-15 14:54 |
+| [TopCord](https://topcord.xyz/) | 🟢 live | 22 ms | 200 | 2026-09-15 14:54 |
+| [vCodes](https://vcodes.xyz) | 🟢 live | 153 ms | 200 | 2026-09-15 14:54 |
+| [Void Bots](https://voidbots.net/) | 🟢 live | 143 ms | 200 | 2026-09-15 14:54 |
+| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 114 ms | 200 | 2026-09-15 14:54 |
 <!-- STATUS:END -->
 
 The table above is regenerated hourly by [scripts/status-sync.ts](scripts/status-sync.ts) (workflow: `status-sync.yml`). A list is marked:
