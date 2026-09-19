@@ -496,6 +496,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_RADARCORDNET",
     webhook: { header: "Authorization", voterField: "userID", eventField: null },
     supports: { post: true, get: true, widget: false, webhook: true },
+    status: 'shutdown',
   },
   {
     id: "space-bot-list.xyz",
