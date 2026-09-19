@@ -572,6 +572,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_TOPCORDXYZ",
     webhook: null,
     supports: { post: true, get: true, widget: true, webhook: false },
+    status: 'shutdown',
   },
   {
     id: "vcodes.xyz",
