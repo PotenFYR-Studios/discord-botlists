@@ -1,3 +1,5 @@
+import type { VoteAnnouncer } from './announcer.js';
+
 /** How a list expects statistics to be named on the wire. */
 export type StatShape = 'server_count' | 'guildCount' | 'guilds' | 'count' | 'servers' | 'serverCount' | 'custom';
 
@@ -163,6 +165,18 @@ export interface BotlistsOptions {
   lists?: BotlistRecord[];
   /** webhook server options. */
   webhook?: WebhookOptions;
+  /**
+   * realtime vote announcements to Discord channel webhooks / external
+   * endpoints. DISABLED by default - pass { enabled: true, ... } to turn on,
+   * or hand in a pre-built VoteAnnouncer instance for full control.
+   */
+  announcer?: VoteAnnouncerOptions | VoteAnnouncer;
+  /**
+   * gap between two list posts inside one postStats fan-out, default 1000ms.
+   * rate-limit safety: a list that answers 429 with a small Retry-After
+   * additionally waits it out before the next list is posted.
+   */
+  postSpacingMs?: number;
   /** global fetch options applied to every request. */
   fetchOptions?: FetchOptions;
   /** disable automated status checks before each request when true. */
@@ -220,6 +234,66 @@ export interface WebhookOptions {
   autoStart?: boolean;
   /** log requests to console, default false. */
   debug?: boolean;
+}
+
+/** How votes are rendered before being broadcast. */
+export type VoteAnnouncerFormatOption = 'text' | 'embed' | 'embed-v2';
+
+/**
+ * VoteAnnouncer options: realtime vote broadcasting to Discord channel
+ * webhooks (text / classic embed / Components V2) and generic external
+ * https endpoints. Disabled unless `enabled: true` when passed to Botlists.
+ * Pure Discord REST + fetch - no Discord library required.
+ */
+export interface VoteAnnouncerOptions {
+  /**
+   * master switch for announcer wiring INSIDE Botlists. The announcer is
+   * disabled by default; standalone VoteAnnouncer instances ignore this.
+   */
+  enabled?: boolean;
+  /** render style, default 'embed'. */
+  format?: VoteAnnouncerFormatOption;
+  /** Discord channel webhook urls (discord.com / discordapp.com). */
+  webhooks?: string[];
+  /** any https endpoint - receives { source, event, list, vote } JSON. */
+  external?: string[];
+  /** override the webhook username (defaults to the webhook's own identity). */
+  username?: string;
+  /** override the webhook avatar url. */
+  avatarUrl?: string;
+  /**
+   * bot token (optional): resolves username/avatar via GET /users/@me so
+   * announcements default to the bot's real identity. Read-only use.
+   */
+  botToken?: string;
+  /** accent color for embed / embed-v2, default 0x5865f2 blurple. */
+  color?: number;
+  /**
+   * {placeholder} template for format 'text' (and embed descriptions).
+   * placeholders: {voter} {voterId} {list} {listId} {bot} {botId} {weight} {weekend}
+   */
+  template?: string;
+  /** link buttons appended to embed-v2 messages (label + url, max 5 used). */
+  links?: { label: string; url: string; emoji?: string }[];
+  /**
+   * full control: mutate or replace any outgoing Discord payload before it
+   * is sent (per vote). Return null to fall through to the rendered payload.
+   */
+  customize?: (vote: UniversalVote, payload: Record<string, unknown>) => Record<string, unknown> | null | void;
+  /** also announce dashboard test deliveries, default false. */
+  announceTestVotes?: boolean;
+  /** per-delivery timeout, default 8000ms. */
+  timeoutMs?: number;
+  /**
+   * minimum spacing between two sends to the SAME target, default 1000ms.
+   * the default pace never trips Discord webhook rate limits.
+   */
+  minIntervalMs?: number;
+  /**
+   * per-target queue bound, default 500. when a target stalls, the OLDEST
+   * pending vote is dropped so memory can never grow unbounded.
+   */
+  maxQueueSize?: number;
 }
 
 export interface FetchOptions {

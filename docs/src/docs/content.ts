@@ -333,6 +333,86 @@ app.post('/webhooks/:list', (req, res) => {
       ],
     },
     {
+      slug: 'vote-announcer',
+      title: 'Vote announcements',
+      blurb: 'Realtime vote posts to Discord webhooks - text, embed or Components V2.',
+      category: 'Guides',
+      blocks: [
+        {
+          type: 'text',
+          content:
+            'The VoteAnnouncer broadcasts every incoming vote to Discord channel webhooks (and any external https endpoint) in realtime. It is DISABLED by default - nothing leaves your process until you pass `enabled: true`. It is built directly on the Discord execute-webhook REST endpoint with plain fetch: no discord.js, no Eris, works inside any framework or none.',
+        },
+        {
+          type: 'code',
+          lang: 'ts',
+          title: 'wire it up',
+          content: `const lists = new Botlists({
+  client,
+  announcer: {
+    enabled: true,               // required - off by default
+    format: 'embed-v2',          // 'text' | 'embed' | 'embed-v2'
+    webhooks: [process.env.VOTE_WEBHOOK_URL!],   // Discord channel webhooks
+    external: ['https://api.example.com/hooks/votes'], // JSON { source, event, list, vote }
+    username: 'Vote Alerts',     // optional webhook identity overrides
+    color: 0x5865f2,
+    links: [{ label: 'Vote Again', url: 'https://top.gg/bot/YOUR_BOT/vote', emoji: '🗳️' }],
+    announceTestVotes: false,    // dashboard test deliveries: ignore by default
+  },
+});`,
+        },
+        {
+          type: 'code',
+          lang: 'ts',
+          title: 'three render formats',
+          content: `// 'text' - plain message content from a {placeholder} template
+{ format: 'text', template: '🗳️ {voter} voted on {list}!' }
+
+// 'embed' - classic rich embed (title, description, color, timestamp, thumbnail)
+{ format: 'embed' }
+
+// 'embed-v2' - Components V2: section + avatar accessory, separator,
+// link buttons; the IS_COMPONENTS_V2 flag is set for you
+{ format: 'embed-v2' }`,
+        },
+        {
+          type: 'table',
+          headers: ['Option', 'Default', 'What it does'],
+          rows: [
+            ['enabled', 'false', 'master switch for wiring inside Botlists (standalone instances are always active)'],
+            ['format', "'embed'", 'render style: text / embed / embed-v2'],
+            ['webhooks', '[]', 'Discord channel webhook urls (discord.com, discordapp.com, canary, ptb)'],
+            ['external', '[]', 'any https endpoint - receives { source, event, list, vote } JSON'],
+            ['username / avatarUrl', 'webhook default', 'override the posting identity'],
+            ['botToken', 'undefined', 'read-only: resolves username/avatar via GET /users/@me so posts use the bot’s identity'],
+            ['template', 'see below', '{placeholder} text: {voter} {voterId} {list} {listId} {bot} {botId} {weight} {weekend}'],
+            ['links', '[]', 'link buttons appended to embed-v2 (max 5)'],
+            ['customize', 'undefined', '(vote, payload) => payload - full control, mutate or replace before sending'],
+            ['announceTestVotes', 'false', 'also announce dashboard test deliveries'],
+            ['minIntervalMs', '1000', 'spacing between two sends to the SAME target (rate-limit safety)'],
+            ['maxQueueSize', '500', 'per-target queue bound; the oldest vote is dropped when full'],
+          ],
+        },
+        {
+          type: 'code',
+          lang: 'ts',
+          title: 'standalone use',
+          content: `import { Botlists, VoteAnnouncer } from '@potenfyrstudios/discord-botlists';
+
+const announcer = new VoteAnnouncer({ format: 'embed-v2', webhooks: [url] });
+announcer.on('delivered', (d) => console.log('sent to', d.target, d.status));
+const lists = new Botlists({ client });
+lists.on('vote', (vote) => announcer.announce(vote));`,
+        },
+        {
+          type: 'note',
+          tone: 'tip',
+          content:
+            'Rate-limit safety is on by default: sends to the same target are spaced ≥ 1 s apart, a 429 with a small Retry-After is waited out exactly once, queues are bounded so a webhook outage can never grow memory, and scheduler timers are unref\'d - zero idle resource usage.',
+        },
+      ],
+    },
+    {
       slug: 'webhook-security',
       title: 'Webhook security',
       blurb: 'How the server rejects fake votes, floods and brute force.',
@@ -385,12 +465,39 @@ app.post('/webhooks/:list', (req, res) => {
           headers: ['Threat', 'Defense', 'Response'],
           rows: [
             ['Fake votes (no secret)', 'Secret required on every POST', '401'],
-            ['Replayed/forged payloads', 'HMAC-SHA256 signature check', '401'],
+            ['Replayed/forged payloads', 'top.gg v1 signature or HMAC-SHA256 check', '401'],
+            ['Captured delivery replayed later', 'v1 timestamp window (10 min)', '401'],
             ['Secret brute force', 'Failure counter per ip', '403 ban after 10'],
             ['Request floods', 'Per ip token bucket', '429 + Retry-After'],
             ['Giant payloads', '512 KB body limit', '413'],
             ['Unlisted sources', 'allowedLists check', '403'],
           ],
+        },
+        {
+          type: 'h3',
+          content: 'top.gg v1 signed deliveries',
+        },
+        {
+          type: 'text',
+          content:
+            'top.gg migrated its webhooks: instead of the shared password in the Authorization header, every v1 delivery carries `x-topgg-signature: t=<unix seconds>,v1=<hex>` where v1 is HMAC-SHA256 of `<t>.<rawBody>` keyed with your whs_-prefixed webhook secret. The SDK verifies this scheme automatically whenever the `top.gg` secret is configured - keep using the same secret, nothing else changes. The legacy Authorization header (and the other lists’ signature headers) keep working alongside it.',
+        },
+        {
+          type: 'code',
+          lang: 'ts',
+          title: 'verify a v1 delivery inside your own framework route',
+          content: `// With headers passed, ingest() enforces transport auth itself and returns
+// null on a bad signature. Without headers it trusts your framework's auth
+// and only parses.
+const parsed = lists.webhook.ingest('top.gg', req.body, {
+  headers: { 'x-topgg-signature': req.headers['x-topgg-signature'] },
+});
+if (!parsed) return res.status(401).end();`,
+        },
+        {
+          type: 'text',
+          content:
+            'The v1 payload is wrapped ({"vote":{"userId":..,"botId":..,"type":"vote"|"test"}}). The SDK flattens it transparently: your `vote` event still receives voterId, botId and a `raw` field holding the original enveloped body. Dashboard test deliveries (type "test") arrive on the `test` event with isTest: true.',
         },
         {
           type: 'note',
@@ -549,11 +656,13 @@ await lists.checkAndReportStatus();`,
         {
           type: 'list',
           items: [
-            'Posts: 250 ms gap between lists, retries on 429 and 5xx honouring Retry-After exactly once before failing.',
+            'Stats posts: 1 s gap between lists by default (postSpacingMs), one polite retry on 429 honouring Retry-After when it is ≤ 30 s, and ±5% jitter on the auto-post timer so fleets never hit lists in lockstep.',
+            'top.gg shards quirk: an EMPTY shards array zeroes your published server_count on top.gg - the SDK omits the field entirely unless the bot actually reports shard data.',
+            'Vote announcer: sends to the same Discord webhook are spaced ≥ 1 s apart (minIntervalMs), a 429 with a small Retry-After is waited out once, and per-target queues are bounded (maxQueueSize 500, oldest dropped) so a stalled webhook can never grow memory. Timers are unref\'d and only alive while a delivery is pending.',
             'BotBlock mode: one request total, never retried inside their 120 s window.',
             'Status probes: max 8 concurrent HEAD requests, browser user agent, board cached for 5 minutes.',
             'Fetches: token header only on endpoints that need it, public reads stay unauthenticated.',
-            'Webhooks: push based, so there is zero polling traffic against any list API.',
+            'Webhooks (inbound): push based, so there is zero polling traffic against any list API.',
           ],
         },
       ],

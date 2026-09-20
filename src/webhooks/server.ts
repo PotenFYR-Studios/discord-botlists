@@ -2,7 +2,7 @@ import { EventEmitter } from 'node:events';
 import { createHmac } from 'node:crypto';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { BotlistRecord, ParsedWebhook, WebhookOptions, WebhookSecurityOptions } from '../types.js';
-import { UniversalParser } from '../core/parser.js';
+import { UniversalParser, unwrapVoteEnvelope } from '../core/parser.js';
 import { resolveList } from '../core/http.js';
 
 interface RateBucket {
@@ -119,7 +119,12 @@ export class VoteWebhookServer extends EventEmitter {
 
   /**
    * feed an express/fastify handler into the parser without a socket.
-   * bypasses rate limiting and bans: your framework does that.
+   *
+   * Transport auth: when you PASS `headers`, ingest() verifies the delivery
+   * itself (Authorization secret, top.gg v1 signature or a configured HMAC
+   * key - same rules as the http server) and returns null on failure. When
+   * you pass NO headers, the call trusts your framework's auth and only
+   * parses. Rate limiting and ip bans stay your framework's job either way.
    */
   public ingest(
     listQuery: string,
@@ -132,10 +137,11 @@ export class VoteWebhookServer extends EventEmitter {
       throw new Error('[discord-botlists] ingest() called without a configured secret');
     }
     const raw = body === undefined || body === null ? '' : JSON.stringify(body);
-    if (list && this.hmacKeys[list.id]) {
-      const headers = normalizeHeaders(options.headers ?? {});
-      if (!this.verifyHmac(list.id, raw, headers)) {
-        this.emit('error', new Error(`hmac verification failed for ${list.id}`));
+    const callerSentHeaders = options.headers !== undefined;
+    if (callerSentHeaders || (list && this.hmacKeys[list.id])) {
+      const auth = this.authorize(list, options.headers ?? {}, raw, body);
+      if (!auth.ok) {
+        this.emit('error', new Error(`${auth.reason} for ${list.id} (ingest)`));
         return null;
       }
     }
@@ -210,7 +216,7 @@ export class VoteWebhookServer extends EventEmitter {
       return;
     }
 
-    const auth = this.authorize(list, req, raw, body);
+    const auth = this.authorize(list, req.headers, raw, body);
     if (!auth.ok) {
       state.authFailures++;
       if (state.authFailures >= (this.security.banAfterFailures ?? DEFAULT_SECURITY.banAfterFailures)) {
@@ -259,7 +265,7 @@ export class VoteWebhookServer extends EventEmitter {
 
   private authorize(
     list: BotlistRecord | null,
-    req: IncomingMessage,
+    rawHeaders: IncomingMessage['headers'] | Record<string, string | string[] | undefined>,
     rawBody: string,
     body: unknown,
   ): { ok: true } | { ok: false; reason: string; status: number } {
@@ -274,7 +280,7 @@ export class VoteWebhookServer extends EventEmitter {
 
     // hmac verification takes precedence when a key exists for this list.
     if (hmacKey) {
-      const headers = normalizeHeaders(req.headers);
+      const headers = normalizeHeaders(rawHeaders);
       if (this.verifyHmac(list?.id ?? '', rawBody, headers)) return { ok: true };
       return { ok: false, reason: 'invalid signature', status: 401 };
     }
@@ -286,7 +292,7 @@ export class VoteWebhookServer extends EventEmitter {
         : { ok: true };
     }
 
-    const headers = normalizeHeaders(req.headers);
+    const headers = normalizeHeaders(rawHeaders);
     // some lists sign instead of sharing a secret; accept common signatures too.
     if (list && this.verifySignatureHex(list.id, rawBody, headers, secret)) return { ok: true };
 
@@ -315,6 +321,18 @@ export class VoteWebhookServer extends EventEmitter {
   }
 
   private verifySignatureHex(listId: string, rawBody: string, headers: Record<string, string>, key: string): boolean {
+    // top.gg v1 scheme: "x-topgg-signature: t=<unix seconds>,v1=<hex hmac-sha256
+    // of '<t>.<raw body>'>". The timestamped envelope does not match the plain
+    // raw-body schemes below, so it is checked first.
+    const topggSig = headers['x-topgg-signature'];
+    if (typeof topggSig === 'string' && topggSig) {
+      const t = /(?:^|,)\s*t=([^,]+)/.exec(topggSig)?.[1]?.trim();
+      const v1 = /(?:^|,)\s*v1=([^,]+)/.exec(topggSig)?.[1]?.trim();
+      if (t && v1) {
+        const expected = createHmac('sha256', key).update(`${t}.${rawBody}`).digest('hex');
+        if (safeEqualHex(v1, expected)) return true;
+      }
+    }
     const expected = createHmac('sha256', key).update(rawBody).digest('hex');
     for (const name of SIGNATURE_HEADERS) {
       const value = headers[name];
@@ -327,13 +345,18 @@ export class VoteWebhookServer extends EventEmitter {
 
   private parseAndEmit(list: BotlistRecord | null, body: unknown, isTest?: boolean): ParsedWebhook | null {
     if (!list) return null;
-    const test = isTest === true ? true : detectTest(list, body);
-    const event = detectEvent(list, body, test);
+    // top.gg v1 wraps the payload ({ vote: { userId, botId, type, ... } });
+    // flatten it so detection and parsing stay list-agnostic. The original
+    // body is preserved on the parsed payload's `raw`.
+    const flat = unwrapVoteEnvelope(body) ?? body;
+    const test = isTest === true ? true : detectTest(list, flat);
+    const event = detectEvent(list, flat, test);
     if (!event) return null;
     const payload =
       event === 'vote' || event === 'test'
-        ? this.parser.parseVoteWebhook(list, body, test)
-        : this.parser.parseCommentWebhook(list, body, event === 'comment' ? 'comment' : event === 'rating' ? 'rating' : 'review');
+        ? this.parser.parseVoteWebhook(list, flat, test)
+        : this.parser.parseCommentWebhook(list, flat, event === 'comment' ? 'comment' : event === 'rating' ? 'rating' : 'review');
+    if (payload && flat !== body) payload.raw = body;
     const parsed: ParsedWebhook = { listId: list.id, event, payload };
     this.emit('raw', parsed);
     this.emit(event, payload);

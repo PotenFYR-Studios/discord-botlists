@@ -118,6 +118,31 @@ client.login(process.env.DISCORD_TOKEN);
 
 Point each botlist's webhook URL at `https://your-domain:8080/discord-botlists/<list-id>` and votes arrive as typed events instantly. Per-list wire formats, env variable names and more live examples: [docs](https://botlists.docs.potenfyr.in/docs) · [examples](https://botlists.docs.potenfyr.in/examples).
 
+### top.gg v1 signed webhooks
+
+top.gg no longer sends the shared password in the `Authorization` header. Every **top.gg v1 delivery** carries `x-topgg-signature: t=<unix seconds>,v1=<hex>`, the HMAC-SHA256 of `<t>.<rawBody>` keyed with your `whs_...` webhook secret from the top.gg dashboard. The SDK verifies this automatically - just keep the secret configured for `top.gg` (the same field you already had). The legacy `Authorization` header and other signature schemes keep working for every other list.
+
+The v1 payload is wrapped (`{"vote":{"userId":..,"botId":..,"type":"vote"|"test"}}`); the SDK flattens it so your `vote` handler is unchanged, preserves the original body on `vote.raw`, and routes dashboard test deliveries to the `test` event with `isTest: true`. Feeding bodies through `lists.webhook.ingest()` from your own framework route? Pass the delivery `headers` and `ingest` enforces the signature check for you (returns `null` on failure); omit them and it trusts your framework's auth.
+
+### Announce votes to Discord in realtime (text / embed / embed-v2)
+
+Disabled by default - opt in and every incoming vote is broadcast to your Discord channel webhooks (and optionally external endpoints) through the raw Discord execute-webhook REST API, no Discord library required:
+
+```ts
+const lists = new Botlists({
+  client,
+  announcer: {
+    enabled: true,
+    format: 'embed-v2', // 'text' ({placeholder} template) | 'embed' | 'embed-v2' (Components V2)
+    webhooks: [process.env.VOTE_WEBHOOK_URL!],          // Discord channel webhooks
+    external: ['https://api.example.com/hooks/votes'],  // JSON: { source, event, list, vote }
+    links: [{ label: 'Vote Again', url: 'https://top.gg/bot/YOUR_BOT/vote', emoji: '🗳️' }],
+  },
+});
+```
+
+Rate-limit safe by default: ≥ 1 s spacing per target (`minIntervalMs`), one polite Retry-After wait on 429, bounded queues (`maxQueueSize`, oldest dropped - a stalled webhook can never grow memory) and unref'd timers that only exist while a delivery is pending. Full control via `customize(vote, payload)`, identity overrides via `username` / `avatarUrl` / `botToken`, and a standalone `VoteAnnouncer` class for custom pipelines.
+
 ## Full API
 
 ### class `Botlists`
@@ -245,6 +270,8 @@ DBL_TOP.GG=eyJ...            # top.gg token
 DBL_DISCORDBOTLIST.COM=...   # discordbotlist.com token
 DBL_VOIDBOTS.NET=...
 ```
+
+Env keys are mapped onto list ids automatically (`DBL_TOPGG` / `DBL_TOP.GG` → `top.gg`), so you never have to hand-translate names. Dots, underscores and casing don't matter.
 
 ```ts
 // 2. constructor map
@@ -374,7 +401,16 @@ bun test                    # unit tests, no network
 bun scripts/test-live.ts    # live integration, reads .env (optional)
 ```
 
-For the live test: `cp .env.example .env`, fill in tokens for the lists you use (all optional), and run `bun scripts/test-live.ts`. It fetches real data, posts real stats (server count 1) and simulates a vote webhook, printing PASS/FAIL per action. Lists without tokens are skipped, nothing hard fails.
+Everything also runs in Docker (the pinned `oven/bun:1` image - no local toolchain needed):
+
+```bash
+docker compose -f docker-compose.test.yml run --rm tests   # typecheck + full suite
+docker compose -f docker-compose.test.yml run --rm build   # tsc build
+TOPGG_TOKEN=... TOPGG_WEBHOOK_SECRET=... \
+  docker compose -f docker-compose.test.yml run --rm live  # real top.gg round-trip
+```
+
+For the live test: `cp .env.example .env`, fill in tokens for the lists you use (all optional), and run `bun scripts/test-live.ts`. It fetches real data, posts real stats (server count 1) and simulates a vote webhook, printing PASS/FAIL per action. Lists without tokens are skipped, nothing hard fails. `scripts/verify-topgg.mjs` is the production-style check: real stats POST + round-trip, a genuinely signed top.gg v1 delivery through the ingest path, and announcer validation - `TOPGG_TOKEN=... TOPGG_WEBHOOK_SECRET=... node scripts/verify-topgg.mjs <serverCount>`.
 
 ## Registry maintenance
 

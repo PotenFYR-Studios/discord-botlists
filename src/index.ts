@@ -17,10 +17,17 @@ import { UniversalParser } from './core/parser.js';
 import { StatusChecker } from './status/checker.js';
 import { ConsoleReport } from './status/report.js';
 import { VoteWebhookServer } from './webhooks/server.js';
+import { VoteAnnouncer } from './announcer.js';
+import type { UniversalVote } from './types.js';
 
 export { BotlistsError, ConsoleReport };
-export { UniversalParser } from './core/parser.js';
+export { UniversalParser, unwrapVoteEnvelope } from './core/parser.js';
 export { StatusChecker } from './status/checker.js';
+export { VoteAnnouncer, isDiscordWebhookUrl } from './announcer.js';
+export type { VoteAnnouncerFormat, AnnouncerDelivery, ExternalVotePayload, DiscordWebhookPayload } from './announcer.js';
+
+/** Retry-After waits above this are not honoured (drop instead of hanging). */
+const MAX_RETRY_WAIT_MS = 30_000;
 
 /**
  * Botlists: the main entry point.
@@ -50,6 +57,9 @@ export class Botlists extends EventEmitter {
   private statusBoard: StatusBoard | null = null;
   private autoTimer: ReturnType<typeof setInterval> | null = null;
   private lastPostAt = 0;
+  private announcer: VoteAnnouncer | null = null;
+  /** gap between two list posts inside one postStats fan-out (rate limit safety). */
+  private readonly postSpacingMs: number;
 
   public constructor(options: BotlistsOptions = {}) {
     super();
@@ -63,12 +73,34 @@ export class Botlists extends EventEmitter {
     this.startupStatusCheck = options.startupStatusCheck ?? false;
     this.statsProvider = options.statsProvider ?? null;
     this.http = new Http(options.fetchOptions);
+    this.postSpacingMs = Math.max(100, options.postSpacingMs ?? 1000);
 
     this.webhook = new VoteWebhookServer(options.webhook ?? {});
     // bubble every webhook event up to the main emitter.
     for (const event of ['vote', 'comment', 'review', 'rating', 'test', 'raw', 'request', 'error'] as const) {
       this.webhook.on(event, (...args: unknown[]) => this.emit(event, ...args));
     }
+
+    // vote announcer (opt-in): disabled unless options.announcer.enabled is
+    // true; a pre-built VoteAnnouncer instance is always wired. Re-announced
+    // events: 'vote' always, 'test' only when announceTestVotes is set.
+    const announcerOpt = options.announcer;
+    if (announcerOpt instanceof VoteAnnouncer) {
+      this.announcer = announcerOpt;
+    } else if (announcerOpt?.enabled) {
+      this.announcer = new VoteAnnouncer(announcerOpt);
+    }
+    if (this.announcer) {
+      this.on('vote', (vote: UniversalVote) => this.announcer!.announce(vote));
+      if (this.announcer.options.announceTestVotes) {
+        this.on('test', (vote: UniversalVote) => this.announcer!.announce(vote));
+      }
+    }
+  }
+
+  /** the wired announcer, when one is enabled. */
+  public get voteAnnouncer(): VoteAnnouncer | null {
+    return this.announcer;
   }
 
   /** all known lists, including any custom ones you passed in. */
@@ -127,8 +159,16 @@ export class Botlists extends EventEmitter {
         continue;
       }
       results.push(await this.postOne(list, resolved, token));
-      // tiny gap between posts keeps us far away from per list rate limits.
-      await sleep(250);
+      // polite gap between list posts (postSpacingMs, default 1000ms) keeps
+      // the fan-out far away from every per-list rate limit. A list that
+      // answered 429 with a big Retry-After adds a cooldown before the NEXT
+      // list so a hot list never turns into a hammering loop.
+      const last = results[results.length - 1];
+      let spacing = this.postSpacingMs;
+      if (last && !last.ok && last.retryAfter && last.retryAfter * 1000 <= MAX_RETRY_WAIT_MS) {
+        spacing = Math.max(spacing, last.retryAfter * 1000 + 250);
+      }
+      await sleep(spacing);
     }
     const report: PostReport = {
       results,
@@ -295,9 +335,12 @@ export class Botlists extends EventEmitter {
   /** start periodic stats posting. interval in ms, default 30 minutes. */
   public startAutoPost(intervalMs = 30 * 60_000, stats?: Partial<StatsPayload>): void {
     this.stopAutoPost();
+    // small jitter (+-5%) so a fleet of bots restarted at the same moment
+    // never lands on the list APIs in lockstep. Default cadence is 30 min.
+    const jittered = Math.round(Math.max(60_000, intervalMs) * (0.95 + Math.random() * 0.1));
     this.autoTimer = setInterval(() => {
       void this.postStats(stats).catch((error: unknown) => this.emit('error', error));
-    }, Math.max(60_000, intervalMs));
+    }, jittered);
     this.autoTimer.unref?.();
   }
 
@@ -336,12 +379,19 @@ export class Botlists extends EventEmitter {
     const started = Date.now();
     const url = applyId(list.apiPost as string, this.botId ?? '');
     const body = buildPostBody(list, stats);
+    const init = {
+      method: list.postMethod || 'POST',
+      body,
+      headers: { [this.authHeaderFor(list)]: token },
+    };
     try {
-      const response = await this.http.request(url, {
-        method: list.postMethod || 'POST',
-        body,
-        headers: { [this.authHeaderFor(list)]: token },
-      });
+      let response = await this.http.request(url, init);
+      // botlist rate limits: honour Retry-After with ONE polite retry instead
+      // of the transport-layer fast retries - we never hammer a 429ing list.
+      if (response.status === 429 && response.retryAfter && response.retryAfter * 1000 <= MAX_RETRY_WAIT_MS) {
+        await sleep(response.retryAfter * 1000 + 250);
+        response = await this.http.request(url, init);
+      }
       const retryAfter = response.retryAfter ?? undefined;
       return {
         listId: list.id,
@@ -409,12 +459,34 @@ function noToken(list: BotlistRecord): PostResult {
   };
 }
 
+/** DBL_* env keys mapped onto their list ids (built once from the registry).
+ *  Both the canonical tokenEnvKey (DBL_TOPGG) and a normalized form of the
+ *  list id (top.gg -> DBL_TOPGG) resolve, so DBL_TOP.GG works too. */
+const ENV_KEYS_TO_LISTS: Map<string, string> = new Map(
+  BOTLISTS.flatMap((list) => {
+    const norm = (s: string) => `DBL_${s.toUpperCase().replace(/[^A-Z0-9]/g, '')}`;
+    const keys: (readonly [string, string])[] = [];
+    if (list.tokenEnvKey) keys.push([list.tokenEnvKey, list.id] as const);
+    keys.push([norm(list.id), list.id] as const);
+    return keys;
+  }),
+);
+
 function readTokenEnv(): Record<string, string> {
   const tokens: Record<string, string> = {};
   // dotenv is intentionally not bundled: read process.env directly so
   // Bun, Node 20+ --env-file and every cloud runtime work out of the box.
+  // DBL_* keys are ALSO mapped onto their list ids (DBL_TOPGG -> "top.gg"):
+  // the token lookups in postStats() are keyed by list id, so an unmapped
+  // raw key would never be found. The raw key stays as a legacy passthrough
+  // for custom lists.
   for (const [key, value] of Object.entries(process.env)) {
-    if (key.startsWith('DBL_') && value) tokens[key] = value;
+    if (!key.startsWith('DBL_') || !value) continue;
+    tokens[key] = value;
+    const mapped =
+      ENV_KEYS_TO_LISTS.get(key) ??
+      ENV_KEYS_TO_LISTS.get(key.toUpperCase().replace(/[^A-Z0-9]/g, ''));
+    if (mapped) tokens[mapped] = value;
   }
   return tokens;
 }

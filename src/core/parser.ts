@@ -201,4 +201,34 @@ function extractQuery(obj: Record<string, unknown>): Record<string, string> {
   return {};
 }
 
+/**
+ * top.gg v1 webhook envelope flattener.
+ *
+ * top.gg's v1 webhooks deliver `{"vote":{"id":..,"botId":..,"userId":..,
+ * "type":"vote"|"test","createdAt":..}}` while v0 delivered the flat
+ * `{user, bot, type}` shape. Returns the body flattened into the universal
+ * shape (user/bot/type at the top level) so detection and parsing stay
+ * list-agnostic, or null when the body is not enveloped. Callers should keep
+ * the ORIGINAL body around for `raw` on the parsed payload.
+ */
+export function unwrapVoteEnvelope(body: unknown): Record<string, unknown> | null {
+  const obj = asObject(body);
+  if (!obj) return null;
+  // already flat (v0 shape) - nothing to unwrap.
+  if (typeof obj['user'] === 'string' || typeof obj['user_id'] === 'string') return null;
+  const inner = pickObject(obj, ['vote', 'vote_created']);
+  if (!inner) return null;
+  const flat: Record<string, unknown> = { ...obj };
+  delete flat['vote'];
+  delete flat['vote_created'];
+  for (const [key, value] of Object.entries(inner)) flat[key] = value;
+  if (flat['user'] === undefined) {
+    flat['user'] = inner['userId'] ?? inner['user_id'] ?? inner['user'] ?? null;
+  }
+  if (flat['bot'] === undefined) {
+    flat['bot'] = inner['botId'] ?? inner['bot_id'] ?? inner['bot'] ?? null;
+  }
+  return flat;
+}
+
 export { BotlistsError };

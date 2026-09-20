@@ -1,0 +1,46 @@
+# Real-world test harness for @potenfyrstudios/discord-botlists.
+#
+#   docker compose -f docker-compose.test.yml run --rm tests
+#     -> typecheck + full bun:test suite (webhook server, signatures, parser)
+#        inside a pinned container. No mocks: the suite boots real HTTP
+#        servers on real sockets and exchanges real signed deliveries.
+#
+#   TOPGG_TOKEN=... docker compose -f docker-compose.test.yml run --rm live
+#     -> live integration against the REAL top.gg API: posts real stats with
+#        your bot token, reads them back, and verifies a top.gg v1 signed
+#        webhook end to end through the SDK.
+#
+#   docker compose -f docker-compose.test.yml run --rm build
+#     -> typecheck + tsc build (what prepublishOnly runs).
+
+services:
+  tests:
+    build: .
+    command: sh -c "bun run lint && bun test"
+    volumes:
+      - ./src:/app/src
+      - ./test:/app/test
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./tsconfig.build.json:/app/tsconfig.build.json
+
+  build:
+    build: .
+    command: sh -c "bun run lint && bun run build"
+    volumes:
+      - ./src:/app/src
+      - ./test:/app/test
+      - ./dist:/app/dist
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./tsconfig.build.json:/app/tsconfig.build.json
+
+  live:
+    build: .
+    # pass tokens with -e TOPGG_TOKEN=... -e TOPGG_WEBHOOK_SECRET=...
+    # (optional: TOPGG_BOT_ID, argv[2] server count in the command)
+    command: bun run scripts/verify-topgg.mjs
+    environment: []
+    volumes:
+      - ./dist:/app/dist
+      - ./scripts:/app/scripts

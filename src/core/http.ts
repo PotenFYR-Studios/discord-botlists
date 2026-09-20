@@ -185,8 +185,13 @@ export function resolveList(query: string, extra: BotlistRecord[] = []): Botlist
 export function buildPostBody(record: BotlistRecord, stats: StatsPayload): Record<string, unknown> {
   const body: Record<string, unknown> = {};
 
-  // top.gg v0 style array of per shard counts.
-  if (record.shardsArrayField) body[record.shardsArrayField] = stats.shards ?? [];
+  // top.gg v0 style array of per shard counts. Only sent when the bot
+  // actually REPORTS shard data: top.gg derives server_count from a present
+  // shards array, so an EMPTY array silently zeroes the published count
+  // (a non-sharded bot must omit the field entirely).
+  if (record.shardsArrayField && Array.isArray(stats.shards) && stats.shards.length > 0) {
+    body[record.shardsArrayField] = stats.shards;
+  }
 
   const count = stats.serverCount;
   if (record.postField) body[record.postField] = count;
