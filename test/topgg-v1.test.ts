@@ -25,6 +25,45 @@ function signV1(raw: string, t = Math.floor(Date.now() / 1000), secret = WHS): s
 const V1_VOTE = { vote: { id: '3029384756102938475', botId: '1470079725106888817', userId: '264811613708746752', type: 'vote', createdAt: '2026-09-20T10:00:00.000Z' } };
 const V1_TEST = { vote: { id: '3029384756102938476', botId: '1470079725106888817', userId: '264811613708746752', type: 'test', createdAt: '2026-09-20T10:00:00.000Z' } };
 
+/**
+ * REAL top.gg v1 payloads (docs.top.gg/webhooks/events). The envelope is
+ * {"type":"vote.create"|"webhook.test","data":{...}} - NOT the {vote:{...}}
+ * shape the original fixtures assumed. The voter's DISCORD id is
+ * data.user.platform_id; data.user.id is top.gg's internal id and NOT a
+ * snowflake. weight is 2 during the weekend multiplier.
+ */
+const RV1_VOTE = {
+  type: 'vote.create',
+  data: {
+    id: '808499215864008704',
+    weight: 1,
+    created_at: '2026-02-09T00:47:14.2510149+00:00',
+    expires_at: '2026-02-09T12:47:14.2510149+00:00',
+    project: { id: '803190510032756736', type: 'bot', platform: 'discord', platform_id: '160105994217586689' },
+    query: { ref: 'jericho' },
+    user: { id: '999888777666555444', platform_id: '264811613708746752', name: 'votername', avatar_url: 'https://cdn.discordapp.com/avatars/264811613708746752/abc.png' },
+  },
+};
+const RV1_VOTE_WEEKEND = {
+  type: 'vote.create',
+  data: {
+    id: '808499215864008705',
+    weight: 2,
+    created_at: '2026-02-09T00:47:14.2510149+00:00',
+    expires_at: '2026-02-09T12:47:14.2510149+00:00',
+    project: { id: '803190510032756736', type: 'bot', platform: 'discord', platform_id: '160105994217586689' },
+    query: {},
+    user: { id: '999888777666555444', platform_id: '264811613708746752', name: 'votername', avatar_url: 'https://cdn.discordapp.com/avatars/264811613708746752/abc.png' },
+  },
+};
+const RV1_TEST = {
+  type: 'webhook.test',
+  data: {
+    user: { id: '999888777666555444', platform_id: '264811613708746752', name: 'votername', avatar_url: 'https://cdn.discordapp.com/avatars/264811613708746752/abc.png' },
+    project: { id: '803190510032756736', type: 'bot', platform: 'discord', platform_id: '160105994217586689' },
+  },
+};
+
 /** start a server on a free port, run assertions, stop. */
 async function withServer(
   opts: ConstructorParameters<typeof VoteWebhookServer>[0],
@@ -88,6 +127,54 @@ describe('top.gg v1 signatures', () => {
       count = 1;
     });
     expect(count).toBe(1);
+  });
+});
+
+describe('top.gg v1 REAL payload envelope (docs.top.gg/webhooks/events)', () => {
+  test('ingest() parses {"type":"vote.create","data":{...}} - voter is user.platform_id', () => {
+    const server = new VoteWebhookServer({ secret: { 'top.gg': WHS } });
+    let got: { voterId?: string | null; botId?: string | null; voterName?: string | null; voterAvatar?: string | null; weekend?: boolean; weight?: number; isTest?: boolean; query?: Record<string, string> } | null = null;
+    server.on('vote', (v: typeof got) => (got = v));
+    const parsed = server.ingest('top.gg', RV1_VOTE);
+    expect(parsed?.event).toBe('vote');
+    expect(got?.voterId).toBe('264811613708746752'); // platform_id, NOT user.id
+    expect(got?.voterName).toBe('votername');
+    expect(got?.voterAvatar).toBe('https://cdn.discordapp.com/avatars/264811613708746752/abc.png');
+    expect(got?.botId).toBe('160105994217586689'); // project.platform_id
+    expect(got?.isTest).toBe(false);
+    expect(got?.weekend).toBe(false);
+    expect(got?.weight).toBe(1);
+    expect(got?.query).toEqual({ ref: 'jericho' });
+  });
+
+  test('weight 2 marks the vote as weekend multiplier', () => {
+    const server = new VoteWebhookServer({ secret: { 'top.gg': WHS } });
+    let got: { weekend?: boolean; weight?: number } | null = null;
+    server.on('vote', (v: typeof got) => (got = v));
+    server.ingest('top.gg', RV1_VOTE_WEEKEND);
+    expect(got?.weekend).toBe(true);
+    expect(got?.weight).toBe(2);
+  });
+
+  test('{"type":"webhook.test"} emits the test event with the voter parsed', () => {
+    const server = new VoteWebhookServer({ secret: { 'top.gg': WHS } });
+    let got: { voterId?: string | null; isTest?: boolean } | null = null;
+    server.on('test', (v: typeof got) => (got = v));
+    const parsed = server.ingest('top.gg', RV1_TEST);
+    expect(parsed?.event).toBe('test');
+    expect(got?.voterId).toBe('264811613708746752');
+    expect(got?.isTest).toBe(true);
+  });
+
+  test('signed real-shape delivery over http is accepted and parsed', async () => {
+    let voterId: string | null = null;
+    await withServer({ port: 0, path: '/hook', secret: { 'top.gg': WHS } }, async (port, server) => {
+      server.on('vote', (v: { voterId: string | null }) => (voterId = v.voterId));
+      const raw = JSON.stringify(RV1_VOTE);
+      const res = await postRaw(port, '/hook/top.gg', raw, { 'x-topgg-signature': signV1(raw) });
+      expect(res.status).toBe(200);
+    });
+    expect(voterId).toBe('264811613708746752');
   });
 });
 

@@ -22,6 +22,7 @@ import type { UniversalVote } from './types.js';
 
 export { BotlistsError, ConsoleReport };
 export { UniversalParser, unwrapVoteEnvelope } from './core/parser.js';
+export { isJwtLike, verifyJwtHs256 } from './core/jwt.js';
 export { StatusChecker } from './status/checker.js';
 export { VoteAnnouncer, isDiscordWebhookUrl } from './announcer.js';
 export type { VoteAnnouncerFormat, AnnouncerDelivery, ExternalVotePayload, DiscordWebhookPayload } from './announcer.js';

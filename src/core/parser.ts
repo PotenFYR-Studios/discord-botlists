@@ -63,7 +63,7 @@ export class UniversalParser {
 
   /** parse any webhook body into a normalized vote. */
   public parseVoteWebhook(list: BotlistRecord, body: unknown, isTest = false) {
-    const obj = asObject(body) ?? {};
+    const obj = flattenNested(asObject(body) ?? {});
     const vote = {
       listId: list.id,
       listName: list.name,
@@ -83,7 +83,7 @@ export class UniversalParser {
 
   /** parse comment, review and rating webhooks. */
   public parseCommentWebhook(list: BotlistRecord, body: unknown, kind: 'comment' | 'review' | 'rating' = 'review') {
-    const obj = asObject(body) ?? {};
+    const obj = flattenNested(asObject(body) ?? {});
     return {
       listId: list.id,
       listName: list.name,
@@ -103,6 +103,33 @@ function asObject(value: unknown): Record<string, unknown> | null {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : null;
+}
+
+/**
+ * Nested-object flattener for lists that deliver entities as objects instead
+ * of id strings. DisQ (docs.disq.ink/webhooks/overview) posts
+ * `{"type":"vote","bot":{"id","name"},"user":{"id","username"},"review":{...}}`
+ * - without this pass the priority pick lists see only an object under `user`
+ * and the voter id parses as null. top.gg v1's `platform_id`-first rule is
+ * handled in unwrapVoteEnvelope before this runs; here `platform_id` still
+ * wins when present so both shapes flatten the same way.
+ */
+function flattenNested(obj: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...obj };
+  const user = asObject(out['user']);
+  if (user) {
+    out['user'] = user['platform_id'] ?? user['id'] ?? user['userId'] ?? user['user_id'] ?? null;
+    if (out['username'] === undefined) out['username'] = user['username'] ?? user['name'] ?? user['displayName'] ?? null;
+    if (out['avatar'] === undefined) out['avatar'] = user['avatar'] ?? user['avatar_url'] ?? null;
+  }
+  const bot = asObject(out['bot']);
+  if (bot) out['bot'] = bot['platform_id'] ?? bot['id'] ?? bot['botId'] ?? bot['bot_id'] ?? null;
+  const review = asObject(out['review']);
+  if (review) {
+    if (out['rating'] === undefined) out['rating'] = review['rating'] ?? review['stars'] ?? null;
+    if (out['content'] === undefined) out['content'] = review['content'] ?? review['comment'] ?? review['text'] ?? null;
+  }
+  return out;
 }
 
 function pickObject(obj: Record<string, unknown> | null, keys: string[]): Record<string, unknown> | null {
@@ -204,8 +231,11 @@ function extractQuery(obj: Record<string, unknown>): Record<string, string> {
 /**
  * top.gg v1 webhook envelope flattener.
  *
- * top.gg's v1 webhooks deliver `{"vote":{"id":..,"botId":..,"userId":..,
- * "type":"vote"|"test","createdAt":..}}` while v0 delivered the flat
+ * The REAL v1 envelope (docs.top.gg/webhooks/events) is
+ * `{"type":"vote.create"|"webhook.test","data":{...}}` where the voter's
+ * DISCORD id is `data.user.platform_id` (`data.user.id` is top.gg's internal
+ * id and NOT a snowflake), the bot is `data.project.platform_id`, and `weight`
+ * is 2 during the weekend multiplier. Legacy v0 delivered the flat
  * `{user, bot, type}` shape. Returns the body flattened into the universal
  * shape (user/bot/type at the top level) so detection and parsing stay
  * list-agnostic, or null when the body is not enveloped. Callers should keep
@@ -216,6 +246,36 @@ export function unwrapVoteEnvelope(body: unknown): Record<string, unknown> | nul
   if (!obj) return null;
   // already flat (v0 shape) - nothing to unwrap.
   if (typeof obj['user'] === 'string' || typeof obj['user_id'] === 'string') return null;
+
+  // REAL top.gg v1: {"type":"vote.create"|"webhook.test","data":{...}}.
+  // discordforge.org webhooks v2 use the same envelope shape with sibling
+  // fields ({"id","type":"vote.created","created_at","bot_id","data":{...}}),
+  // so envelope keys are merged too (data wins on collision).
+  const type = typeof obj['type'] === 'string' ? obj['type'] : null;
+  const data = asObject(obj['data']);
+  if (type && data && (type.startsWith('vote.') || type.startsWith('webhook.'))) {
+    const flat: Record<string, unknown> = { ...obj };
+    delete flat['data'];
+    for (const [key, value] of Object.entries(data)) flat[key] = value;
+    const user = asObject(data['user']);
+    if (user) {
+      // platform_id is the Discord snowflake; fall back to the top.gg id only
+      // when a list variant omits it (it will fail snowflake checks upstream).
+      flat['user'] = user['platform_id'] ?? user['id'] ?? null;
+      flat['username'] = user['name'] ?? null;
+      flat['avatar'] = user['avatar_url'] ?? null;
+    }
+    const project = asObject(data['project']);
+    if (project) flat['bot'] = project['platform_id'] ?? project['id'] ?? null;
+    // top.gg has no explicit weekend flag - weight 2 IS the weekend multiplier.
+    if (data['weight'] === 2) flat['isWeekend'] = true;
+    // keep the envelope type so detectTest/detectEvent classify the event
+    // ("vote.create" -> vote, "webhook.test" -> test via includes()).
+    flat['type'] = type;
+    return flat;
+  }
+
+  // enveloped variants some lists deliver: {"vote":{...}} / {"vote_created":{...}}.
   const inner = pickObject(obj, ['vote', 'vote_created']);
   if (!inner) return null;
   const flat: Record<string, unknown> = { ...obj };

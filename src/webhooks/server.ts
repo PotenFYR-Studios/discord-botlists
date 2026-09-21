@@ -4,6 +4,7 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import type { BotlistRecord, ParsedWebhook, WebhookOptions, WebhookSecurityOptions } from '../types.js';
 import { UniversalParser, unwrapVoteEnvelope } from '../core/parser.js';
 import { resolveList } from '../core/http.js';
+import { isJwtLike, verifyJwtHs256 } from '../core/jwt.js';
 
 interface RateBucket {
   count: number;
@@ -28,7 +29,14 @@ const DEFAULT_SECURITY: Required<Omit<WebhookSecurityOptions, 'hmac' | 'allowedL
 const SECRET_HEADERS = ['authorization', 'x-webhook-authentication', 'x-webhook-secret'] as const;
 
 /** headers botlists commonly use for HMAC signatures. */
-const SIGNATURE_HEADERS = ['x-signature-256', 'x-hub-signature-256', 'x-signature', 'x-signature-sha256'] as const;
+const SIGNATURE_HEADERS = [
+  'x-signature-256',
+  'x-hub-signature-256',
+  'x-signature',
+  'x-signature-sha256',
+  // discordforge.org webhooks v2: "X-Forge-Signature: sha256=<hex hmac of raw body>"
+  'x-forge-signature',
+] as const;
 
 /**
  * VoteWebhookServer: dependency free http server that receives vote, comment
@@ -136,10 +144,24 @@ export class VoteWebhookServer extends EventEmitter {
     if (this.requireSecret && !Object.keys(this.secrets).length) {
       throw new Error('[discord-botlists] ingest() called without a configured secret');
     }
+    // discordlist.gg delivers the whole body as an HS256 JWT string: verify it
+    // with the configured secret (the signature IS the auth) and parse the
+    // claims instead. An invalid token is a rejected delivery, not a vote.
+    let jwtVerified = false;
+    if (isJwtLike(body)) {
+      const secret = this.secrets[list.id] ?? this.secrets['*'];
+      const claims = secret ? verifyJwtHs256(body, secret) : null;
+      if (!claims) {
+        this.emit('error', new Error(`invalid jwt for ${list.id} (ingest)`));
+        return null;
+      }
+      body = claims;
+      jwtVerified = true;
+    }
     const raw = body === undefined || body === null ? '' : JSON.stringify(body);
     const callerSentHeaders = options.headers !== undefined;
-    if (callerSentHeaders || (list && this.hmacKeys[list.id])) {
-      const auth = this.authorize(list, options.headers ?? {}, raw, body);
+    if (callerSentHeaders || jwtVerified || (list && this.hmacKeys[list.id])) {
+      const auth = this.authorize(list, options.headers ?? {}, raw, body, jwtVerified);
       if (!auth.ok) {
         this.emit('error', new Error(`${auth.reason} for ${list.id} (ingest)`));
         return null;
@@ -207,16 +229,27 @@ export class VoteWebhookServer extends EventEmitter {
       return;
     }
     let body: unknown = null;
+    let jwtVerified = false;
     try {
       body = raw ? JSON.parse(raw) : null;
     } catch {
-      res.writeHead(400, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ ok: false, error: 'invalid json' }));
-      this.emit('error', new Error(`invalid json from ${ip} (${list?.id ?? 'unknown list'})`));
-      return;
+      // discordlist.gg delivers the ENTIRE body as an HS256 JWT signed with
+      // the webhook secret (claims: {user_id, bot_id, is_test}). A valid
+      // signature doubles as the transport auth - no headers to compare.
+      const secret = list ? this.secrets[list.id] ?? this.secrets['*'] : this.secrets['*'];
+      const claims = isJwtLike(raw) && secret ? verifyJwtHs256(raw, secret) : null;
+      if (claims) {
+        body = claims;
+        jwtVerified = true;
+      } else {
+        res.writeHead(400, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: 'invalid json' }));
+        this.emit('error', new Error(`invalid json from ${ip} (${list?.id ?? 'unknown list'})`));
+        return;
+      }
     }
 
-    const auth = this.authorize(list, req.headers, raw, body);
+    const auth = this.authorize(list, req.headers, raw, body, jwtVerified);
     if (!auth.ok) {
       state.authFailures++;
       if (state.authFailures >= (this.security.banAfterFailures ?? DEFAULT_SECURITY.banAfterFailures)) {
@@ -268,12 +301,17 @@ export class VoteWebhookServer extends EventEmitter {
     rawHeaders: IncomingMessage['headers'] | Record<string, string | string[] | undefined>,
     rawBody: string,
     body: unknown,
+    jwtVerified = false,
   ): { ok: true } | { ok: false; reason: string; status: number } {
     // optional allowlist: only named lists may post.
     const allow = this.security.allowedLists;
     if (allow && list && !allow.includes(list.id)) {
       return { ok: false, reason: 'list not allowed', status: 403 };
     }
+
+    // a verified JWT body (discordlist.gg) IS the auth: the signature was
+    // checked with the secret at parse time.
+    if (jwtVerified) return { ok: true };
 
     const secret = list ? this.secrets[list.id] ?? this.secrets['*'] : this.secrets['*'];
     const hmacKey = list ? this.hmacKeys[list.id] : undefined;
@@ -321,17 +359,29 @@ export class VoteWebhookServer extends EventEmitter {
   }
 
   private verifySignatureHex(listId: string, rawBody: string, headers: Record<string, string>, key: string): boolean {
-    // top.gg v1 scheme: "x-topgg-signature: t=<unix seconds>,v1=<hex hmac-sha256
-    // of '<t>.<raw body>'>". The timestamped envelope does not match the plain
-    // raw-body schemes below, so it is checked first.
-    const topggSig = headers['x-topgg-signature'];
-    if (typeof topggSig === 'string' && topggSig) {
-      const t = /(?:^|,)\s*t=([^,]+)/.exec(topggSig)?.[1]?.trim();
-      const v1 = /(?:^|,)\s*v1=([^,]+)/.exec(topggSig)?.[1]?.trim();
+    // Timestamped scheme: "t=<unix seconds>,v1=<hex hmac-sha256 of '<t>.<raw
+    // body>'>". top.gg's x-topgg-signature and DisQ's x-disq-signature
+    // (docs.disq.ink/webhooks/overview) both use it. It does not match the
+    // plain raw-body schemes below, so it is checked first.
+    for (const name of ['x-topgg-signature', 'x-disq-signature']) {
+      const sig = headers[name];
+      if (typeof sig !== 'string' || !sig) continue;
+      const t = /(?:^|,)\s*t=([^,]+)/.exec(sig)?.[1]?.trim();
+      const v1 = /(?:^|,)\s*v1=([^,]+)/.exec(sig)?.[1]?.trim();
       if (t && v1) {
         const expected = createHmac('sha256', key).update(`${t}.${rawBody}`).digest('hex');
         if (safeEqualHex(v1, expected)) return true;
       }
+    }
+    // topbot.gg variant: the signature header carries ONLY the hex hmac; the
+    // timestamp arrives in a separate x-topbot-timestamp header (hmac over
+    // "<timestamp>.<raw body>"). Only tried when the timestamp header exists,
+    // so plain-hex signature headers are unaffected.
+    const topbotSig = headers['x-topbot-signature'];
+    const topbotTs = headers['x-topbot-timestamp'];
+    if (typeof topbotSig === 'string' && typeof topbotTs === 'string' && topbotSig && topbotTs && !topbotSig.includes('=')) {
+      const expectedTs = createHmac('sha256', key).update(`${topbotTs}.${rawBody}`).digest('hex');
+      if (safeEqualHex(topbotSig.trim(), expectedTs)) return true;
     }
     const expected = createHmac('sha256', key).update(rawBody).digest('hex');
     for (const name of SIGNATURE_HEADERS) {
@@ -469,8 +519,11 @@ function detectTest(list: BotlistRecord | null, body: unknown): boolean {
   if (typeof body !== 'object' || body === null) return false;
   const record = body as Record<string, unknown>;
   const type = record[list?.webhook?.eventField ?? 'type'];
-  if (typeof type === 'string' && type.includes('test')) return true;
-  return record['test'] === true;
+  // case-insensitive: botlist.me sends "Test", v0 lists send "test".
+  if (typeof type === 'string' && type.toLowerCase().includes('test')) return true;
+  // dlist.space sends test:true, discordforge legacy isTest, discordlist.gg
+  // JWT claims is_test.
+  return record['test'] === true || record['isTest'] === true || record['is_test'] === true;
 }
 
 function detectEvent(list: BotlistRecord, body: unknown, isTest: boolean): ParsedWebhook['event'] | null {
@@ -478,8 +531,10 @@ function detectEvent(list: BotlistRecord, body: unknown, isTest: boolean): Parse
   if (typeof body === 'object' && body !== null) {
     const record = body as Record<string, unknown>;
     const eventField = list.webhook?.eventField;
-    const type = eventField ? record[eventField] : record['type'];
-    if (typeof type === 'string') {
+    const rawType = eventField ? record[eventField] : record['type'];
+    // case-insensitive: botlist.me sends "Upvote" for real votes.
+    const type = typeof rawType === 'string' ? rawType.toLowerCase() : null;
+    if (type) {
       if (type.includes('review')) return 'review';
       if (type.includes('comment')) return 'comment';
       if (type.includes('rating')) return 'rating';
