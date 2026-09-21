@@ -15,7 +15,7 @@
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&pause=1200&color=8B5CF6&center=true&vCenter=true&width=800&lines=Post+stats+to+every+botlist+with+one+call;Realtime+votes%2C+comments+and+reviews;One+parser+for+every+API+shape;Zero+dependencies+%C2%B7+fully+typed)](https://github.com/PotenFYR-Studios/discord-botlists)
 
-**`@potenfyrstudios/discord-botlists`**: the universal multi-botlist SDK for Discord bots: post stats to 33 verified live lists, get votes in realtime, parse every API into one shape.
+**`@potenfyrstudios/discord-botlists`**: the universal multi-botlist SDK for Discord bots: post stats to 27 verified live lists, get votes in realtime, parse every API into one shape.
 
 [Docs](https://botlists.docs.potenfyr.in) · [Examples](https://botlists.docs.potenfyr.in/examples) · [npm](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists) · [Issues](https://github.com/PotenFYR-Studios/discord-botlists/issues) · [Live status](#live-status)
 
@@ -27,7 +27,7 @@
 
 Posting your bot's stats to every list and handling every list's webhook format yourself is weeks of glue code. This package does all of it with zero runtime dependencies:
 
-- **Stats posting** to 33 verified live lists, each with its correct wire format, auth header and endpoint, learned from every list's own docs plus the BotBlock directory. Dead lists are pruned automatically by the hourly status sync.
+- **Stats posting** to 27 verified live lists, each with its correct wire format, auth header and endpoint, learned from every list's own docs plus the BotBlock directory. Dead lists are pruned automatically by the hourly status sync.
 - **Realtime vote, comment and review events** through a built-in webhook server. No polling, no delay, no express dependency.
 - **Universal parser** that normalizes any list's bot data into one `UniversalBot` object so you never juggle `server_count` vs `guildCount` vs `guilds` vs `count` again.
 - **Status tracking**: automated hourly probes detect deprecated or shut down lists, with latency and HTTP state, synced into this README and the docs site.
@@ -301,7 +301,7 @@ await lists.postStatsTo('radarcord', { serverCount: 100 });
 await lists.postViaBotBlock({ serverCount: 100 });
 ```
 
-Every list gets its correct body shape automatically: `server_count` for top.gg, `guildCount` for discord.bots.gg, `guilds` for discordbotlist.com, `servers` for disforge, and so on for all 33.
+Every list gets its correct body shape automatically: `server_count` for top.gg, `guildCount` for discord.bots.gg, `guilds` for discordbotlist.com, `servers` for disforge, and so on for all 27.
 
 ### Rate limit safety
 
@@ -333,11 +333,11 @@ const lists = new Botlists({
 
 Custom lists work everywhere built-in ones do: posting, webhooks, parsing, status.
 
-## Supported lists (33 verified live)
+## Supported lists (27 verified live)
 
-The generated registry (`src/data/lists.generated.ts`, reproducible from the BotBlock snapshot) only contains lists that answered during the latest status audit. Shutdown and deprecated lists are removed automatically:
+The generated registry (`src/data/lists.generated.ts`, reproducible from the BotBlock snapshot) only contains lists that answered during the latest status audit. Shutdown and deprecated lists are removed automatically. The September 2026 docs audit pruned 8 domains that now serve registrar parking or squatter pages despite answering HTTP 200 (blist.xyz, botlist.co, botsdatabase.com, discord.services, discordbot.world, motiondevelopment.top, space-bot-list.xyz, topcord.xyz) and added topbot.gg and discordforge.org:
 
-top.gg | discordbotlist.com | discord.bots.gg | botlist.me | discords.com | voidbots.net | vcodes.xyz | radarcord.net | discordextremelist.xyz | bots.ondiscord.xyz | discordlist.gg | disforge.com | disq.ink | dlist.space | cybralist.com | discord.rovelstars.com | yabl.xyz | justdiscord.org | omniplex.gg | discover.fluxpoint.dev | blist.xyz | motiondevelopment.top | topcord.xyz | discordbot.world | bots.discordlabs.org | botsdatabase.com | discordbotlist.xyz | space-bot-list.xyz | botlist.co | discord.services | stellarbotlist.com | carbonitex.net | discord.place
+top.gg | discordbotlist.com | discord.bots.gg | botlist.me | discords.com | voidbots.net | vcodes.xyz | radarcord.net | discordlist.gg | disforge.com | disq.ink | dlist.space | cybralist.com | discord.rovelstars.com | yabl.xyz | justdiscord.org | omniplex.gg | discover.fluxpoint.dev | bots.discordlabs.org | discordbotlist.xyz | stellarbotlist.com | carbonitex.net | discord.place | topbot.gg | discordforge.org
 
 Each record carries: endpoint URLs, wire field names, shard field names, auth header, widget and view URLs, webhook format hint and env var key.
 
@@ -346,43 +346,37 @@ Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discor
 ## Live status
 
 <!-- STATUS:START -->
-Last sync: **2026-09-21** | 🟢 33 live | 🟡 0 deprecated | 🔴 0 shutdown | ⚪ 0 unknown
+Last sync: **2026-09-21** | 🟢 27 live | 🟡 0 deprecated | 🔴 0 shutdown | ⚪ 0 unknown
 
 | List | Status | Latency | HTTP | Last checked (UTC) |
 | --- | --- | --- | --- | --- |
-| [Blist](https://blist.xyz/) | 🟢 live | 27 ms | 200 | 2026-09-21 00:59 |
-| [Botlist.Co](https://botlist.co/platforms/discord) | 🟢 live | 606 ms | 200 | 2026-09-21 00:59 |
-| [Botlist.me](https://botlist.me/) | 🟢 live | 315 ms | 200 | 2026-09-21 00:59 |
-| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 510 ms | 200 | 2026-09-21 00:59 |
-| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 340 ms | 200 | 2026-09-21 00:59 |
-| [Bots Database](https://botsdatabase.com/) | 🟢 live | 59 ms | 200 | 2026-09-21 00:59 |
-| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 295 ms | 200 | 2026-09-21 00:59 |
-| [Cybralist](https://cybralist.com/) | 🟢 live | 351 ms | 200 | 2026-09-21 00:59 |
-| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 307 ms | 200 | 2026-09-21 00:59 |
-| [discord.place](https://discord.place/bots) | 🟢 live | 151 ms | 200 | 2026-09-21 00:59 |
-| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 1209 ms | 200 | 2026-09-21 00:59 |
-| [Discord Services](https://discord.services/) | 🟢 live | 22 ms | 200 | 2026-09-21 00:59 |
-| [Discord Bot World](https://discordbot.world/) | 🟢 live | 925 ms | 200 | 2026-09-21 00:59 |
-| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 177 ms | 200 | 2026-09-21 00:59 |
-| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live | 1176 ms | 200 | 2026-09-21 00:59 |
-| [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live | 894 ms | 200 | 2026-09-21 00:59 |
-| [dlist.gg](https://discordlist.gg/) | 🟢 live | 338 ms | 200 | 2026-09-21 00:59 |
-| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 130 ms | 200 | 2026-09-21 00:59 |
-| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 223 ms | 200 | 2026-09-21 00:59 |
-| [Disforge](https://disforge.com/bots) | 🟢 live | 853 ms | 200 | 2026-09-21 00:59 |
-| [DisQ](https://disq.ink/) | 🟢 live | 1949 ms | 200 | 2026-09-21 00:59 |
-| [DList.Space](https://dlist.space/) | 🟢 live | 55 ms | 200 | 2026-09-21 00:59 |
-| [JustDiscord](https://justdiscord.org/) | 🟢 live | 431 ms | 200 | 2026-09-21 00:59 |
-| [MotionDevelopment](https://www.motiondevelopment.top/) | 🟢 live | 335 ms | 200 | 2026-09-21 00:59 |
-| [Omniplex](https://omniplex.gg/) | 🟢 live | 1057 ms | 200 | 2026-09-21 00:59 |
-| [Radarcord](https://radarcord.net/) | 🟢 live | 1419 ms | 200 | 2026-09-21 00:59 |
-| [Space Bot List](https://space-bot-list.xyz/) | 🟢 live | 25 ms | 200 | 2026-09-21 00:59 |
-| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 612 ms | 200 | 2026-09-21 00:59 |
-| [Discord Bot List](https://top.gg/) | 🟢 live | 31 ms | 403 | 2026-09-21 00:59 |
-| [TopCord](https://topcord.xyz/) | 🟢 live | 19 ms | 200 | 2026-09-21 00:59 |
-| [vCodes](https://vcodes.xyz) | 🟢 live | 210 ms | 200 | 2026-09-21 00:59 |
-| [Void Bots](https://voidbots.net/) | 🟢 live | 188 ms | 200 | 2026-09-21 00:59 |
-| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 94 ms | 200 | 2026-09-21 00:59 |
+| [Botlist.me](https://botlist.me/) | 🟢 live | 899 ms | 200 | 2026-09-21 02:32 |
+| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 530 ms | 200 | 2026-09-21 02:32 |
+| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 1593 ms | 200 | 2026-09-21 02:32 |
+| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 1140 ms | 200 | 2026-09-21 02:32 |
+| [Cybralist](https://cybralist.com/) | 🟢 live | 554 ms | 200 | 2026-09-21 02:32 |
+| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 747 ms | 200 | 2026-09-21 02:32 |
+| [discord.place](https://discord.place/bots) | 🟢 live | 157 ms | 403 | 2026-09-21 02:32 |
+| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 1546 ms | 200 | 2026-09-21 02:32 |
+| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 671 ms | 200 | 2026-09-21 02:32 |
+| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live | 814 ms | 200 | 2026-09-21 02:32 |
+| [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live | 1225 ms | 200 | 2026-09-21 02:32 |
+| [DiscordForge](https://discordforge.org/) | 🟢 live | 524 ms | 200 | 2026-09-21 02:32 |
+| [dlist.gg](https://discordlist.gg/) | 🟢 live | 473 ms | 200 | 2026-09-21 02:32 |
+| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 463 ms | 200 | 2026-09-21 02:32 |
+| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 1072 ms | 200 | 2026-09-21 02:32 |
+| [Disforge](https://disforge.com/bots) | 🟢 live | 2384 ms | 200 | 2026-09-21 02:33 |
+| [DisQ](https://disq.ink/) | 🟢 live | 1225 ms | 200 | 2026-09-21 02:32 |
+| [DList.Space](https://dlist.space/) | 🟢 live | 235 ms | 200 | 2026-09-21 02:32 |
+| [JustDiscord](https://justdiscord.org/) | 🟢 live | 966 ms | 200 | 2026-09-21 02:32 |
+| [Omniplex](https://omniplex.gg/) | 🟢 live | 1156 ms | 200 | 2026-09-21 02:32 |
+| [Radarcord](https://radarcord.net/) | 🟢 live | 1226 ms | 200 | 2026-09-21 02:32 |
+| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 971 ms | 200 | 2026-09-21 02:32 |
+| [Discord Bot List](https://top.gg/) | 🟢 live | 158 ms | 403 | 2026-09-21 02:32 |
+| [TopBot](https://topbot.gg/) | 🟢 live | 707 ms | 200 | 2026-09-21 02:32 |
+| [vCodes](https://vcodes.xyz) | 🟢 live | 931 ms | 200 | 2026-09-21 02:32 |
+| [Void Bots](https://voidbots.net/) | 🟢 live | 571 ms | 200 | 2026-09-21 02:32 |
+| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 167 ms | 200 | 2026-09-21 02:32 |
 <!-- STATUS:END -->
 
 The table above is regenerated hourly by [scripts/status-sync.ts](scripts/status-sync.ts) (workflow: `status-sync.yml`). A list is marked:

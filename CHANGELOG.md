@@ -3,6 +3,26 @@
 All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.3] - 2026-09-21
+
+Every webhook-enabled list's payload was audited against its official docs; the fixes below are pinned by tests using the documented payloads.
+
+### Fixed
+- **Real top.gg v1 vote webhooks parsed with an empty `voterId`** - top.gg v1 actually delivers `{"type":"vote.create"|"webhook.test","data":{...}}` (docs.top.gg/webhooks/events), not the `{"vote":{...}}` envelope 1.0.2 assumed. Real votes emitted `voterId: null`, so downstream consumers (Jericho included) silently dropped every genuine vote: no rewards, no announcements. The envelope now flattens correctly: `voterId` is `data.user.platform_id` (the DISCORD snowflake; `data.user.id` is top.gg's internal id), `voterName`/`voterAvatar` from `data.user`, `botId` from `data.project.platform_id`, `query` from `data.query`, and `weight: 2` (weekend multiplier) sets `weekend: true`. Dashboard tests (`type: "webhook.test"`) route to the `test` event.
+- **DisQ votes parsed with an empty `voterId`** - docs.disq.ink delivers the voter as a nested object (`user.id`). Nested `user`/`bot`/`review` objects are now flattened before field extraction, for vote and comment/review webhooks alike.
+- **Case-sensitive event detection** - botlist.me sends `type: "Upvote"`/`"Test"`; test/vote detection is now case-insensitive.
+
+### Added
+- **topbot.gg** - new list (stats POST `{"serverCount","shardCount"}`, vote webhooks `{event, flagged, user}` signed via `x-topbot-signature` + `x-topbot-timestamp`, hmac over `"<timestamp>.<raw body>"`). Its API key is Bearer-style: set the token value to `Bearer <api key>`.
+- **discordforge.org** - new list (stats POST `{"server_count","shard_count"}`; webhooks v2 envelope `{id, type:"vote.created", created_at, bot_id, data:{voter_id,...}}` signed with `X-Forge-Signature: sha256=<hex hmac of raw body>`; legacy `{id, username, isTest}` shape supported alongside).
+- **discordlist.gg JWT webhook bodies** - dlist.gg signs the entire request body as an HS256 JWT keyed with your Webhook Authorization secret (claims `{user_id, bot_id, is_test}`). The HTTP server and `ingest()` verify the token and parse the claims; a valid signature doubles as the transport auth. `isJwtLike`/`verifyJwtHs256` are exported from the package root.
+- DisQ `X-DisQ-Signature` (the same `t=,v1=` hmac family as top.gg v1) is now verified.
+- Test-delivery flags `isTest` (discordforge legacy) and `is_test` (discordlist.gg claims) alongside the existing `test: true` (dlist.space).
+
+### Changed
+- **8 dead lists pruned** - their domains now serve registrar parking or squatter pages while still answering HTTP 200 (why the status sync never flagged them): blist.xyz, botlist.co, botsdatabase.com, discord.services, discordbot.world, motiondevelopment.top, space-bot-list.xyz, topcord.xyz. The registry is 27 verified-live lists.
+- Webhook support claims trued up against the docs audit: discordextremelist.xyz (no vote webhook exists) and bots.ondiscord.xyz (none publicly documented) no longer advertise webhook support; `voterField` metadata corrected for botlist.me, discords.com, radarcord.net, voidbots.net, vcodes.xyz, disq.ink and discordlist.gg.
+
 ## [1.0.2] - 2026-09-20
 
 ### Added

@@ -39,81 +39,88 @@ AUTH_OVERRIDE = {
 }
 
 # vote webhook knowledge per list: [header that carries the secret, body field holding the voter id]
+# Audited against each list's official docs in September 2026:
+# - discordextremelist.xyz REMOVED: their v2 API docs document no vote webhook
+#   at all (upvotes/downvotes are stored, never delivered).
+# - bots.ondiscord.xyz REMOVED: site is live but no webhook is publicly
+#   documented (none in their API docs, sitemap or archives) - do not claim
+#   support for an undocumented payload.
+# - discords.com voter field is `user` (docs.botsfordiscord.com).
+# - disq.ink delivers `user` as an OBJECT: the id is `user.id`
+#   (docs.disq.ink/webhooks/overview); the parser flattens nested objects.
+# - botlist.me voter field is `user`, type is "Upvote"/"Test"
+#   (docs.botlist.me/Webhooks/Vote_Webhooks).
+# - radarcord.net voter field is `user` (docs.radarcord.net/api/bots).
+# - voidbots.net voter field is `user`, type "vote"/"test"
+#   (docs.voidbots.net/docs/webhooks.md).
+# - vcodes.xyz delivers `user` as an OBJECT (`user.id`); vote notification is
+#   primarily a websocket gateway, the HTTP webhook is undocumented.
+# - discordlist.gg's body is a HS256 JWT whose claims are
+#   {user_id, bot_id, is_test}; the SDK verifies it with the webhook secret.
+# - topbot.gg votes POST {event, flagged, user} signed with
+#   x-topbot-signature (hmac of "<x-topbot-timestamp>.<raw body>").
+# - discordforge.org webhooks v2 POST {id, type:"vote.created", created_at,
+#   bot_id, data:{voter_id, streak, total_votes, weekly_votes}} signed with
+#   X-Forge-Signature: sha256=<hex hmac of raw body>.
 WEBHOOK_HINTS = {
     "top.gg": {"header": "Authorization", "voterField": "user", "eventField": "type"},
     "discordbotlist.com": {"header": "Authorization", "voterField": "id", "eventField": None},
-    "botlist.me": {"header": "authorization", "voterField": "id", "eventField": None},
-    "voidbots.net": {"header": "Authorization", "voterField": "user_id", "eventField": None},
-    "discordlist.gg": {"header": "Authorization", "voterField": "id", "eventField": None},
-    "bots.ondiscord.xyz": {"header": "Authorization", "voterField": "id", "eventField": None},
-    "discords.com": {"header": "authorization", "voterField": "user_id", "eventField": None},
-    "vcodes.xyz": {"header": "Authorization", "voterField": "userID", "eventField": None},
-    "radarcord.net": {"header": "Authorization", "voterField": "userID", "eventField": None},
-    "discordextremelist.xyz": {"header": "Authorization", "voterField": "user_id", "eventField": None},
-    "disq.ink": {"header": "Authorization", "voterField": "user", "eventField": None},
+    "botlist.me": {"header": "authorization", "voterField": "user", "eventField": None},
+    "voidbots.net": {"header": "Authorization", "voterField": "user", "eventField": None},
+    "discordlist.gg": {"header": "Authorization", "voterField": "user_id", "eventField": None},
+    "discords.com": {"header": "authorization", "voterField": "user", "eventField": None},
+    "vcodes.xyz": {"header": "Authorization", "voterField": "user.id", "eventField": None},
+    "radarcord.net": {"header": "Authorization", "voterField": "user", "eventField": None},
+    "disq.ink": {"header": "Authorization", "voterField": "user.id", "eventField": None},
     "dlist.space": {"header": "Authorization", "voterField": "user_id", "eventField": None},
+    "topbot.gg": {"header": "x-topbot-signature", "voterField": "user", "eventField": "event"},
+    "discordforge.org": {"header": "X-Forge-Signature", "voterField": "voter_id", "eventField": "type"},
+}
+
+# lists verified operational in September 2026 that the stale BotBlock
+# snapshot does not know about. Same shape as a snapshot record.
+NEW_LISTS = {
+    "topbot.gg": {
+        "name": "TopBot",
+        "url": "https://topbot.gg/",
+        "api_docs": "https://topbot.gg/en/developers/api",
+        "api_post": "https://topbot.gg/api/v1/bots/:id/stats",
+        "api_field": "serverCount",
+        "api_shard_count": "shardCount",
+        "api_get": "https://topbot.gg/api/v1/bots/:id",
+        "view_bot": "https://topbot.gg/en/bots/:id",
+        "bot_widget": "https://topbot.gg/api/widget/:id",
+    },
+    "discordforge.org": {
+        "name": "DiscordForge",
+        "url": "https://discordforge.org/",
+        "api_docs": "https://discordforge.org/support/developers",
+        "api_post": "https://discordforge.org/api/bots/stats",
+        "api_field": "server_count",
+        "api_shard_count": "shard_count",
+        "api_get": "https://discordforge.org/api/bots/:id",
+        "view_bot": "https://discordforge.org/bot/:id",
+    },
 }
 
 # manual metadata for lists still running in 2026 that BotBlock marks defunct
 # or that we want to document precisely. Everything here was verified against
-# the list's own docs or site during the v2 rewrite.
-MANUAL = {"blist.xyz": {
-        "name": "Blist",
-        "api_post": "https://blist.xyz/api/bots/:id/stats/",
-        "api_field": "server_count",
-        "api_get": "https://blist.xyz/api/bots/:id/",
-        "view_bot": "https://blist.xyz/bot/:id",
-        "api_docs": "https://blist.xyz/docs",
-    },"bots.discordlabs.org": {
+# the list's own docs or site during the v2 rewrite. Lists dropped September
+# 2026 after their domains died (registrar parking pages, gambling squatters
+# or NXDOMAIN): blist.xyz, botlist.co, botsdatabase.com, discord.services,
+# discordbot.world, motiondevelopment.top, space-bot-list.xyz, topcord.xyz.
+MANUAL = {"bots.discordlabs.org": {
         "name": "Discord Labs",
         "api_post": "https://bots.discordlabs.org/api/bots/:id/stats",
         "api_field": "server_count",
         "api_get": "https://bots.discordlabs.org/api/bots/:id",
         "view_bot": "https://bots.discordlabs.org/bot/:id",
-    },"motiondevelopment.top": {
-        "name": "MotionDevelopment",
-        "api_post": "https://api.motiondevelopment.top/api/v1/bots/:id/stats",
-        "api_field": "servers",
-        "api_get": "https://api.motiondevelopment.top/api/v1/bots/:id",
-        "view_bot": "https://motiondevelopment.top/bots/:id",
-        "api_docs": "https://docs.motiondevelopment.top/",
-    },"topcord.xyz": {
-        "name": "TopCord",
-        "api_post": "https://topcord.xyz/api/bots/:id/stats",
-        "api_field": "guilds",
-        "view_bot": "https://topcord.xyz/bots/:id",
-    },"discordbot.world": {
-        "name": "Discord Bot World",
-        "api_post": "https://discordbot.world/api/bots/:id/stats",
-        "api_field": "server_count",
-        "api_get": "https://discordbot.world/api/bots/:id",
-        "view_bot": "https://discordbot.world/bots/:id",
-    },"botsdatabase.com": {
-        "name": "Bots Database",
-        "api_post": "https://botsdatabase.com/api/bots/:id/stats",
-        "api_field": "server_count",
-        "view_bot": "https://botsdatabase.com/bot/:id",
     },"discordbotlist.xyz": {
         "name": "Discord Bot List XYZ",
         "api_post": "https://discordbotlist.xyz/api/bots/:id/stats",
         "api_field": "server_count",
         "view_bot": "https://discordbotlist.xyz/bots/:id",
-    },"space-bot-list.xyz": {
-        "name": "Space Bot List",
-        "api_post": "https://space-bot-list.xyz/api/bots/:id/stats",
-        "api_field": "server_count",
-        "view_bot": "https://space-bot-list.xyz/bot/:id",
-    },"botlist.co": {
-        "name": "Botlist.Co",
-        "api_post": "https://api.botlist.co/v1/bots/:id/stats",
-        "api_field": "server_count",
-        "view_bot": "https://botlist.co/bots/:id",
-    },"discord.services": {
-        "name": "Discord Services",
-        "api_post": "https://api.discord.services/v1/bots/:id/stats",
-        "api_field": "server_count",
-        "view_bot": "https://discord.services/bot/:id",
-    },"botlist.me": {"webhook": {"header": "authorization", "voterField": "id", "eventField": None}},"top.gg": {"webhook": {"header": "Authorization", "voterField": "user", "eventField": "type"}}
+    },"botlist.me": {"webhook": {"header": "authorization", "voterField": "user", "eventField": None}},"top.gg": {"webhook": {"header": "Authorization", "voterField": "user", "eventField": "type"}}
 }
 
 CAMEL = re.compile(r"[^a-zA-Z0-9]+")
@@ -137,6 +144,8 @@ def main() -> None:
 
     # drop lists that are dead in the snapshot and have no manual override
     raw = {k: v for k, v in raw.items() if not v.get("defunct") or k in MANUAL}
+    # merge in lists the stale BotBlock snapshot does not know about
+    raw.update(NEW_LISTS)
 
     lines = [
         "// Generated from scripts/snapshot/botblock-lists.json by scripts/snapshot/build_lists.py.",

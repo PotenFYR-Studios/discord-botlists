@@ -6,9 +6,10 @@ import { BOTLISTS } from '../src/data/lists.generated.js';
 
 describe('botlist registry', () => {
   test('ships a verified live registry', () => {
-    // 33 lists verified alive during the v2 audit. The registry is auto
-    // pruned by scripts/status-sync.ts, so this is a floor, not a target.
-    expect(BOTLISTS.length).toBeGreaterThanOrEqual(30);
+    // 27 lists verified alive during the September 2026 docs audit (8 dead
+    // domains pruned, topbot.gg + discordforge.org added). The registry is
+    // auto-pruned by scripts/status-sync.ts, so this is a floor, not a target.
+    expect(BOTLISTS.length).toBeGreaterThanOrEqual(25);
   });
 
   test('every record has the required fields', () => {
