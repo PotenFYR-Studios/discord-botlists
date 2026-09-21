@@ -1,7 +1,7 @@
 {
   "name": "@potenfyrstudios/discord-botlists",
   "version": "1.0.3",
-  "description": "Universal multi-botlist SDK for Discord bots: post stats to 30+ verified live lists, realtime vote webhooks, ratings and a universal data parser with full TypeScript types",
+  "description": "Universal multi-botlist SDK for Discord bots: post stats to 27 verified live lists, realtime vote webhooks, ratings and a universal data parser with full TypeScript types",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -61,7 +61,7 @@
   "bugs": {
     "url": "https://github.com/PotenFYR-Studios/discord-botlists/issues"
   },
-  "homepage": "https://potenfyr.in",
+  "homepage": "https://botlists.docs.potenfyr.in/",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
