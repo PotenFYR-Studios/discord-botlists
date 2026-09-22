@@ -325,6 +325,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_DISQINK",
     webhook: { header: "Authorization", voterField: "user.id", eventField: null },
     supports: { post: true, get: true, widget: false, webhook: true },
+    status: 'shutdown',
   },
   {
     id: "dlist.space",
