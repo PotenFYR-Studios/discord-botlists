@@ -382,6 +382,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_OMNIPLEXGG",
     webhook: null,
     supports: { post: true, get: true, widget: true, webhook: false },
+    status: 'shutdown',
   },
   {
     id: "radarcord.net",
