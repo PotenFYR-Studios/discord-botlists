@@ -1,6 +1,6 @@
 # Botlist status board
 
-Generated 2026-09-27T05:07:12.220Z by scripts/status-sync.ts.
+Generated 2026-09-27T11:53:45.990Z by scripts/status-sync.ts.
 
 - Live: **27**
 - Deprecated: **0**
@@ -9,30 +9,30 @@ Generated 2026-09-27T05:07:12.220Z by scripts/status-sync.ts.
 
 | List | Status | Latency | HTTP | Last checked (UTC) |
 | --- | --- | --- | --- | --- |
-| [Botlist.me](https://botlist.me/) | 🟢 live | 299 ms | 200 | 2026-09-27 05:07 |
-| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 531 ms | 200 | 2026-09-27 05:07 |
-| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 341 ms | 200 | 2026-09-27 05:07 |
-| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 321 ms | 200 | 2026-09-27 05:07 |
-| [Cybralist](https://cybralist.com/) | 🟢 live | 431 ms | 200 | 2026-09-27 05:07 |
-| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 309 ms | 200 | 2026-09-27 05:07 |
-| [discord.place](https://discord.place/bots) | 🟢 live | 294 ms | 200 | 2026-09-27 05:07 |
-| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 1203 ms | 200 | 2026-09-27 05:07 |
-| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 458 ms | 200 | 2026-09-27 05:07 |
-| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live | 1145 ms | 200 | 2026-09-27 05:07 |
-| [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live | 198 ms | 200 | 2026-09-27 05:07 |
-| [DiscordForge](https://discordforge.org/) | 🟢 live | 339 ms | 200 | 2026-09-27 05:07 |
-| [dlist.gg](https://discordlist.gg/) | 🟢 live | 133 ms | 200 | 2026-09-27 05:07 |
-| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 127 ms | 200 | 2026-09-27 05:07 |
-| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 143 ms | 200 | 2026-09-27 05:07 |
-| [Disforge](https://disforge.com/bots) | 🟢 live | 879 ms | 200 | 2026-09-27 05:07 |
-| [DisQ](https://disq.ink/) | 🟢 live | 1193 ms | 200 | 2026-09-27 05:07 |
-| [DList.Space](https://dlist.space/) | 🟢 live | 73 ms | 200 | 2026-09-27 05:07 |
-| [JustDiscord](https://justdiscord.org/) | 🟢 live | 502 ms | 200 | 2026-09-27 05:07 |
-| [Omniplex](https://omniplex.gg/) | 🟢 live | 1669 ms | 200 | 2026-09-27 05:07 |
-| [Radarcord](https://radarcord.net/) | 🟢 live | 889 ms | 200 | 2026-09-27 05:07 |
-| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 429 ms | 200 | 2026-09-27 05:07 |
-| [Discord Bot List](https://top.gg/) | 🟢 live | 38 ms | 403 | 2026-09-27 05:07 |
-| [TopBot](https://topbot.gg/) | 🟢 live | 604 ms | 200 | 2026-09-27 05:07 |
-| [vCodes](https://vcodes.xyz) | 🟢 live | 125 ms | 200 | 2026-09-27 05:07 |
-| [Void Bots](https://voidbots.net/) | 🟢 live | 83 ms | 200 | 2026-09-27 05:07 |
-| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 86 ms | 200 | 2026-09-27 05:07 |
+| [Botlist.me](https://botlist.me/) | 🟢 live | 252 ms | 200 | 2026-09-27 11:53 |
+| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 274 ms | 200 | 2026-09-27 11:53 |
+| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 349 ms | 200 | 2026-09-27 11:53 |
+| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 444 ms | 200 | 2026-09-27 11:53 |
+| [Cybralist](https://cybralist.com/) | 🟢 live | 315 ms | 200 | 2026-09-27 11:53 |
+| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 158 ms | 200 | 2026-09-27 11:53 |
+| [discord.place](https://discord.place/bots) | 🟢 live | 239 ms | 200 | 2026-09-27 11:53 |
+| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 1153 ms | 200 | 2026-09-27 11:53 |
+| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 238 ms | 200 | 2026-09-27 11:53 |
+| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live | 1184 ms | 200 | 2026-09-27 11:53 |
+| [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live | 205 ms | 200 | 2026-09-27 11:53 |
+| [DiscordForge](https://discordforge.org/) | 🟢 live | 216 ms | 200 | 2026-09-27 11:53 |
+| [dlist.gg](https://discordlist.gg/) | 🟢 live | 131 ms | 200 | 2026-09-27 11:53 |
+| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 192 ms | 200 | 2026-09-27 11:53 |
+| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 159 ms | 200 | 2026-09-27 11:53 |
+| [Disforge](https://disforge.com/bots) | 🟢 live | 890 ms | 200 | 2026-09-27 11:53 |
+| [DisQ](https://disq.ink/) | 🟢 live | 689 ms | 200 | 2026-09-27 11:53 |
+| [DList.Space](https://dlist.space/) | 🟢 live | 99 ms | 200 | 2026-09-27 11:53 |
+| [JustDiscord](https://justdiscord.org/) | 🟢 live | 446 ms | 200 | 2026-09-27 11:53 |
+| [Omniplex](https://omniplex.gg/) | 🟢 live | 992 ms | 200 | 2026-09-27 11:53 |
+| [Radarcord](https://radarcord.net/) | 🟢 live | 931 ms | 200 | 2026-09-27 11:53 |
+| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 530 ms | 200 | 2026-09-27 11:53 |
+| [Discord Bot List](https://top.gg/) | 🟢 live | 36 ms | 403 | 2026-09-27 11:53 |
+| [TopBot](https://topbot.gg/) | 🟢 live | 453 ms | 200 | 2026-09-27 11:53 |
+| [vCodes](https://vcodes.xyz) | 🟢 live | 410 ms | 200 | 2026-09-27 11:53 |
+| [Void Bots](https://voidbots.net/) | 🟢 live | 151 ms | 200 | 2026-09-27 11:53 |
+| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 77 ms | 200 | 2026-09-27 11:53 |
