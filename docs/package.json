@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build && bun scripts/prerender.ts",
     "preview": "vite preview",
-    "prebuild": "bun ../scripts/gen-version.ts"
+    "prebuild": "bun ../scripts/gen-version.ts",
+    "og:image": "bun scripts/og/build-og.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
