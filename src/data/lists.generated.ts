@@ -306,6 +306,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_DISFORGECOM",
     webhook: null,
     supports: { post: true, get: false, widget: false, webhook: false },
+    status: 'shutdown',
   },
   {
     id: "disq.ink",
