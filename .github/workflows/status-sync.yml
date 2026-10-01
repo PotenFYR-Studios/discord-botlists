@@ -12,6 +12,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 jobs:
   sync:
@@ -47,9 +48,18 @@ jobs:
           git add src/data/lists.generated.ts
           git commit -m "fix(registry): mark dead lists: $DEAD" || true
           git push origin "$PREFIX"
-          gh pr create \
+          # Org policy may forbid Actions-created PRs; fall back to an issue so
+          # the run stays green and the registry change still gets human review.
+          if ! gh pr create \
             --title "fix(registry): mark dead lists: $DEAD" \
             --body "Automated status sync detected these lists as deprecated or shutdown: $DEAD
 
             Details in .status/STATUS.md. Merge to stop posting stats to them." \
-            --base master --head "$PREFIX"
+            --base master --head "$PREFIX"; then
+            gh issue create \
+              --title "Registry update needed: mark dead lists: $DEAD" \
+              --body "Automated status sync detected these lists as deprecated or shutdown: $DEAD
+
+            PR creation was not permitted, so the prepared branch \`$PREFIX\` was pushed instead.
+            Details in .status/STATUS.md. Open a PR from that branch to stop posting stats to them."
+          fi
