@@ -211,6 +211,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_DISCORDEXTREMELISTXYZ",
     webhook: null,
     supports: { post: true, get: true, widget: false, webhook: false },
+    status: 'shutdown',
   },
   {
     id: "discordforge.org",
@@ -306,6 +307,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_DISFORGECOM",
     webhook: null,
     supports: { post: true, get: false, widget: false, webhook: false },
+    status: 'shutdown',
   },
   {
     id: "disq.ink",
@@ -325,6 +327,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_DISQINK",
     webhook: { header: "Authorization", voterField: "user.id", eventField: null },
     supports: { post: true, get: true, widget: false, webhook: true },
+    status: 'shutdown',
   },
   {
     id: "dlist.space",
@@ -382,6 +385,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_OMNIPLEXGG",
     webhook: null,
     supports: { post: true, get: true, widget: true, webhook: false },
+    status: 'shutdown',
   },
   {
     id: "radarcord.net",
@@ -401,6 +405,7 @@ export const BOTLISTS: readonly BotlistRecord[] = [
     tokenEnvKey: "DBL_RADARCORDNET",
     webhook: { header: "Authorization", voterField: "user", eventField: null },
     supports: { post: true, get: true, widget: false, webhook: true },
+    status: 'shutdown',
   },
   {
     id: "stellarbotlist.com",
