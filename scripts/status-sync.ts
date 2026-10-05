@@ -4,13 +4,15 @@
  * .status/status.json + STATUS.md, patches README.md and the docs site,
  * and outputs GitHub Actions step outputs.
  *
- * PR policy: a pull request is opened ONLY when a list is detected as
- * deprecated or shutdown. Latency/uptime refreshes commit to main directly
- * via the workflow (or are ignored when run locally).
+ * Notify policy: the workflow tracks dead lists in ONE GitHub issue. A list
+ * is only reported while it is NOT yet marked in the generated registry
+ * (src/data/lists.generated.ts); once every reported list is marked, the
+ * issue auto-closes. Latency/uptime refreshes commit to the default branch
+ * directly via the workflow (or are ignored when run locally).
  *
  * Outputs (written to $GITHUB_OUTPUT when present):
- *   pr_needed=true|false
- *   dead_lists=<comma separated ids>
+ *   pr_needed=true|false            (true = unmarked dead lists exist)
+ *   dead_lists=<comma separated ids> (dead AND not yet marked)
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -29,7 +31,10 @@ console.log(`probing ${client.lists.length} lists...`);
 const board = await client.refreshStatus(true);
 
 const dead = board.entries.filter((e) => e.state === 'shutdown' || e.state === 'deprecated');
+const marked = new Set(readMarkedIds());
+const unmarked = dead.map((d) => d.listId).filter((id) => !marked.has(id));
 console.log(`live=${board.summary.live} deprecated=${board.summary.deprecated} shutdown=${board.summary.shutdown} unknown=${board.summary.unknown}`);
+console.log(`dead=${dead.length} alreadyMarked=${dead.length - unmarked.length} needsReview=${unmarked.length}`);
 
 mkdirSync(OUT_DIR, { recursive: true });
 mkdirSync(`${ROOT}docs/src/data`, { recursive: true });
@@ -45,7 +50,7 @@ writeFileSync(`${OUT_DIR}/STATUS.md`, renderStatusMd(board));
 writeFileSync(WEBSITE_DATA, JSON.stringify(payload, null, 2));
 
 patchReadme(board);
-writeGitHubOutputs(dead.map((d) => d.listId));
+writeGitHubOutputs(unmarked);
 
 console.log(`done in ${((Date.now() - begin.getTime()) / 1000).toFixed(1)}s`);
 
@@ -83,6 +88,24 @@ function patchReadme(b: typeof board): void {
     md += `\n## Live status\n\n${section}\n`;
   }
   writeFileSync(README, md);
+}
+
+/** ids already marked dead in the generated registry (human reviewed). */
+function readMarkedIds(): string[] {
+  let source: string;
+  try {
+    source = readFileSync(`${ROOT}src/data/lists.generated.ts`, 'utf8');
+  } catch {
+    return [];
+  }
+  const ids: string[] = [];
+  const re = /id: ("(?:[^"\\]|\\.)*")/g;
+  for (let match = re.exec(source); match; match = re.exec(source)) {
+    const blockEnd = source.indexOf('  },', match.index);
+    const block = source.slice(match.index, blockEnd === -1 ? undefined : blockEnd);
+    if (/status: '(?:shutdown|deprecated)'/.test(block)) ids.push(JSON.parse(match[1]) as string);
+  }
+  return ids;
 }
 
 function writeGitHubOutputs(ids: string[]): void {

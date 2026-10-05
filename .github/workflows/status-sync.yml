@@ -1,8 +1,10 @@
 name: Status sync
 
-# Probes every list hourly, refreshes the README status table and docs site
-# status.json on main, and opens a PR ONLY when a list turns deprecated or
-# shutdown (so registry changes are always human reviewed).
+# Probes every list hourly and refreshes the README status table and docs
+# site status.json on the default branch. Dead lists are tracked in ONE
+# GitHub issue - never a branch or PR: while a detected list is not yet
+# marked in the generated registry, the issue gets (re)opened and updated;
+# once every reported list is marked, the issue closes itself.
 
 on:
   schedule:
@@ -11,7 +13,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
   issues: write
 
 jobs:
@@ -34,32 +35,37 @@ jobs:
           git diff --cached --quiet && echo "no changes" && exit 0
           git commit -m "chore(status): refresh botlist status board"
           git push
-      - name: Open PR for deprecated or shutdown lists
+      - name: Open or update the dead-list tracking issue
         if: steps.probe.outputs.pr_needed == 'true'
         env:
-          # first-party value written by scripts/status-sync.ts (list ids only)
+          # first-party value written by scripts/status-sync.ts: dead list ids
+          # that are not yet marked in the generated registry
           DEAD: ${{ steps.probe.outputs.dead_lists }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PREFIX="status/registry-update-$(date +%Y%m%d%H)"
-          git checkout -b "$PREFIX"
-          # mark dead lists in the generated registry so consumers stop posting
-          bun scripts/mark-dead.ts $DEAD
-          git add src/data/lists.generated.ts
-          git commit -m "fix(registry): mark dead lists: $DEAD" || true
-          git push origin "$PREFIX"
-          # Org policy may forbid Actions-created PRs; fall back to an issue so
-          # the run stays green and the registry change still gets human review.
-          if ! gh pr create \
-            --title "fix(registry): mark dead lists: $DEAD" \
-            --body "Automated status sync detected these lists as deprecated or shutdown: $DEAD
+          TITLE="Registry update needed: mark dead lists"
+          BODY="Automated status sync detected these lists as deprecated or shutdown, and they are not yet marked in the generated registry: $DEAD
 
-            Details in .status/STATUS.md. Merge to stop posting stats to them." \
-            --base master --head "$PREFIX"; then
-            gh issue create \
-              --title "Registry update needed: mark dead lists: $DEAD" \
-              --body "Automated status sync detected these lists as deprecated or shutdown: $DEAD
-
-            PR creation was not permitted, so the prepared branch \`$PREFIX\` was pushed instead.
-            Details in .status/STATUS.md. Open a PR from that branch to stop posting stats to them."
+          To resolve, run 'bun scripts/mark-dead.ts $DEAD', commit and push the result to master. Marking them stops posting stats to them. Details in .status/STATUS.md."
+          NUM=$(gh issue list --state open --search "$TITLE in:title" --limit 1 --json number --jq '.[0].number // empty')
+          if [ -z "$NUM" ]; then
+            CLOSED=$(gh issue list --state closed --search "$TITLE in:title" --limit 1 --json number --jq '.[0].number // empty')
+            if [ -z "$CLOSED" ]; then
+              gh issue create --title "$TITLE" --body "$BODY"
+            else
+              gh issue reopen "$CLOSED"
+              gh issue comment "$CLOSED" --body "$BODY"
+            fi
+          else
+            gh issue comment "$NUM" --body "$BODY"
+          fi
+      - name: Close the tracking issue once every dead list is marked
+        if: steps.probe.outputs.pr_needed != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITLE="Registry update needed: mark dead lists"
+          NUM=$(gh issue list --state open --search "$TITLE in:title" --limit 1 --json number --jq '.[0].number // empty')
+          if [ -n "$NUM" ]; then
+            gh issue close "$NUM" --comment "All reported dead lists are now marked in the generated registry. Auto-closing."
           fi
