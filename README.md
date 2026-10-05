@@ -15,7 +15,7 @@
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&pause=1200&color=8B5CF6&center=true&vCenter=true&width=800&lines=Post+stats+to+every+botlist+with+one+call;Realtime+votes%2C+comments+and+reviews;One+parser+for+every+API+shape;Zero+dependencies+%C2%B7+fully+typed)](https://github.com/PotenFYR-Studios/discord-botlists)
 
-**`@potenfyrstudios/discord-botlists`**: the universal multi-botlist SDK for Discord bots: post stats to 27 verified live lists, get votes in realtime, parse every API into one shape.
+**`@potenfyrstudios/discord-botlists`**: the universal multi-botlist SDK for Discord bots: post stats to 22 verified live lists, get votes in realtime, parse every API into one shape.
 
 [Docs](https://botlists.docs.potenfyr.in) · [Examples](https://botlists.docs.potenfyr.in/examples) · [npm](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists) · [Issues](https://github.com/PotenFYR-Studios/discord-botlists/issues) · [Live status](#live-status)
 
@@ -27,7 +27,7 @@
 
 Posting your bot's stats to every list and handling every list's webhook format yourself is weeks of glue code. This package does all of it with zero runtime dependencies:
 
-- **Stats posting** to 27 verified live lists, each with its correct wire format, auth header and endpoint, learned from every list's own docs plus the BotBlock directory. Dead lists are pruned automatically by the hourly status sync.
+- **Stats posting** to 22 verified live lists, each with its correct wire format, auth header and endpoint, learned from every list's own docs plus the BotBlock directory. Dead lists are pruned automatically by the hourly status sync.
 - **Realtime vote, comment and review events** through a built-in webhook server. No polling, no delay, no express dependency.
 - **Universal parser** that normalizes any list's bot data into one `UniversalBot` object so you never juggle `server_count` vs `guildCount` vs `guilds` vs `count` again.
 - **Status tracking**: automated hourly probes detect deprecated or shut down lists, with latency and HTTP state, synced into this README and the docs site.
@@ -301,7 +301,7 @@ await lists.postStatsTo('radarcord', { serverCount: 100 });
 await lists.postViaBotBlock({ serverCount: 100 });
 ```
 
-Every list gets its correct body shape automatically: `server_count` for top.gg, `guildCount` for discord.bots.gg, `guilds` for discordbotlist.com, `servers` for disforge, and so on for all 27.
+Every list gets its correct body shape automatically: `server_count` for top.gg, `guildCount` for discord.bots.gg, `guilds` for discordbotlist.com, `servers` for disforge, and so on for every supported list.
 
 ### Rate limit safety
 
@@ -333,11 +333,11 @@ const lists = new Botlists({
 
 Custom lists work everywhere built-in ones do: posting, webhooks, parsing, status.
 
-## Supported lists (27 verified live)
+## Supported lists (22 verified live)
 
-The generated registry (`src/data/lists.generated.ts`, reproducible from the BotBlock snapshot) only contains lists that answered during the latest status audit. Shutdown and deprecated lists are removed automatically. The September 2026 docs audit pruned 8 domains that now serve registrar parking or squatter pages despite answering HTTP 200 (blist.xyz, botlist.co, botsdatabase.com, discord.services, discordbot.world, motiondevelopment.top, space-bot-list.xyz, topcord.xyz) and added topbot.gg and discordforge.org:
+The generated registry (`src/data/lists.generated.ts`, reproducible from the BotBlock snapshot) carries every audited list. Shutdown and deprecated lists stay in the registry but are marked `status: 'shutdown'` / `'deprecated'`: the SDK skips posting to them, and the status board below reports them red. The September 2026 docs audit pruned 8 domains that serve registrar parking or squatter pages despite answering HTTP 200 (blist.xyz, botlist.co, botsdatabase.com, discord.services, discordbot.world, motiondevelopment.top, space-bot-list.xyz, topcord.xyz) and added topbot.gg and discordforge.org. The October 2026 hourly sync marked 5 more lists dead after repeated probe timeouts (discordextremelist.xyz, disforge.com, disq.ink, omniplex.gg, radarcord.net):
 
-top.gg | discordbotlist.com | discord.bots.gg | botlist.me | discords.com | voidbots.net | vcodes.xyz | radarcord.net | discordlist.gg | disforge.com | disq.ink | dlist.space | cybralist.com | discord.rovelstars.com | yabl.xyz | justdiscord.org | omniplex.gg | discover.fluxpoint.dev | bots.discordlabs.org | discordbotlist.xyz | stellarbotlist.com | carbonitex.net | discord.place | topbot.gg | discordforge.org
+botlist.me | bots.discordlabs.org | bots.ondiscord.xyz | carbonitex.net | cybralist.com | discord.bots.gg | discord.place | discord.rovelstars.com | discordbotlist.com | discordbotlist.xyz | discordforge.org | discordlist.gg | discords.com | discover.fluxpoint.dev | dlist.space | justdiscord.org | stellarbotlist.com | top.gg | topbot.gg | vcodes.xyz | voidbots.net | yabl.xyz
 
 Each record carries: endpoint URLs, wire field names, shard field names, auth header, widget and view URLs, webhook format hint and env var key.
 
@@ -346,37 +346,37 @@ Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discor
 ## Live status
 
 <!-- STATUS:START -->
-Last sync: **2026-10-05** | 🟢 27 live | 🟡 0 deprecated | 🔴 0 shutdown | ⚪ 0 unknown
+Last sync: **2026-10-05** | 🟢 22 live | 🟡 0 deprecated | 🔴 5 shutdown | ⚪ 0 unknown
 
 | List | Status | Latency | HTTP | Last checked (UTC) |
 | --- | --- | --- | --- | --- |
-| [Botlist.me](https://botlist.me/) | 🟢 live | 428 ms | 200 | 2026-10-05 06:49 |
-| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 712 ms | 200 | 2026-10-05 06:49 |
-| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 521 ms | 200 | 2026-10-05 06:49 |
-| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 363 ms | 200 | 2026-10-05 06:49 |
-| [Cybralist](https://cybralist.com/) | 🟢 live | 587 ms | 200 | 2026-10-05 06:49 |
-| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 489 ms | 200 | 2026-10-05 06:49 |
-| [discord.place](https://discord.place/bots) | 🟢 live | 408 ms | 200 | 2026-10-05 06:49 |
-| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 1984 ms | 200 | 2026-10-05 06:49 |
-| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 322 ms | 200 | 2026-10-05 06:49 |
-| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live | 1190 ms | 200 | 2026-10-05 06:49 |
-| [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live | 476 ms | 200 | 2026-10-05 06:49 |
-| [DiscordForge](https://discordforge.org/) | 🟢 live | 479 ms | 200 | 2026-10-05 06:49 |
-| [dlist.gg](https://discordlist.gg/) | 🟢 live | 207 ms | 200 | 2026-10-05 06:49 |
-| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 269 ms | 200 | 2026-10-05 06:49 |
-| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 204 ms | 200 | 2026-10-05 06:49 |
-| [Disforge](https://disforge.com/bots) | 🟢 live | 1258 ms | 200 | 2026-10-05 06:49 |
-| [DisQ](https://disq.ink/) | 🟢 live | 1303 ms | 200 | 2026-10-05 06:49 |
-| [DList.Space](https://dlist.space/) | 🟢 live | 149 ms | 200 | 2026-10-05 06:49 |
-| [JustDiscord](https://justdiscord.org/) | 🟢 live | 668 ms | 200 | 2026-10-05 06:49 |
-| [Omniplex](https://omniplex.gg/) | 🟢 live | 445 ms | 200 | 2026-10-05 06:49 |
-| [Radarcord](https://radarcord.net/) | 🟢 live | 852 ms | 200 | 2026-10-05 06:49 |
-| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 737 ms | 200 | 2026-10-05 06:49 |
-| [Discord Bot List](https://top.gg/) | 🟢 live | 127 ms | 403 | 2026-10-05 06:49 |
-| [TopBot](https://topbot.gg/) | 🟢 live | 1258 ms | 200 | 2026-10-05 06:49 |
-| [vCodes](https://vcodes.xyz) | 🟢 live | 661 ms | 200 | 2026-10-05 06:49 |
-| [Void Bots](https://voidbots.net/) | 🟢 live | 222 ms | 200 | 2026-10-05 06:49 |
-| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 165 ms | 200 | 2026-10-05 06:49 |
+| [Botlist.me](https://botlist.me/) | 🟢 live | 1056 ms | 200 | 2026-10-05 13:31 |
+| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 929 ms | 200 | 2026-10-05 13:31 |
+| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 1034 ms | 200 | 2026-10-05 13:31 |
+| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 1384 ms | 200 | 2026-10-05 13:31 |
+| [Cybralist](https://cybralist.com/) | 🟢 live | 902 ms | 200 | 2026-10-05 13:31 |
+| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 589 ms | 200 | 2026-10-05 13:31 |
+| [discord.place](https://discord.place/bots) | 🟢 live | 286 ms | 403 | 2026-10-05 13:31 |
+| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 2454 ms | 200 | 2026-10-05 13:31 |
+| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 836 ms | 200 | 2026-10-05 13:31 |
+| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live | 971 ms | 200 | 2026-10-05 13:31 |
+| [Discord Extreme List](https://discordextremelist.xyz/) | 🔴 shutdown | 1970 ms | 200 | 2026-10-05 13:32 |
+| [DiscordForge](https://discordforge.org/) | 🟢 live | 593 ms | 200 | 2026-10-05 13:31 |
+| [dlist.gg](https://discordlist.gg/) | 🟢 live | 530 ms | 200 | 2026-10-05 13:31 |
+| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 621 ms | 200 | 2026-10-05 13:31 |
+| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 1197 ms | 200 | 2026-10-05 13:31 |
+| [Disforge](https://disforge.com/bots) | 🔴 shutdown | 2618 ms | 200 | 2026-10-05 13:32 |
+| [DisQ](https://disq.ink/) | 🔴 shutdown | 1414 ms | 200 | 2026-10-05 13:32 |
+| [DList.Space](https://dlist.space/) | 🟢 live | 630 ms | 200 | 2026-10-05 13:31 |
+| [JustDiscord](https://justdiscord.org/) | 🟢 live | 2830 ms | 200 | 2026-10-05 13:32 |
+| [Omniplex](https://omniplex.gg/) | 🔴 shutdown | 1100 ms | 200 | 2026-10-05 13:31 |
+| [Radarcord](https://radarcord.net/) | 🔴 shutdown | 1775 ms | 200 | 2026-10-05 13:32 |
+| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 1578 ms | 200 | 2026-10-05 13:32 |
+| [Discord Bot List](https://top.gg/) | 🟢 live | 172 ms | 403 | 2026-10-05 13:31 |
+| [TopBot](https://topbot.gg/) | 🟢 live | 764 ms | 200 | 2026-10-05 13:32 |
+| [vCodes](https://vcodes.xyz) | 🟢 live | 1416 ms | 200 | 2026-10-05 13:32 |
+| [Void Bots](https://voidbots.net/) | 🟢 live | 925 ms | 200 | 2026-10-05 13:32 |
+| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 580 ms | 200 | 2026-10-05 13:32 |
 <!-- STATUS:END -->
 
 The table above is regenerated hourly by [scripts/status-sync.ts](scripts/status-sync.ts) (workflow: `status-sync.yml`). A list is marked:
@@ -385,7 +385,7 @@ The table above is regenerated hourly by [scripts/status-sync.ts](scripts/status
 - 🟡 **deprecated**: superseded or announced end of life.
 - 🔴 **shutdown**: unreachable, or domain is parked/dead.
 
-When a list turns deprecated or shutdown, the workflow **opens a pull request** that removes it from the post registry, so a human always approves registry changes. Pure latency/uptime refreshes land on main directly.
+When a list turns deprecated or shutdown, the workflow keeps a **single tracking issue** open until every reported list is marked dead in the registry (`bun scripts/mark-dead.ts <ids>`), so a human always approves registry changes — no branches, no automated PRs. Marked lists drop out of stats posting and show red above. Pure latency/uptime refreshes land on the default branch directly.
 
 ## Testing
 
@@ -445,9 +445,9 @@ Built by **[PotenFYR Studios](https://github.com/PotenFYR-Studios)** · [potenfy
 ## ⭐ Star History
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=potenfyr-studios/.github,potenfyr-studios/.web,potenfyr-studios/AuthCore,potenfyr-studios/Database-Eggs,potenfyr-studios/EchoingDeaths,potenfyr-studios/FYRwall,potenfyr-studios/HBS-Tool,potenfyr-studios/LinkFYR,potenfyr-studios/Minecraft-Eggs,potenfyr-studios/OrbyNode,potenfyr-studios/PteroOps-MCP,potenfyr-studios/Prog-Language-Eggs,potenfyr-studios/Shell-Eggs,potenfyr-studios/VigilFYR,potenfyr-studios/discord-botlists,potenfyr-studios/ojaj,potenfyr-studios/potenfyr-nest,potenfyr-studios/statfyr&type=Date&theme=dark" />
-  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=potenfyr-studios/.github,potenfyr-studios/.web,potenfyr-studios/AuthCore,potenfyr-studios/Database-Eggs,potenfyr-studios/EchoingDeaths,potenfyr-studios/FYRwall,potenfyr-studios/HBS-Tool,potenfyr-studios/LinkFYR,potenfyr-studios/Minecraft-Eggs,potenfyr-studios/OrbyNode,potenfyr-studios/PteroOps-MCP,potenfyr-studios/Prog-Language-Eggs,potenfyr-studios/Shell-Eggs,potenfyr-studios/VigilFYR,potenfyr-studios/discord-botlists,potenfyr-studios/ojaj,potenfyr-studios/potenfyr-nest,potenfyr-studios/statfyr&type=Date" />
-  <img alt="Star history chart for all PotenFYR Studios public repositories" src="https://api.star-history.com/svg?repos=potenfyr-studios/.github,potenfyr-studios/.web,potenfyr-studios/AuthCore,potenfyr-studios/Database-Eggs,potenfyr-studios/EchoingDeaths,potenfyr-studios/FYRwall,potenfyr-studios/HBS-Tool,potenfyr-studios/LinkFYR,potenfyr-studios/Minecraft-Eggs,potenfyr-studios/OrbyNode,potenfyr-studios/PteroOps-MCP,potenfyr-studios/Prog-Language-Eggs,potenfyr-studios/Shell-Eggs,potenfyr-studios/VigilFYR,potenfyr-studios/discord-botlists,potenfyr-studios/ojaj,potenfyr-studios/potenfyr-nest,potenfyr-studios/statfyr&type=Date" width="80%" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=potenfyr-studios/.github,potenfyr-studios/.web,potenfyr-studios/AuthCore,potenfyr-studios/CustomDamageNumbers,potenfyr-studios/Database-Eggs,potenfyr-studios/EchoingDeaths,potenfyr-studios/FYRwall,potenfyr-studios/HBS-Tool,potenfyr-studios/LinkFYR,potenfyr-studios/Minecraft-Eggs,potenfyr-studios/OrbyNode,potenfyr-studios/PteroOps-MCP,potenfyr-studios/Prog-Language-Eggs,potenfyr-studios/Shell-Eggs,potenfyr-studios/VigilFYR,potenfyr-studios/discord-botlists,potenfyr-studios/ojaj,potenfyr-studios/potenfyr-nest,potenfyr-studios/statfyr&type=Date&theme=dark" />
+  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=potenfyr-studios/.github,potenfyr-studios/.web,potenfyr-studios/AuthCore,potenfyr-studios/CustomDamageNumbers,potenfyr-studios/Database-Eggs,potenfyr-studios/EchoingDeaths,potenfyr-studios/FYRwall,potenfyr-studios/HBS-Tool,potenfyr-studios/LinkFYR,potenfyr-studios/Minecraft-Eggs,potenfyr-studios/OrbyNode,potenfyr-studios/PteroOps-MCP,potenfyr-studios/Prog-Language-Eggs,potenfyr-studios/Shell-Eggs,potenfyr-studios/VigilFYR,potenfyr-studios/discord-botlists,potenfyr-studios/ojaj,potenfyr-studios/potenfyr-nest,potenfyr-studios/statfyr&type=Date" />
+  <img alt="Star history chart for all PotenFYR Studios public repositories" src="https://api.star-history.com/svg?repos=potenfyr-studios/.github,potenfyr-studios/.web,potenfyr-studios/AuthCore,potenfyr-studios/CustomDamageNumbers,potenfyr-studios/Database-Eggs,potenfyr-studios/EchoingDeaths,potenfyr-studios/FYRwall,potenfyr-studios/HBS-Tool,potenfyr-studios/LinkFYR,potenfyr-studios/Minecraft-Eggs,potenfyr-studios/OrbyNode,potenfyr-studios/PteroOps-MCP,potenfyr-studios/Prog-Language-Eggs,potenfyr-studios/Shell-Eggs,potenfyr-studios/VigilFYR,potenfyr-studios/discord-botlists,potenfyr-studios/ojaj,potenfyr-studios/potenfyr-nest,potenfyr-studios/statfyr&type=Date" width="80%" />
 </picture>
 
 Every public PotenFYR Studios repository on one live chart, served by [star-history.com](https://star-history.com).
