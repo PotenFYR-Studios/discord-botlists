@@ -2,7 +2,9 @@ import { describe, expect, test } from 'bun:test';
 import { Botlists } from '../src/index.js';
 import { UniversalParser } from '../src/core/parser.js';
 import { buildPostBody, resolveList } from '../src/core/http.js';
+import { StatusChecker } from '../src/status/checker.js';
 import { BOTLISTS } from '../src/data/lists.generated.js';
+import type { BotlistRecord } from '../src/types.js';
 
 describe('botlist registry', () => {
   test('ships a verified live registry', () => {
@@ -34,6 +36,36 @@ describe('botlist registry', () => {
 
   test('unknown list resolves to null', () => {
     expect(resolveList('this-list-does-not-exist-123')).toBeNull();
+  });
+
+  test('registry-marked dead lists are skipped for posting', () => {
+    const marked = BOTLISTS.filter((l) => l.status === 'shutdown' || l.status === 'deprecated');
+    expect(marked.length).toBeGreaterThan(0);
+    const client = new Botlists();
+    const pick = (only?: string[]) =>
+      (client as unknown as { pickTargets(only?: string[]): BotlistRecord[] }).pickTargets(only).map((l) => l.id);
+    const ids = pick();
+    for (const list of marked) expect(ids).not.toContain(list.id);
+    // an explicit `only` still reaches a marked list when you know better
+    expect(pick([marked[0].id])).toContain(marked[0].id);
+  });
+});
+
+describe('status checker', () => {
+  test('reports registry-marked lists as dead even when the site answers 200', async () => {
+    const marked = BOTLISTS.find((l) => l.status === 'shutdown');
+    expect(marked).toBeDefined();
+    const live = BOTLISTS.find((l) => !l.status);
+    expect(live).toBeDefined();
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = (async () => new Response('', { status: 200 })) as typeof fetch;
+    try {
+      const checker = new StatusChecker();
+      expect((await checker.checkOne(marked!)).state).toBe('shutdown');
+      expect((await checker.checkOne(live!)).state).toBe('live');
+    } finally {
+      globalThis.fetch = realFetch;
+    }
   });
 });
 

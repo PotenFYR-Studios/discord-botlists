@@ -64,6 +64,9 @@ export class StatusChecker {
     if (outcome.state === 'live' && outcome.httpStatus !== null && outcome.httpStatus >= 500) {
       state = 'unknown';
     }
+    // registry verdict wins: a human marked this list dead, keep reporting it
+    // dead even while the domain still answers (parking pages answer HTTP 200).
+    if (list.status === 'shutdown' || list.status === 'deprecated') state = list.status;
 
     return {
       listId: list.id,

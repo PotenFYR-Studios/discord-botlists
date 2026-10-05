@@ -109,9 +109,9 @@ export class Botlists extends EventEmitter {
     return [...BOTLISTS, ...this.extraLists] as const;
   }
 
-  /** count of lists that accept stats posts. */
+  /** count of lists that accept stats posts (registry-dead ones excluded). */
   public get postableCount(): number {
-    return this.lists.filter((l) => l.supports.post && l.apiPost).length;
+    return this.lists.filter((l) => l.supports.post && l.apiPost && l.status !== 'shutdown' && l.status !== 'deprecated').length;
   }
 
   /**
@@ -371,6 +371,9 @@ export class Botlists extends EventEmitter {
     return this.lists.filter((list) => {
       if (!list.supports.post || !list.apiPost) return false;
       if (only?.length) return only.some((q) => matches(list, q));
+      // registry-marked dead lists are skipped on auto post; an explicit
+      // `only` above still reaches them when you know what you are doing.
+      if (list.status === 'shutdown' || list.status === 'deprecated') return false;
       if (skip?.length && skip.some((q) => matches(list, q))) return false;
       return true;
     });
