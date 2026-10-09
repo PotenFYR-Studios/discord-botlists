@@ -4,7 +4,7 @@
 
 [![npm](https://img.shields.io/npm/v/@potenfyrstudios/discord-botlists.svg?style=for-the-badge&logo=npm&logoColor=white&labelColor=1c1e26&color=8b5cf6)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
 [![npm downloads](https://img.shields.io/npm/dt/@potenfyrstudios/discord-botlists.svg?style=for-the-badge&logo=npm&logoColor=white&labelColor=1c1e26&color=ec4899)](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
-[![Website](https://img.shields.io/badge/https:/docs.potenfyr.in/discord-botlists-8b5cf6?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=1c1e26)](https:/docs.potenfyr.in/discord-botlists)
+[![Website](https://img.shields.io/badge/https://docs.potenfyr.in/repo/discord-botlists?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=1c1e26)](https://docs.potenfyr.in/repo/discord-botlists)
 [![Discord](https://img.shields.io/badge/Discord-Join%20us-5865F2?style=for-the-badge&logo=discord&logoColor=white&labelColor=1c1e26)](https://discord.com/invite/zUaN2FPBec)
 [![GitHub](https://img.shields.io/badge/GitHub-PotenFYR--Studios-181717?style=for-the-badge&logo=github&logoColor=white&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists)
 [![View](https://komarev.com/ghpvc/?username=PotenFYR-Studios-discord-botlists&color=ec4899&style=for-the-badge&label=VIEW&labelColor=1c1e26)](https://github.com/PotenFYR-Studios/discord-botlists)
@@ -17,7 +17,7 @@
 
 **`@potenfyrstudios/discord-botlists`**: the universal multi-botlist SDK for Discord bots: post stats to 22 verified live lists, get votes in realtime, parse every API into one shape.
 
-[Docs](https:/docs.potenfyr.in/discord-botlists) · [Examples](https:/docs.potenfyr.in/discord-botlists/examples) · [npm](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists) · [Issues](https://github.com/PotenFYR-Studios/discord-botlists/issues) · [Live status](#live-status)
+[Docs](https://docs.potenfyr.in/repo/discord-botlists) · [Examples](https://docs.potenfyr.in/repo/discord-botlists/examples) · [npm](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists) · [Issues](https://github.com/PotenFYR-Studios/discord-botlists/issues) · [Live status](#live-status)
 
 </div>
 
@@ -34,7 +34,7 @@ Posting your bot's stats to every list and handling every list's webhook format 
 - **Fully typed**: strict TypeScript, generic event emitter, autocomplete for every option.
 - **Lightweight**: zero dependencies, works on Node 18+ and Bun.
 
-> The full documentation lives at **[https:/docs.potenfyr.in/discord-botlists](https:/docs.potenfyr.in/discord-botlists)**: [API reference](https:/docs.potenfyr.in/discord-botlists/1.0.1/api-reference), [examples](https:/docs.potenfyr.in/discord-botlists/examples) and the [live status board](https:/docs.potenfyr.in/discord-botlists/status). This README mirrors the same content.
+> The full documentation lives at **[https://docs.potenfyr.in/repo/discord-botlists](https://docs.potenfyr.in/repo/discord-botlists)**: [API reference](https://docs.potenfyr.in/repo/discord-botlists/api-reference), [examples](https://docs.potenfyr.in/repo/discord-botlists/examples) and the [live status board](https://docs.potenfyr.in/repo/discord-botlists/status). This README mirrors the same content.
 
 ## Installation
 
@@ -116,7 +116,7 @@ lists.on('review', (review) => {
 client.login(process.env.DISCORD_TOKEN);
 ```
 
-Point each botlist's webhook URL at `https://your-domain:8080/discord-botlists/<list-id>` and votes arrive as typed events instantly. Per-list wire formats, env variable names and more live examples: [docs](https:/docs.potenfyr.in/discord-botlists/docs) · [examples](https:/docs.potenfyr.in/discord-botlists/examples).
+Point each botlist's webhook URL at `https://your-domain:8080/discord-botlists/<list-id>` and votes arrive as typed events instantly. Per-list wire formats, env variable names and more live examples: [docs](https://docs.potenfyr.in/repo/discord-botlists/docs) · [examples](https://docs.potenfyr.in/repo/discord-botlists/examples).
 
 ### top.gg v1 signed webhooks
 
@@ -427,8 +427,8 @@ Found a vulnerability? Please report privately: see [SECURITY.md](SECURITY.md).
 
 ## Docs & links
 
-- [Documentation site](https:/docs.potenfyr.in/discord-botlists) (this repo's `docs/`, deployed via GitHub Pages)
-- [API reference](https:/docs.potenfyr.in/discord-botlists/1.0.1/api-reference) · [Examples](https:/docs.potenfyr.in/discord-botlists/examples) · [Status board](https:/docs.potenfyr.in/discord-botlists/status)
+- [Documentation site](https://docs.potenfyr.in/repo/discord-botlists) (this repo's `docs/`, deployed via GitHub Pages)
+- [API reference](https://docs.potenfyr.in/repo/discord-botlists/api-reference) · [Examples](https://docs.potenfyr.in/repo/discord-botlists/examples) · [Status board](https://docs.potenfyr.in/repo/discord-botlists/status)
 - [npm package](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists)
 - [PotenFYR Studios](https://github.com/PotenFYR-Studios) | [Website](https://potenfyr.in) | [Discord](https://discord.com/invite/zUaN2FPBec)
 
