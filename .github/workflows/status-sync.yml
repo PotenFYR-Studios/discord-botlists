@@ -1,8 +1,9 @@
 name: Status sync
 
-# Probes every list hourly and refreshes the README status table and docs
-# site status.json on the default branch. Dead lists are tracked in ONE
-# GitHub issue - never a branch or PR: while a detected list is not yet
+# Probes every list hourly. The default branch is only touched when a list
+# changes state (silent, [skip ci]); the full live board and new-list
+# candidates are force-pushed to the single-commit `status-data` branch.
+# Dead lists are tracked in ONE GitHub issue - never a PR: while a detected list is not yet
 # marked in the generated registry, the issue gets (re)opened and updated;
 # once every reported list is marked, the issue closes itself.
 
@@ -27,14 +28,30 @@ jobs:
       - name: Probe all lists
         id: probe
         run: bun scripts/status-sync.ts
-      - name: Commit status refresh (live data only)
+      - name: Discover new botlists
+        continue-on-error: true
+        run: bun scripts/discover-lists.ts
+      - name: Commit state changes to the default branch (silent)
+        # master only changes when a list changes state; [skip ci] keeps it quiet.
         run: |
           git config user.name "potenfyr-bot"
           git config user.email "bot@potenfyr.in"
           git add .status/status.json .status/STATUS.md README.md docs/src/data/status.json
-          git diff --cached --quiet && echo "no changes" && exit 0
-          git commit -m "chore(status): refresh botlist status board"
+          git diff --cached --quiet && echo "no state changes" && exit 0
+          git commit -m "chore(status): botlist state changed [skip ci]"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push
+      - name: Publish live board to the status-data branch (silent)
+        # one force-pushed orphan commit: latency/uptime/timestamps and discovery
+        # candidates live here, so hourly runs add nothing to master history.
+        run: |
+          cd .status-out
+          git init -q -b status-data
+          git config user.name "potenfyr-bot"
+          git config user.email "bot@potenfyr.in"
+          git add -A
+          git commit -q -m "status board $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" status-data
       - name: Open or update the dead-list tracking issue
         if: steps.probe.outputs.pr_needed == 'true'
         env:

@@ -1,10 +1,9 @@
 {
-  "generatedAt": 1792333687605,
   "siteUrl": "https://botlists.docs.potenfyr.in/",
   "summary": {
-    "live": 21,
-    "deprecated": 0,
-    "shutdown": 5,
+    "live": 26,
+    "deprecated": 1,
+    "shutdown": 0,
     "unknown": 1
   },
   "entries": [
@@ -12,325 +11,169 @@
       "listId": "botlist.me",
       "listName": "Botlist.me",
       "website": "https://botlist.me/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 395,
-      "uptime30d": null,
-      "lastChecked": 1792333685704,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "bots.discordlabs.org",
       "listName": "Discord Labs",
       "website": "https://bots.discordlabs.org/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 651,
-      "uptime30d": null,
-      "lastChecked": 1792333685961,
-      "deprecated": false,
-      "notice": null
+      "state": "deprecated"
     },
     {
       "listId": "bots.ondiscord.xyz",
       "listName": "Bots on Discord",
       "website": "https://bots.ondiscord.xyz/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 554,
-      "uptime30d": null,
-      "lastChecked": 1792333685864,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "carbonitex.net",
       "listName": "Carbonitex",
       "website": "https://www.carbonitex.net/discord/bots",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 253,
-      "uptime30d": null,
-      "lastChecked": 1792333685563,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "cybralist.com",
       "listName": "Cybralist",
       "website": "https://cybralist.com/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 550,
-      "uptime30d": null,
-      "lastChecked": 1792333685860,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "discord.bots.gg",
       "listName": "Discord Bots",
       "website": "https://discord.bots.gg/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 528,
-      "uptime30d": null,
-      "lastChecked": 1792333685838,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "discord.place",
       "listName": "discord.place",
       "website": "https://discord.place/bots",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 586,
-      "uptime30d": null,
-      "lastChecked": 1792333685896,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "discord.rovelstars.com",
       "listName": "Rovel Discord List",
       "website": "https://discord.rovelstars.com",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 1760,
-      "uptime30d": null,
-      "lastChecked": 1792333687070,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "discordbotlist.com",
       "listName": "Discord Bot List",
       "website": "https://discordbotlist.com/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 723,
-      "uptime30d": null,
-      "lastChecked": 1792333686286,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "discordbotlist.xyz",
       "listName": "Discord Bot List XYZ",
       "website": "https://discordbotlist.xyz/",
-      "state": "unknown",
-      "httpStatus": 502,
-      "latencyMs": 655,
-      "uptime30d": null,
-      "lastChecked": 1792333686359,
-      "deprecated": false,
-      "notice": null
+      "state": "unknown"
     },
     {
       "listId": "discordextremelist.xyz",
       "listName": "Discord Extreme List",
       "website": "https://discordextremelist.xyz/",
-      "state": "shutdown",
-      "httpStatus": 200,
-      "latencyMs": 271,
-      "uptime30d": null,
-      "lastChecked": 1792333686109,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "discordforge.org",
       "listName": "DiscordForge",
       "website": "https://discordforge.org/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 375,
-      "uptime30d": null,
-      "lastChecked": 1792333686235,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "discordlist.gg",
       "listName": "dlist.gg",
       "website": "https://discordlist.gg/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 133,
-      "uptime30d": null,
-      "lastChecked": 1792333685997,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "discords.com",
       "listName": "Bots for Discord",
       "website": "https://discords.com/bots/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 274,
-      "uptime30d": null,
-      "lastChecked": 1792333686170,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "discover.fluxpoint.dev",
       "listName": "Fluxpoint Discover",
       "website": "https://discover.fluxpoint.dev/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 286,
-      "uptime30d": null,
-      "lastChecked": 1792333686247,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "disforge.com",
       "listName": "Disforge",
       "website": "https://disforge.com/bots",
-      "state": "shutdown",
-      "httpStatus": 200,
-      "latencyMs": 1316,
-      "uptime30d": null,
-      "lastChecked": 1792333687313,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "disq.ink",
       "listName": "DisQ",
       "website": "https://disq.ink/",
-      "state": "shutdown",
-      "httpStatus": 200,
-      "latencyMs": 1103,
-      "uptime30d": null,
-      "lastChecked": 1792333687212,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "dlist.space",
       "listName": "DList.Space",
       "website": "https://dlist.space/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 80,
-      "uptime30d": null,
-      "lastChecked": 1792333686250,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "justdiscord.org",
       "listName": "JustDiscord",
       "website": "https://justdiscord.org/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 557,
-      "uptime30d": null,
-      "lastChecked": 1792333686792,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "omniplex.gg",
       "listName": "Omniplex",
       "website": "https://omniplex.gg/",
-      "state": "shutdown",
-      "httpStatus": 200,
-      "latencyMs": 887,
-      "uptime30d": null,
-      "lastChecked": 1792333687134,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "radarcord.net",
       "listName": "Radarcord",
       "website": "https://radarcord.net/",
-      "state": "shutdown",
-      "httpStatus": 200,
-      "latencyMs": 748,
-      "uptime30d": null,
-      "lastChecked": 1792333686998,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "stellarbotlist.com",
       "listName": "Stellar Bot List",
       "website": "https://stellarbotlist.com/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 730,
-      "uptime30d": null,
-      "lastChecked": 1792333687016,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
+    },
+    {
+      "listId": "thediscordlist.com",
+      "listName": "TheDiscordList",
+      "website": "https://thediscordlist.com/",
+      "state": "live"
     },
     {
       "listId": "top.gg",
       "listName": "Discord Bot List",
       "website": "https://top.gg/",
-      "state": "live",
-      "httpStatus": 403,
-      "latencyMs": 85,
-      "uptime30d": null,
-      "lastChecked": 1792333686444,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "topbot.gg",
       "listName": "TopBot",
       "website": "https://topbot.gg/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 1161,
-      "uptime30d": null,
-      "lastChecked": 1792333687605,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "vcodes.xyz",
       "listName": "vCodes",
       "website": "https://vcodes.xyz",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 178,
-      "uptime30d": null,
-      "lastChecked": 1792333686970,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "voidbots.net",
       "listName": "Void Bots",
       "website": "https://voidbots.net/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 567,
-      "uptime30d": null,
-      "lastChecked": 1792333687537,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     },
     {
       "listId": "yabl.xyz",
       "listName": "Yet Another Bot List",
       "website": "https://yabl.xyz/",
-      "state": "live",
-      "httpStatus": 200,
-      "latencyMs": 40,
-      "uptime30d": null,
-      "lastChecked": 1792333687038,
-      "deprecated": false,
-      "notice": null
+      "state": "live"
     }
   ]
 }

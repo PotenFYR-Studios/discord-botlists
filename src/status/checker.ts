@@ -15,7 +15,7 @@ export class StatusChecker {
 
   public constructor(options: { concurrency?: number; timeout?: number; cacheTtlMs?: number } = {}) {
     this.concurrency = options.concurrency ?? 8;
-    this.timeout = options.timeout ?? 8000;
+    this.timeout = options.timeout ?? 12000;
     this.cacheTtlMs = options.cacheTtlMs ?? 5 * 60_000;
   }
 
@@ -82,56 +82,72 @@ export class StatusChecker {
     };
   }
 
-  /** single HEAD probe with a GET fallback for hosts that reject HEAD. */
+  /**
+   * Probe with patience: slow is not dead. Each round tries HEAD then GET and
+   * the second round gets a doubled time budget. Only a hard network failure
+   * (DNS gone, connection refused) on EVERY attempt counts as `shutdown`.
+   * Timeouts, resets, TLS hiccups, 403/429 and 5xx never do - those lists are
+   * alive but slow, rate limited or behind a bot wall, so they surface as
+   * live/`unknown` instead of being written off.
+   */
   private async probe(url: string): Promise<{ state: ListStatus; httpStatus: number | null }> {
+    let hard = 0;
+    let attempts = 0;
+    for (const budget of [this.timeout, this.timeout * 2]) {
+      for (const method of ['HEAD', 'GET'] as const) {
+        attempts++;
+        const outcome = await this.attempt(url, method, budget);
+        if (outcome.kind === 'response') {
+          if (outcome.status < 500) return { state: 'live', httpStatus: outcome.status };
+          return { state: 'unknown', httpStatus: outcome.status };
+        }
+        if (outcome.kind === 'dead') hard++;
+      }
+    }
+    if (hard === attempts) return { state: 'shutdown', httpStatus: null };
+    return { state: 'unknown', httpStatus: null };
+  }
+
+  private async attempt(
+    url: string,
+    method: 'HEAD' | 'GET',
+    budget: number,
+  ): Promise<{ kind: 'response'; status: number } | { kind: 'dead' } | { kind: 'slow' }> {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.timeout);
+    const timer = setTimeout(() => controller.abort(), budget);
     try {
       const response = await fetch(url, {
-        method: 'HEAD',
+        method,
         redirect: 'follow',
         signal: controller.signal,
-        headers: { 'user-agent': 'Mozilla/5.0 (compatible; discord-botlists-status/2.0)' },
+        headers: { 'user-agent': 'Mozilla/5.0 (compatible; discord-botlists-status/2.1)' },
       });
-      clearTimeout(timer);
-      // parked domains and "for sale" pages often answer 200, live lists do too.
-      if (response.status < 500) return { state: 'live', httpStatus: response.status };
-      return { state: 'unknown', httpStatus: response.status };
+      if (method === 'GET') await response.body?.cancel();
+      return { kind: 'response', status: response.status };
     } catch (error) {
+      const code = errorCode(error);
+      if (code === 'ENOTFOUND' || code === 'ECONNREFUSED' || code === 'EAI_AGAIN') return { kind: 'dead' };
+      return { kind: 'slow' };
+    } finally {
       clearTimeout(timer);
-      const aborted = error instanceof Error && error.name === 'AbortError';
-      // fall back to GET once, some sites 405 on HEAD.
-      if (!aborted) {
-        try {
-          const controller2 = new AbortController();
-          const timer2 = setTimeout(() => controller2.abort(), this.timeout);
-          const response = await fetch(url, {
-            method: 'GET',
-            redirect: 'follow',
-            signal: controller2.signal,
-            headers: { 'user-agent': 'Mozilla/5.0 (compatible; discord-botlists-status/2.0)' },
-          });
-          clearTimeout(timer2);
-          await response.body?.cancel();
-          if (response.status < 500) return { state: 'live', httpStatus: response.status };
-          return { state: 'unknown', httpStatus: response.status };
-        } catch {
-          // fall through to shutdown.
-        }
-      }
-      return { state: 'shutdown', httpStatus: null };
     }
   }
 
   /** rendered markdown table for the README status section. */
-  public static toMarkdown(board: StatusBoard): string {
-    const lines = [
-      '| List | Status | Latency | HTTP | Last checked (UTC) |',
-      '| --- | --- | --- | --- | --- |',
-    ];
+  public static toMarkdown(board: StatusBoard, compact = false): string {
+    const lines = compact
+      ? ['| List | Status |', '| --- | --- |']
+      : [
+          '| List | Status | Latency | HTTP | Last checked (UTC) |',
+          '| --- | --- | --- | --- | --- |',
+        ];
     for (const entry of board.entries) {
       const icon =
         entry.state === 'live' ? '🟢' : entry.state === 'deprecated' ? '🟡' : entry.state === 'shutdown' ? '🔴' : '⚪';
+      if (compact) {
+        lines.push(`| [${entry.listName}](${entry.website}) | ${icon} ${entry.state} |`);
+        continue;
+      }
       const latency = entry.latencyMs === null ? 'n/a' : `${entry.latencyMs} ms`;
       const http = entry.httpStatus === null ? 'n/a' : String(entry.httpStatus);
       const when = new Date(entry.lastChecked).toISOString().slice(0, 16).replace('T', ' ');
@@ -139,4 +155,9 @@ export class StatusChecker {
     }
     return lines.join('\n');
   }
+}
+
+function errorCode(error: unknown): string {
+  const e = error as { code?: string; cause?: { code?: string }; name?: string };
+  return e?.cause?.code ?? e?.code ?? e?.name ?? 'UNKNOWN';
 }

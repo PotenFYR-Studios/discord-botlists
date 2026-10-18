@@ -1,0 +1,78 @@
+[
+  {
+    "id": "arcane-center.xyz",
+    "reason": "connect timeout on site and API (2026-10-18)"
+  },
+  {
+    "id": "blist.xyz",
+    "reason": "connect timeout on site and API (2026-10-18)"
+  },
+  {
+    "id": "boatspace.xyz",
+    "reason": "stats route 404"
+  },
+  {
+    "id": "botsdatabase.com",
+    "reason": "API host TLS broken"
+  },
+  {
+    "id": "cloudlist.xyz",
+    "reason": "stats route 404"
+  },
+  {
+    "id": "discord.services",
+    "reason": "stats route 404"
+  },
+  {
+    "id": "space-bot-list.xyz",
+    "reason": "stats route 404"
+  },
+  {
+    "id": "topcord.xyz",
+    "reason": "API host TLS broken"
+  },
+  {
+    "id": "bots.distop.xyz",
+    "reason": "TLS broken"
+  },
+  {
+    "id": "arobotlist.xyz",
+    "reason": "no stats API"
+  },
+  {
+    "id": "guardianbots.xyz",
+    "reason": "no stats API"
+  },
+  {
+    "id": "dankbotlist.com",
+    "reason": "site times out, no API"
+  },
+  {
+    "id": "infinitybots.gg",
+    "reason": "parked demo page, API host does not resolve"
+  },
+  {
+    "id": "botlist.space",
+    "reason": "redirects to unrelated casino domain"
+  },
+  {
+    "id": "discordium.com",
+    "reason": "525 origin error, no stats API found"
+  },
+  {
+    "id": "discodus.com",
+    "reason": "no stats API documented"
+  },
+  {
+    "id": "discordful.com",
+    "reason": "no stats API documented"
+  },
+  {
+    "id": "topbotlist.com",
+    "reason": "no stats API documented"
+  },
+  {
+    "id": "discadia.com",
+    "reason": "server directory, no bot stats API"
+  }
+]

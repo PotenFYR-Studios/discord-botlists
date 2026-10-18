@@ -36,6 +36,7 @@ AUTH_OVERRIDE = {
     "omniplex.gg": "Authorization",
     "discover.fluxpoint.dev": "Authorization",
     "carbonitex.net": "key",
+    "thediscordlist.com": "Authorization",
 }
 
 # vote webhook knowledge per list: [header that carries the secret, body field holding the voter id]
@@ -74,6 +75,7 @@ WEBHOOK_HINTS = {
     "disq.ink": {"header": "Authorization", "voterField": "user.id", "eventField": None},
     "dlist.space": {"header": "Authorization", "voterField": "user_id", "eventField": None},
     "topbot.gg": {"header": "x-topbot-signature", "voterField": "user", "eventField": "event"},
+    "thediscordlist.com": {"header": "X-TDL-Signature", "voterField": "data.user.id", "eventField": "event"},
     "discordforge.org": {"header": "X-Forge-Signature", "voterField": "voter_id", "eventField": "type"},
 }
 
@@ -95,11 +97,20 @@ NEW_LISTS = {
         "name": "DiscordForge",
         "url": "https://discordforge.org/",
         "api_docs": "https://discordforge.org/support/developers",
-        "api_post": "https://discordforge.org/api/bots/stats",
+        "api_post": "https://discordforge.org/api/v1/bots/stats",
         "api_field": "server_count",
         "api_shard_count": "shard_count",
-        "api_get": "https://discordforge.org/api/bots/:id",
+        "api_get": None,
         "view_bot": "https://discordforge.org/bot/:id",
+    },
+    "thediscordlist.com": {
+        "name": "TheDiscordList",
+        "url": "https://thediscordlist.com/",
+        "api_docs": "https://thediscordlist.com/docs/api",
+        "api_post": "https://thediscordlist.com/api/bots/:id/stats",
+        "api_field": "server_count",
+        "api_shard_count": "shard_count",
+        "view_bot": "https://thediscordlist.com/bots/:id",
     },
 }
 
@@ -109,7 +120,19 @@ NEW_LISTS = {
 # 2026 after their domains died (registrar parking pages, gambling squatters
 # or NXDOMAIN): blist.xyz, botlist.co, botsdatabase.com, discord.services,
 # discordbot.world, motiondevelopment.top, space-bot-list.xyz, topcord.xyz.
-MANUAL = {"bots.discordlabs.org": {
+MANUAL = {"discords.com": {
+        # botsfordiscord.com/api/bot/:id 301-redirects, and fetch turns a
+        # redirected POST into a GET. Real stats route: POST .../setservers.
+        "api_post": "https://discords.com/bots/api/bot/:id/setservers",
+        "api_get": "https://discords.com/bots/api/bot/:id",
+        "view_bot": "https://discords.com/bots/bot/:id",
+        "bot_widget": "https://discords.com/bots/api/bot/:id/widget",
+    },"vcodes.xyz": {
+        # the apex host 307-redirects to www and the Authorization header is
+        # dropped on a cross-origin redirect, so call www directly.
+        "api_post": "https://www.vcodes.xyz/api/bots/stats",
+        "api_get": "https://www.vcodes.xyz/api/bots/:id",
+    },"bots.discordlabs.org": {
         "name": "Discord Labs",
         "api_post": "https://bots.discordlabs.org/api/bots/:id/stats",
         "api_field": "server_count",
@@ -121,6 +144,19 @@ MANUAL = {"bots.discordlabs.org": {
         "api_field": "server_count",
         "view_bot": "https://discordbotlist.xyz/bots/:id",
     },"botlist.me": {"webhook": {"header": "authorization", "voterField": "user", "eventField": None}},"top.gg": {"webhook": {"header": "Authorization", "voterField": "user", "eventField": "type"}}
+}
+
+# lists whose token must be sent as "<scheme> <token>".
+AUTH_SCHEME = {"topbot.gg": "Bearer", "thediscordlist.com": "Bearer", "discordforge.org": "Bearer"}
+
+# human-reviewed lifecycle verdicts, kept here so regenerating never drops them.
+# discordextremelist.xyz, disforge.com, disq.ink, omniplex.gg and radarcord.net were
+# wrongly marked shutdown by the old timeout-means-dead probe; their APIs answer
+# (200/400/401/403) so they were restored on 2026-10-18.
+# (scripts/mark-dead.ts can still patch the generated file in place.)
+STATUS = {
+    # moved to discordlabs.org; the bot API is gone (stats route answers 405).
+    "bots.discordlabs.org": "deprecated",
 }
 
 CAMEL = re.compile(r"[^a-zA-Z0-9]+")
@@ -171,8 +207,9 @@ def main() -> None:
             "shardsArrayField": ts_str(r.get("api_shards")),
             "apiGet": ts_str(manual.get("api_get", r.get("api_get"))),
             "viewBot": ts_str(manual.get("view_bot", r.get("view_bot"))),
-            "widget": ts_str(r.get("bot_widget")),
+            "widget": ts_str(manual.get("bot_widget", r.get("bot_widget"))),
             "authHeader": ts_str(AUTH_OVERRIDE.get(key, "Authorization")),
+            "authScheme": ts_str(AUTH_SCHEME.get(key)),
             "tokenEnvKey": json.dumps("DBL_" + ident(key).upper()),
             "webhook": "null"
             if not webhook
@@ -182,13 +219,15 @@ def main() -> None:
             % (
                 "true" if (manual.get("api_post", r.get("api_post"))) else "false",
                 "true" if (manual.get("api_get", r.get("api_get"))) else "false",
-                "true" if r.get("bot_widget") else "false",
+                "true" if manual.get("bot_widget", r.get("bot_widget")) else "false",
                 "true" if webhook else "false",
             ),
         }
         lines.append("  {")
         for fk, fv in fields.items():
             lines.append(f"    {fk}: {fv},")
+        if key in STATUS:
+            lines.append(f"    status: '{STATUS[key]}',")
         lines.append("  },")
     lines.append("];")
     lines.append("")
