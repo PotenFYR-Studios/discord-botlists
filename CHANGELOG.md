@@ -3,6 +3,39 @@
 All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+- **Framework adapters** `expressHandler`, `nodeHandler`, `fastifyHandler`, `koaHandler`, `lambdaHandler`, `fetchHandler` (also `@potenfyrstudios/discord-botlists/adapters`) and the core `webhook.process()`: use your existing server, no built-in server needed. `handleRequest` accepts `{ list }`.
+- **`client.attach()`**: waits for any Discord library to be ready (events + readiness polling), posts, then auto-posts.
+- **`VoteLedger`** (`voteLedger` option, `client.ledger`, `MemoryVoteStore`/`FileVoteStore`/bring-your-own `VoteStore`): per-user vote memory across all lists with `hasVoted`, `claim` (reward exactly once per vote), `streak`, `nextVoteAt`, `top`.
+- **`webhook.handleRequest(Request): Promise<Response>`** for Hono, Next.js, Bun, Deno, Cloudflare Workers.
+- **`client.doctor()`** token/env/bot-id diagnostics (read-only).
+- **Typed events** via `BotlistsEventMap`.
+- **Per-list circuit breaker** (`circuitBreaker` option, `client.health`, `client.resetHealth()`): a list failing 5x in a row (network/5xx/404/410) is skipped with exponential backoff (15 min to 6 h) and re-probed; 400/401/403/429 never trip it. The live status board also gates `postStats` for hosts that no longer resolve.
+- **Webhook delivery dedupe** (`webhook.dedupeTtlMs`, default 10 min): re-deliveries of the same envelope id (TheDiscordList, DiscordForge v2) emit once.
+- **thediscordlist.com** - new list (stats POST `{"server_count","shard_count"}` with `Authorization: Bearer`, signed `X-TDL-Signature: t=<unix>,v1=<hmac of "<t>.<raw body>">` webhooks; `listing.upvoted` parses as a vote, other events such as `listing.bumped` and `bot.stats_reported` are ignored).
+- `authScheme` on registry records: lists that need `Authorization: Bearer <token>` (thediscordlist.com, discordforge.org, topbot.gg) get the prefix added automatically; a token that already carries it is left alone.
+- `scripts/discover-lists.ts` (`npm run discover`) finds BotBlock lists missing from the registry and validates their site and stats API before they are suggested. Runs hourly in the status workflow.
+- `npm run check:pack` (part of `prepublishOnly`) fails the publish if the tarball holds anything but compiled `dist` JS/typings and package metadata.
+
+### Fixed
+- **discord.js bots posted a server count of 0**: `client.guilds` is a manager with `.cache`, which the reader never looked at. Counts are now read from discord.js (`guilds.cache.size`), Eris, Oceanic, Fluxer, Discordeno, Seyfert and plain objects.
+- **Sharded bots reported one shard's count** and sent shard *ids* where lists expect per-shard guild counts. Totals now come from `client.shard.fetchClientValues` / `ShardingManager`, and `shards` holds real per-shard counts (or is omitted).
+- **`require()` failed on Node 18/20** (the `require` export pointed at the ESM build). The package now ships ESM + CommonJS with typed subpath exports.
+- **Five lists wrongly marked shutdown are restored** (discordextremelist.xyz, disforge.com, disq.ink, omniplex.gg, radarcord.net): the old probe treated a timeout as dead; their APIs answer.
+- **discordforge.org** stats moved to `POST /api/v1/bots/stats` (Bearer); the legacy route returns 410 since 2026-10-14.
+- **discords.com** stats posted to a redirecting host, which fetch turns into a GET. Now `POST /bots/api/bot/:id/setservers`.
+- **vcodes.xyz** calls `www.vcodes.xyz` directly; the apex redirect stripped the Authorization header.
+- **discordlabs.org** is marked deprecated (moved; the bot API is gone).
+- **Status detection** treated a timeout as `shutdown`, so slow lists were reported dead. Probes now retry HEAD and GET with a doubled budget, and only a hard DNS/connection failure on every attempt means `shutdown`; slow or bot-walled lists stay `live`/`unknown`.
+- Namespaced non-vote webhook events (e.g. `bot.stats_reported`) are no longer mistaken for votes.
+
+### Changed
+- The built-in webhook server is documented as optional and off by default (no port is opened unless you opt in).
+- `node:http` is imported lazily, so the package loads on edge runtimes; `BotClientLike` accepts any object.
+- The hourly status sync is silent: master only changes when a list changes state (no timestamps/latency in committed files, `[skip ci]`); the full live board is force-pushed to the single-commit `status-data` branch.
+
 ## [1.0.3] - 2026-09-21
 
 Every webhook-enabled list's payload was audited against its official docs; the fixes below are pinned by tests using the documented payloads.

@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { createHmac } from 'node:crypto';
-import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
-import type { BotlistRecord, ParsedWebhook, WebhookOptions, WebhookSecurityOptions } from '../types.js';
+import type { IncomingMessage, Server, ServerResponse } from 'node:http';
+import type { BotlistRecord, ParsedWebhook, WebhookInput, WebhookOptions, WebhookOutput, WebhookSecurityOptions } from '../types.js';
 import { UniversalParser, unwrapVoteEnvelope } from '../core/parser.js';
 import { resolveList } from '../core/http.js';
 import { isJwtLike, verifyJwtHs256 } from '../core/jwt.js';
@@ -66,6 +66,8 @@ export class VoteWebhookServer extends EventEmitter {
   private readonly security: WebhookSecurityOptions;
   private readonly requireSecret: boolean;
   private readonly hmacKeys: Record<string, string>;
+  private readonly dedupeTtlMs: number;
+  private readonly seenDeliveries = new Map<string, number>();
   private readonly ipState = new Map<string, IpState>();
   private server: Server | null = null;
   private started = false;
@@ -82,6 +84,7 @@ export class VoteWebhookServer extends EventEmitter {
     this.security = options.security ?? {};
     this.requireSecret = this.security.requireSecret ?? DEFAULT_SECURITY.requireSecret;
     this.hmacKeys = this.security.hmac ?? {};
+    this.dedupeTtlMs = options.dedupeTtlMs ?? 10 * 60_000;
     if (options.autoStart) void this.start();
   }
 
@@ -94,6 +97,9 @@ export class VoteWebhookServer extends EventEmitter {
           'Pass webhook.secret (string or per-list record) or set security.requireSecret = false for local testing.',
       );
     }
+    // loaded lazily: importing this package must never pull node:http into
+    // runtimes that have no http server (Workers, Deno Deploy, edge).
+    const { createServer } = await import('node:http');
     const server = createServer((req, res) => void this.handle(req, res));
     await new Promise<void>((resolve, reject) => {
       server.once('error', reject);
@@ -276,18 +282,100 @@ export class VoteWebhookServer extends EventEmitter {
     }
   }
 
+  /**
+   * Framework-agnostic core. Every adapter (express, fastify, koa, lambda,
+   * fetch-style) funnels into this one function, so auth, JWT, HMAC, dedupe
+   * and parsing behave identically everywhere - and no server is ever started.
+   *
+   * Pass whatever your framework has: an already-parsed `body` object, a
+   * `rawBody` string/bytes (best: signatures are checked against the exact
+   * bytes), or both. `list` pins the botlist when your route is not
+   * `/<anything>/<list-id>` or `?list=<id>`.
+   */
+  public async process(input: WebhookInput): Promise<WebhookOutput> {
+    const out = (status: number, body: unknown, headers: Record<string, string> = {}): WebhookOutput => ({
+      status,
+      body,
+      headers: { 'content-type': 'application/json', ...headers },
+    });
+    const method = (input.method ?? 'POST').toUpperCase();
+    if (method === 'GET') return { status: 302, body: null, headers: { location: this.redirectUrl } };
+    if (method !== 'POST') return out(405, { ok: false, error: 'method not allowed' });
+
+    const list = input.list ? safeResolve(input.list) : this.identifyListFromUrl(input.url ?? '/', input.host);
+    if (input.list && !list) return out(404, { ok: false, error: `unknown list "${input.list}"` });
+
+    let raw = '';
+    if (typeof input.rawBody === 'string') raw = input.rawBody;
+    else if (input.rawBody) raw = new TextDecoder().decode(input.rawBody);
+    else if (typeof input.body === 'string') raw = input.body;
+    else if (input.body !== undefined && input.body !== null) raw = JSON.stringify(input.body);
+    if (raw.length > 1_000_000) return out(413, { ok: false, error: 'payload too large' });
+
+    let body: unknown = null;
+    let jwtVerified = false;
+    if (input.body !== undefined && input.body !== null && typeof input.body === 'object') {
+      body = input.body;
+    } else {
+      try {
+        body = raw ? JSON.parse(raw) : null;
+      } catch {
+        const secret = list ? (this.secrets[list.id] ?? this.secrets['*']) : this.secrets['*'];
+        const claims = isJwtLike(raw) && secret ? verifyJwtHs256(raw, secret) : null;
+        if (!claims) return out(400, { ok: false, error: 'invalid json' });
+        body = claims;
+        jwtVerified = true;
+      }
+    }
+    const auth = this.authorize(list, input.headers ?? {}, raw, body, jwtVerified);
+    if (!auth.ok) {
+      this.emit('error', new Error(`${auth.reason} (${list?.id ?? 'unknown list'})`));
+      return out(auth.status, { ok: false, error: auth.reason });
+    }
+    this.parseAndEmit(list ?? UNKNOWN_LIST, body, detectTest(list, body));
+    this.emit('request', { method, url: input.url ?? '', status: 200, listId: list?.id ?? null });
+    return out(200, { ok: true });
+  }
+
+  /**
+   * Web-standard entry point: `(request: Request) => Promise<Response>` for
+   * Hono, Elysia, Next.js route handlers, SvelteKit, Remix, Bun.serve, Deno,
+   * Cloudflare Workers (and h3/Nitro via toWebRequest).
+   */
+  public async handleRequest(request: Request, options: { list?: string } = {}): Promise<Response> {
+    const url = new URL(request.url);
+    const headers: Record<string, string> = {};
+    request.headers.forEach((value, key) => {
+      headers[key] = value;
+    });
+    const method = request.method.toUpperCase();
+    const result = await this.process({
+      method,
+      url: `${url.pathname}${url.search}`,
+      host: url.host,
+      headers,
+      rawBody: method === 'POST' ? await request.text() : undefined,
+      list: options.list,
+    });
+    return new Response(result.body === null ? null : JSON.stringify(result.body), { status: result.status, headers: result.headers });
+  }
+
   /** map the request onto a list via the webhook path suffix or query param. */
   private identifyList(req: IncomingMessage): BotlistRecord | null {
-    const full = req.url ?? '';
+    return this.identifyListFromUrl(req.url ?? '', req.headers.host);
+  }
+
+  private identifyListFromUrl(full: string, host?: string): BotlistRecord | null {
     // 1. /<base>/<list> style paths: try every remaining segment, last first.
-    const rest = full.slice(this.path.length).split('?')[0] ?? '';
+    // mounted elsewhere (handleRequest in a framework router)? use the whole path.
+    const rest = full.slice(full.startsWith(this.path) ? this.path.length : 0).split('?')[0] ?? '';
     const segments = rest.split('/').filter(Boolean).reverse();
     for (const segment of segments) {
       const list = safeResolve(decodeURIComponent(segment));
       if (list) return list;
     }
     // 2. ?list= or ?source= query parameter.
-    const url = new URL(full, `http://${req.headers.host ?? 'localhost'}`);
+    const url = new URL(full, `http://${host ?? 'localhost'}`);
     const param = url.searchParams.get('list') ?? url.searchParams.get('source');
     if (param) {
       const list = safeResolve(param);
@@ -363,7 +451,7 @@ export class VoteWebhookServer extends EventEmitter {
     // body>'>". top.gg's x-topgg-signature and DisQ's x-disq-signature
     // (docs.disq.ink/webhooks/overview) both use it. It does not match the
     // plain raw-body schemes below, so it is checked first.
-    for (const name of ['x-topgg-signature', 'x-disq-signature']) {
+    for (const name of ['x-topgg-signature', 'x-disq-signature', 'x-tdl-signature']) {
       const sig = headers[name];
       if (typeof sig !== 'string' || !sig) continue;
       const t = /(?:^|,)\s*t=([^,]+)/.exec(sig)?.[1]?.trim();
@@ -393,11 +481,30 @@ export class VoteWebhookServer extends EventEmitter {
     return false;
   }
 
+  /**
+   * true when this exact delivery was already processed. Only envelope-style
+   * bodies are keyed ({id, created_at, event|type: "x.y"}); lists whose `id`
+   * is the voter (discordbotlist.com) are never treated as delivery ids.
+   */
+  private isDuplicate(listId: string, body: unknown): boolean {
+    if (this.dedupeTtlMs <= 0 || typeof body !== 'object' || body === null) return false;
+    const r = body as Record<string, unknown>;
+    const namespaced = typeof r['event'] === 'string' || (typeof r['type'] === 'string' && r['type'].includes('.'));
+    if (typeof r['id'] !== 'string' || !r['id'] || !('created_at' in r) || !namespaced) return false;
+    const now = Date.now();
+    for (const [key, at] of this.seenDeliveries) if (now - at > this.dedupeTtlMs) this.seenDeliveries.delete(key);
+    const key = `${listId}:${r['id']}`;
+    if (this.seenDeliveries.has(key)) return true;
+    this.seenDeliveries.set(key, now);
+    return false;
+  }
+
   private parseAndEmit(list: BotlistRecord | null, body: unknown, isTest?: boolean): ParsedWebhook | null {
     if (!list) return null;
     // top.gg v1 wraps the payload ({ vote: { userId, botId, type, ... } });
     // flatten it so detection and parsing stay list-agnostic. The original
     // body is preserved on the parsed payload's `raw`.
+    if (this.isDuplicate(list.id, body)) return null;
     const flat = unwrapVoteEnvelope(body) ?? body;
     const test = isTest === true ? true : detectTest(list, flat);
     const event = detectEvent(list, flat, test);
@@ -540,6 +647,9 @@ function detectEvent(list: BotlistRecord, body: unknown, isTest: boolean): Parse
       if (type.includes('rating')) return 'rating';
       if (type.includes('vote')) return 'vote';
     }
+    // namespaced events ("bot.stats_reported", "listing.bumped", "webhook.ping") that
+    // are not votes/reviews must not be mistaken for votes by the default below.
+    if (type && type.includes('.')) return null;
     // body shape heuristics for lists without an event field.
     if ('rating' in record || 'stars' in record) return 'rating';
     if ('review' in record || 'content' in record || 'comment' in record) return 'review';

@@ -53,7 +53,7 @@ describe('botlist registry', () => {
 
 describe('status checker', () => {
   test('reports registry-marked lists as dead even when the site answers 200', async () => {
-    const marked = BOTLISTS.find((l) => l.status === 'shutdown');
+    const marked = BOTLISTS.find((l) => l.status === 'shutdown' || l.status === 'deprecated');
     expect(marked).toBeDefined();
     const live = BOTLISTS.find((l) => !l.status);
     expect(live).toBeDefined();
@@ -61,7 +61,7 @@ describe('status checker', () => {
     globalThis.fetch = (async () => new Response('', { status: 200 })) as typeof fetch;
     try {
       const checker = new StatusChecker();
-      expect((await checker.checkOne(marked!)).state).toBe('shutdown');
+      expect((await checker.checkOne(marked!)).state).toBe(marked!.status as string);
       expect((await checker.checkOne(live!)).state).toBe('live');
     } finally {
       globalThis.fetch = realFetch;

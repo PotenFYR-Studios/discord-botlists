@@ -1,41 +1,82 @@
 {
   "name": "@potenfyrstudios/discord-botlists",
   "version": "1.0.3",
-  "description": "Universal multi-botlist SDK for Discord bots: post stats to 22 verified live lists, realtime vote webhooks, ratings and a universal data parser with full TypeScript types",
+  "description": "Universal multi-botlist SDK for Discord bots (any library, any server framework, ESM + CJS, serverless-ready): post stats to 27 verified live lists, realtime vote webhooks, ratings and a universal data parser with full TypeScript types",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/cjs/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
     },
     "./webhooks": {
-      "types": "./dist/webhooks/server.d.ts",
-      "import": "./dist/webhooks/server.js",
-      "require": "./dist/webhooks/server.js"
+      "import": {
+        "types": "./dist/webhooks/server.d.ts",
+        "default": "./dist/webhooks/server.js"
+      },
+      "require": {
+        "types": "./dist/cjs/webhooks/server.d.ts",
+        "default": "./dist/cjs/webhooks/server.js"
+      }
+    },
+    "./adapters": {
+      "import": {
+        "types": "./dist/adapters/index.d.ts",
+        "default": "./dist/adapters/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/adapters/index.d.ts",
+        "default": "./dist/cjs/adapters/index.js"
+      }
+    },
+    "./votes": {
+      "import": {
+        "types": "./dist/votes/ledger.d.ts",
+        "default": "./dist/votes/ledger.js"
+      },
+      "require": {
+        "types": "./dist/cjs/votes/ledger.d.ts",
+        "default": "./dist/cjs/votes/ledger.js"
+      }
     },
     "./lists": {
-      "types": "./dist/data/lists.d.ts",
-      "import": "./dist/data/lists.js",
-      "require": "./dist/data/lists.js"
+      "import": {
+        "types": "./dist/data/lists.generated.d.ts",
+        "default": "./dist/data/lists.generated.js"
+      },
+      "require": {
+        "types": "./dist/cjs/data/lists.generated.d.ts",
+        "default": "./dist/cjs/data/lists.generated.js"
+      }
     },
     "./package.json": "./package.json"
   },
   "files": [
-    "dist",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist/cjs/package.json",
+    "!dist/**/*.test.*",
+    "!dist/**/*.map",
     "README.md",
     "LICENSE",
     "NOTICE.md"
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.cjs.json && node scripts/finish-build.mjs",
     "lint": "tsc --noEmit",
-    "test": "bun test test/",
-    "test:node": "node --test test/node/",
-    "prepublishOnly": "npm run lint && npm run build"
+    "test": "bun test test/*.test.ts",
+    "test:node": "node --test \"test/node/*.test.cjs\"",
+    "check:pack": "node scripts/check-pack.mjs",
+    "discover": "bun scripts/discover-lists.ts",
+    "prepublishOnly": "npm run lint && npm run build && npm run check:pack"
   },
   "keywords": [
     "discord-botlists",
@@ -50,7 +91,18 @@
     "eris",
     "stats poster",
     "botblock",
-    "discord"
+    "discord",
+    "express",
+    "fastify",
+    "koa",
+    "hono",
+    "cloudflare-workers",
+    "aws-lambda",
+    "oceanic",
+    "seyfert",
+    "discordeno",
+    "serverless",
+    "vote-rewards"
   ],
   "author": "PotenFYR Studios",
   "license": "SEE LICENSE IN LICENSE",
@@ -73,5 +125,6 @@
     "@types/node": "^22.20.2",
     "bun-types": "^1.4.2",
     "typescript": "^5.9.3"
-  }
+  },
+  "module": "./dist/index.js"
 }

@@ -15,7 +15,7 @@
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&pause=1200&color=8B5CF6&center=true&vCenter=true&width=800&lines=Post+stats+to+every+botlist+with+one+call;Realtime+votes%2C+comments+and+reviews;One+parser+for+every+API+shape;Zero+dependencies+%C2%B7+fully+typed)](https://github.com/PotenFYR-Studios/discord-botlists)
 
-**`@potenfyrstudios/discord-botlists`**: the universal multi-botlist SDK for Discord bots: post stats to 22 verified live lists, get votes in realtime, parse every API into one shape.
+**`@potenfyrstudios/discord-botlists`**: the universal multi-botlist SDK for Discord bots: post stats to 27 verified live lists, get votes in realtime, parse every API into one shape.
 
 [Docs](https://docs.potenfyr.in/repo/discord-botlists) · [Examples](https://docs.potenfyr.in/repo/discord-botlists/examples) · [npm](https://www.npmjs.com/package/@potenfyrstudios/discord-botlists) · [Issues](https://github.com/PotenFYR-Studios/discord-botlists/issues) · [Live status](#live-status)
 
@@ -27,8 +27,8 @@
 
 Posting your bot's stats to every list and handling every list's webhook format yourself is weeks of glue code. This package does all of it with zero runtime dependencies:
 
-- **Stats posting** to 22 verified live lists, each with its correct wire format, auth header and endpoint, learned from every list's own docs plus the BotBlock directory. Dead lists are pruned automatically by the hourly status sync.
-- **Realtime vote, comment and review events** through a built-in webhook server. No polling, no delay, no express dependency.
+- **Stats posting** to 27 verified live lists, each with its correct wire format, auth header and endpoint, learned from every list's own docs plus the BotBlock directory. Dead lists are pruned automatically by the hourly status sync.
+- **Realtime vote, comment and review events** through your own web server (Express, Fastify, Koa, Hono, serverless and more) or, if you prefer, an optional built-in one. Nothing listens on a port unless you ask for it.
 - **Universal parser** that normalizes any list's bot data into one `UniversalBot` object so you never juggle `server_count` vs `guildCount` vs `guilds` vs `count` again.
 - **Status tracking**: automated hourly probes detect deprecated or shut down lists, with latency and HTTP state, synced into this README and the docs site.
 - **Fully typed**: strict TypeScript, generic event emitter, autocomplete for every option.
@@ -99,7 +99,8 @@ client.once('ready', async () => {
   const report = await lists.postStats();
   console.log(`posted to ${report.posted} lists`);
 
-  // 2. start realtime vote webhooks
+  // 2. (optional) start the built-in vote webhook server.
+  // Skip this if you already run a web server: see "Using your own server" below.
   await lists.startWebhooks();
 });
 
@@ -143,6 +144,81 @@ const lists = new Botlists({
 
 Rate-limit safe by default: ≥ 1 s spacing per target (`minIntervalMs`), one polite Retry-After wait on 429, bounded queues (`maxQueueSize`, oldest dropped - a stalled webhook can never grow memory) and unref'd timers that only exist while a delivery is pending. Full control via `customize(vote, payload)`, identity overrides via `username` / `avatarUrl` / `botToken`, and a standalone `VoteAnnouncer` class for custom pipelines.
 
+## Using your own server and Discord library
+
+The built-in webhook server is optional and off by default: the package opens no port unless you call `startWebhooks()` or pass `webhook.autoStart`. Instead you can plug vote webhooks into a server you already run. The Discord client is read by duck-typing, so no Discord library is a dependency. The adapters and client readers below are covered by tests with stand-in objects shaped like each framework or library; they have not been run against every real version.
+
+**Web frameworks.** Every adapter forwards to one core (`webhook.process()`), so secrets, HMAC/JWT checks and dedupe behave identically. Pin the list with `{ list: 'top.gg' }` or let the URL decide (`/votes/top.gg` or `?list=top.gg`).
+
+| You run | Use |
+| --- | --- |
+| Express, Connect, Polka, Restify, NestJS (express), Next.js pages API | `expressHandler(lists.webhook)` |
+| Fastify | `fastifyHandler(lists.webhook)` |
+| Koa / @koa/router | `koaHandler(lists.webhook)` |
+| AWS Lambda, API Gateway v1/v2, function URLs, Netlify, Vercel | `lambdaHandler(lists.webhook)` |
+| Hono, Elysia, Next.js route handlers, SvelteKit, Remix, Bun, Deno, Cloudflare Workers, h3/Nitro | `fetchHandler(lists.webhook)` or `lists.webhook.handleRequest(request)` |
+| Anything else | `await lists.webhook.process({ method, url, headers, rawBody })` |
+
+```ts
+import express from 'express';
+import { Botlists, expressHandler } from '@potenfyrstudios/discord-botlists';
+
+const lists = new Botlists({ client, webhook: { secret: { 'top.gg': process.env.TOPGG_SECRET! } } });
+app.post('/votes/:list', express.raw({ type: '*/*' }), expressHandler(lists.webhook));
+lists.on('vote', (v) => reward(v.voterId));
+```
+
+Signature lists (top.gg v1, DisQ, TheDiscordList, TopBot, DiscordForge v2) sign the exact bytes, so give the adapter the raw body (`express.raw`, `fastify-raw-body`, koa-bodyparser `rawBody`) or leave the stream untouched. Parsed-only bodies are re-serialised, which usually matches but is not guaranteed.
+
+**Discord libraries.** Written for discord.js (v13/v14, sharded or not, including `ShardingManager`), Eris, Oceanic, Fluxer, Discordeno, Seyfert, or your own object.
+
+```ts
+const lists = new Botlists({ client });
+lists.attach(); // waits for ready, posts once, then every 30 min
+```
+
+`attach()` listens for `clientReady`/`botReady`/`ready` (discord.js `ready` is skipped: deprecated since 14.22) and also polls readiness, so a renamed event cannot leave the bot unlisted. Server and shard counts are summed across shards through `client.shard.fetchClientValues('guilds.cache.size')` or a `ShardingManager`; Eris/Oceanic per-shard counts come from `guild.shardID`. Anything else: pass `statsProvider` or `postStats({ serverCount })`.
+
+**Runtimes.** ESM and CommonJS builds with typed subpath exports (`/adapters`, `/webhooks`, `/votes`, `/lists`), no top-level `node:http` import (it loads only if you call `startWebhooks()`), zero runtime dependencies. Tested on Node (import and require) and Bun. The Web `Request`/`Response` handler is built for Workers and Deno, but I have not run it on them.
+
+## Beyond posting stats
+
+Features single-list SDKs (`@top-gg/sdk`, `topgg-autoposter`, `blapi`) do not give you:
+
+**Vote ledger: reward users without polling any API.** Votes from every list land in one per-user record.
+
+```ts
+import { Botlists, FileVoteStore } from '@potenfyrstudios/discord-botlists';
+
+const lists = new Botlists({
+  client,
+  webhook: { secret: process.env.VOTE_SECRET },
+  voteLedger: { store: new FileVoteStore('./data/votes.json') }, // or `true` for memory, or your own VoteStore (redis, sqlite...)
+});
+
+// /daily command: true only ONCE per vote, retry- and double-click-safe
+if (await lists.ledger!.claim(interaction.user.id)) grantReward();
+await lists.ledger!.hasVoted(userId);              // voted on ANY list in the last 12h
+await lists.ledger!.hasVoted(userId, { listId: 'top.gg', withinMs: 3_600_000 });
+await lists.ledger!.streak(userId);                // consecutive UTC days
+await lists.ledger!.nextVoteAt(userId, 'top.gg');  // when they can vote again
+await lists.ledger!.top(10);                       // leaderboard
+```
+
+**Bring your own server: `handleRequest(Request) => Response`.** No http server of ours needed for Hono, Next.js route handlers, Bun, Deno, Cloudflare Workers or Remix. Same secret, HMAC, JWT and dedupe rules as the built-in server.
+
+```ts
+app.post('/votes/*', (c) => lists.webhook.handleRequest(c.req.raw)); // Hono
+```
+
+**Self-healing posting.** A per-list circuit breaker skips lists that keep failing (network/5xx/404/410) with exponential backoff and re-probes them; auth and rate-limit errors never trip it. `lists.health` shows the state, `lists.resetHealth()` clears it. Slow lists are never reported dead: the status probe retries HEAD and GET and only declares `shutdown` on a hard DNS/connection failure.
+
+**`await lists.doctor()`** checks every configured token against the list (rejected, unverified, unreachable), flags `DBL_*` env typos and a missing bot id, and never posts anything.
+
+**Webhook dedupe.** Lists retry slow deliveries; the same envelope id emits once (`webhook.dedupeTtlMs`).
+
+**Typed events.** `lists.on('vote', (v) => v.voterId)` is fully typed via `BotlistsEventMap`.
+
 ## Full API
 
 ### class `Botlists`
@@ -152,7 +228,7 @@ Rate-limit safe by default: ≥ 1 s spacing per target (`minIntervalMs`), one po
 | `postStats(stats?, opts?)` | `Promise<PostReport>` | Post to every list you have a token for. `opts.only` / `opts.skip` filter by list id. |
 | `postStatsTo(list, stats?)` | `Promise<PostResult>` | Post to one list. |
 | `postViaBotBlock(stats?)` | `Promise<PostReport>` | One request to botblock.org that fans out to all lists. |
-| `startWebhooks(port?)` | `Promise<string>` | Start the realtime webhook server, returns its address. |
+| `startWebhooks(port?)` | `Promise<string>` | Optional. Start the built-in webhook server, returns its address. Not needed when you use an adapter. |
 | `stopWebhooks()` | `Promise<void>` | Stop the webhook server. |
 | `ingestWebhook(list, body, isTest?)` | `void` | Feed a webhook body from your own express/fastify app. |
 | `fetchBot(list, botId?)` | `Promise<UniversalBot>` | Fetch and normalize a bot from one list. |
@@ -333,11 +409,11 @@ const lists = new Botlists({
 
 Custom lists work everywhere built-in ones do: posting, webhooks, parsing, status.
 
-## Supported lists (22 verified live)
+## Supported lists (27 verified live)
 
-The generated registry (`src/data/lists.generated.ts`, reproducible from the BotBlock snapshot) carries every audited list. Shutdown and deprecated lists stay in the registry but are marked `status: 'shutdown'` / `'deprecated'`: the SDK skips posting to them, and the status board below reports them red. The September 2026 docs audit pruned 8 domains that serve registrar parking or squatter pages despite answering HTTP 200 (blist.xyz, botlist.co, botsdatabase.com, discord.services, discordbot.world, motiondevelopment.top, space-bot-list.xyz, topcord.xyz) and added topbot.gg and discordforge.org. The October 2026 hourly sync marked 5 more lists dead after repeated probe timeouts (discordextremelist.xyz, disforge.com, disq.ink, omniplex.gg, radarcord.net):
+The generated registry (`src/data/lists.generated.ts`, reproducible from the BotBlock snapshot) carries every audited list. Shutdown and deprecated lists stay in the registry but are marked `status: 'shutdown'` / `'deprecated'`: the SDK skips posting to them, and the status board below reports them red. The September 2026 docs audit pruned 8 domains that serve registrar parking or squatter pages despite answering HTTP 200 (blist.xyz, botlist.co, botsdatabase.com, discord.services, discordbot.world, motiondevelopment.top, space-bot-list.xyz, topcord.xyz) and added topbot.gg and discordforge.org. The October 2026 sync briefly marked 5 lists dead because the old probe treated a timeout as shutdown; they were re-verified (their APIs answer) and restored. Only bots.discordlabs.org (moved, API gone) is deprecated:
 
-botlist.me | bots.discordlabs.org | bots.ondiscord.xyz | carbonitex.net | cybralist.com | discord.bots.gg | discord.place | discord.rovelstars.com | discordbotlist.com | discordbotlist.xyz | discordforge.org | discordlist.gg | discords.com | discover.fluxpoint.dev | dlist.space | justdiscord.org | stellarbotlist.com | top.gg | topbot.gg | vcodes.xyz | voidbots.net | yabl.xyz
+botlist.me | bots.ondiscord.xyz | carbonitex.net | cybralist.com | discord.bots.gg | discord.place | discord.rovelstars.com | discordbotlist.com | discordbotlist.xyz | discordextremelist.xyz | disforge.com | disq.ink | omniplex.gg | radarcord.net | discordforge.org | discordlist.gg | discords.com | discover.fluxpoint.dev | dlist.space | justdiscord.org | stellarbotlist.com | thediscordlist.com | top.gg | topbot.gg | vcodes.xyz | voidbots.net | yabl.xyz
 
 Each record carries: endpoint URLs, wire field names, shard field names, auth header, widget and view URLs, webhook format hint and env var key.
 
@@ -346,37 +422,38 @@ Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discor
 ## Live status
 
 <!-- STATUS:START -->
-Last sync: **2026-10-18** | 🟢 21 live | 🟡 0 deprecated | 🔴 5 shutdown | ⚪ 1 unknown
+🟢 26 live | 🟡 1 deprecated | 🔴 0 shutdown | ⚪ 1 unknown
 
-| List | Status | Latency | HTTP | Last checked (UTC) |
-| --- | --- | --- | --- | --- |
-| [Botlist.me](https://botlist.me/) | 🟢 live | 395 ms | 200 | 2026-10-18 14:28 |
-| [Discord Labs](https://bots.discordlabs.org/) | 🟢 live | 651 ms | 200 | 2026-10-18 14:28 |
-| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live | 554 ms | 200 | 2026-10-18 14:28 |
-| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live | 253 ms | 200 | 2026-10-18 14:28 |
-| [Cybralist](https://cybralist.com/) | 🟢 live | 550 ms | 200 | 2026-10-18 14:28 |
-| [Discord Bots](https://discord.bots.gg/) | 🟢 live | 528 ms | 200 | 2026-10-18 14:28 |
-| [discord.place](https://discord.place/bots) | 🟢 live | 586 ms | 200 | 2026-10-18 14:28 |
-| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live | 1760 ms | 200 | 2026-10-18 14:28 |
-| [Discord Bot List](https://discordbotlist.com/) | 🟢 live | 723 ms | 200 | 2026-10-18 14:28 |
-| [Discord Bot List XYZ](https://discordbotlist.xyz/) | ⚪ unknown | 655 ms | 502 | 2026-10-18 14:28 |
-| [Discord Extreme List](https://discordextremelist.xyz/) | 🔴 shutdown | 271 ms | 200 | 2026-10-18 14:28 |
-| [DiscordForge](https://discordforge.org/) | 🟢 live | 375 ms | 200 | 2026-10-18 14:28 |
-| [dlist.gg](https://discordlist.gg/) | 🟢 live | 133 ms | 200 | 2026-10-18 14:28 |
-| [Bots for Discord](https://discords.com/bots/) | 🟢 live | 274 ms | 200 | 2026-10-18 14:28 |
-| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live | 286 ms | 200 | 2026-10-18 14:28 |
-| [Disforge](https://disforge.com/bots) | 🔴 shutdown | 1316 ms | 200 | 2026-10-18 14:28 |
-| [DisQ](https://disq.ink/) | 🔴 shutdown | 1103 ms | 200 | 2026-10-18 14:28 |
-| [DList.Space](https://dlist.space/) | 🟢 live | 80 ms | 200 | 2026-10-18 14:28 |
-| [JustDiscord](https://justdiscord.org/) | 🟢 live | 557 ms | 200 | 2026-10-18 14:28 |
-| [Omniplex](https://omniplex.gg/) | 🔴 shutdown | 887 ms | 200 | 2026-10-18 14:28 |
-| [Radarcord](https://radarcord.net/) | 🔴 shutdown | 748 ms | 200 | 2026-10-18 14:28 |
-| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live | 730 ms | 200 | 2026-10-18 14:28 |
-| [Discord Bot List](https://top.gg/) | 🟢 live | 85 ms | 403 | 2026-10-18 14:28 |
-| [TopBot](https://topbot.gg/) | 🟢 live | 1161 ms | 200 | 2026-10-18 14:28 |
-| [vCodes](https://vcodes.xyz) | 🟢 live | 178 ms | 200 | 2026-10-18 14:28 |
-| [Void Bots](https://voidbots.net/) | 🟢 live | 567 ms | 200 | 2026-10-18 14:28 |
-| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live | 40 ms | 200 | 2026-10-18 14:28 |
+| List | Status |
+| --- | --- |
+| [Botlist.me](https://botlist.me/) | 🟢 live |
+| [Discord Labs](https://bots.discordlabs.org/) | 🟡 deprecated |
+| [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live |
+| [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live |
+| [Cybralist](https://cybralist.com/) | 🟢 live |
+| [Discord Bots](https://discord.bots.gg/) | 🟢 live |
+| [discord.place](https://discord.place/bots) | 🟢 live |
+| [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live |
+| [Discord Bot List](https://discordbotlist.com/) | 🟢 live |
+| [Discord Bot List XYZ](https://discordbotlist.xyz/) | ⚪ unknown |
+| [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live |
+| [DiscordForge](https://discordforge.org/) | 🟢 live |
+| [dlist.gg](https://discordlist.gg/) | 🟢 live |
+| [Bots for Discord](https://discords.com/bots/) | 🟢 live |
+| [Fluxpoint Discover](https://discover.fluxpoint.dev/) | 🟢 live |
+| [Disforge](https://disforge.com/bots) | 🟢 live |
+| [DisQ](https://disq.ink/) | 🟢 live |
+| [DList.Space](https://dlist.space/) | 🟢 live |
+| [JustDiscord](https://justdiscord.org/) | 🟢 live |
+| [Omniplex](https://omniplex.gg/) | 🟢 live |
+| [Radarcord](https://radarcord.net/) | 🟢 live |
+| [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live |
+| [TheDiscordList](https://thediscordlist.com/) | 🟢 live |
+| [Discord Bot List](https://top.gg/) | 🟢 live |
+| [TopBot](https://topbot.gg/) | 🟢 live |
+| [vCodes](https://vcodes.xyz) | 🟢 live |
+| [Void Bots](https://voidbots.net/) | 🟢 live |
+| [Yet Another Bot List](https://yabl.xyz/) | 🟢 live |
 <!-- STATUS:END -->
 
 The table above is regenerated hourly by [scripts/status-sync.ts](scripts/status-sync.ts) (workflow: `status-sync.yml`). A list is marked:

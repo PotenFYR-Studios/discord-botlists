@@ -4,6 +4,10 @@ import type {
   BotlistEvent,
   BotlistsOptions,
   BotlistRecord,
+  BotlistsEventMap,
+  DoctorEntry,
+  DoctorReport,
+  ListHealth,
   PostReport,
   PostResult,
   StatsPayload,
@@ -18,6 +22,11 @@ import { StatusChecker } from './status/checker.js';
 import { ConsoleReport } from './status/report.js';
 import { VoteWebhookServer } from './webhooks/server.js';
 import { VoteAnnouncer } from './announcer.js';
+import { VoteLedger } from './votes/ledger.js';
+import { READY_EVENTS, looksReady, readClientStats, readLocalGuildCount } from './core/client.js';
+export { readClientStats } from './core/client.js';
+export { expressHandler, nodeHandler, fastifyHandler, koaHandler, lambdaHandler, fetchHandler } from './adapters/index.js';
+export type { AdapterOptions } from './adapters/index.js';
 import type { UniversalVote } from './types.js';
 
 export { BotlistsError, ConsoleReport };
@@ -25,6 +34,8 @@ export { UniversalParser, unwrapVoteEnvelope } from './core/parser.js';
 export { isJwtLike, verifyJwtHs256 } from './core/jwt.js';
 export { StatusChecker } from './status/checker.js';
 export { VoteAnnouncer, isDiscordWebhookUrl } from './announcer.js';
+export { VoteLedger, MemoryVoteStore, FileVoteStore } from './votes/ledger.js';
+export type { VoteStore, VoterRecord, VoteLedgerOptions } from './votes/ledger.js';
 export type { VoteAnnouncerFormat, AnnouncerDelivery, ExternalVotePayload, DiscordWebhookPayload } from './announcer.js';
 
 /** Retry-After waits above this are not honoured (drop instead of hanging). */
@@ -40,10 +51,22 @@ const MAX_RETRY_WAIT_MS = 30_000;
  *  statsPosted -> PostReport after each fan-out post
  *  status      -> StatusBoard after each status refresh
  */
+/** typed on/once/off for the events in BotlistsEventMap (declaration merging). */
+export interface Botlists {
+  on<K extends keyof BotlistsEventMap>(event: K, listener: (...args: BotlistsEventMap[K]) => void): this;
+  once<K extends keyof BotlistsEventMap>(event: K, listener: (...args: BotlistsEventMap[K]) => void): this;
+  off<K extends keyof BotlistsEventMap>(event: K, listener: (...args: BotlistsEventMap[K]) => void): this;
+  on(event: string | symbol, listener: (...args: any[]) => void): this;
+  once(event: string | symbol, listener: (...args: any[]) => void): this;
+  off(event: string | symbol, listener: (...args: any[]) => void): this;
+}
+
 export class Botlists extends EventEmitter {
   public readonly botId: string | null;
   public readonly client: BotClientLike | null;
   public readonly webhook: VoteWebhookServer;
+  /** per-user vote memory, set when `voteLedger` is enabled. */
+  public readonly ledger: VoteLedger | null;
 
   private readonly tokens: Record<string, string>;
   private readonly authHeaders: Record<string, string>;
@@ -61,6 +84,8 @@ export class Botlists extends EventEmitter {
   private announcer: VoteAnnouncer | null = null;
   /** gap between two list posts inside one postStats fan-out (rate limit safety). */
   private readonly postSpacingMs: number;
+  private readonly breakerConfig: { threshold: number; baseMs: number; maxMs: number } | null;
+  private readonly breaker = new Map<string, { failures: number; openUntil: number; lastError: string | null }>();
 
   public constructor(options: BotlistsOptions = {}) {
     super();
@@ -75,11 +100,25 @@ export class Botlists extends EventEmitter {
     this.statsProvider = options.statsProvider ?? null;
     this.http = new Http(options.fetchOptions);
     this.postSpacingMs = Math.max(100, options.postSpacingMs ?? 1000);
+    const cb = options.circuitBreaker;
+    this.breakerConfig =
+      cb === false
+        ? null
+        : { threshold: Math.max(1, cb?.threshold ?? 5), baseMs: cb?.baseMs ?? 15 * 60_000, maxMs: cb?.maxMs ?? 6 * 3_600_000 };
 
     this.webhook = new VoteWebhookServer(options.webhook ?? {});
     // bubble every webhook event up to the main emitter.
     for (const event of ['vote', 'comment', 'review', 'rating', 'test', 'raw', 'request', 'error'] as const) {
       this.webhook.on(event, (...args: unknown[]) => this.emit(event, ...args));
+    }
+
+    const ledgerOpt = options.voteLedger;
+    this.ledger = !ledgerOpt ? null : ledgerOpt instanceof VoteLedger ? ledgerOpt : new VoteLedger(ledgerOpt === true ? {} : ledgerOpt);
+    if (this.ledger) {
+      const ledger = this.ledger;
+      const record = (vote: UniversalVote) => void ledger.record(vote).catch((error: unknown) => this.emit('error', error));
+      this.on('vote', record);
+      this.on('test', record);
     }
 
     // vote announcer (opt-in): disabled unless options.announcer.enabled is
@@ -159,7 +198,20 @@ export class Botlists extends EventEmitter {
         results.push(noToken(list));
         continue;
       }
-      results.push(await this.postOne(list, resolved, token));
+      const open = this.circuitOpenUntil(list);
+      if (open) {
+        const state = this.breaker.get(list.id);
+        results.push({
+          listId: list.id,
+          listName: list.name,
+          ok: false,
+          status: null,
+          error: `circuit open until ${new Date(open).toISOString()} after ${state?.failures ?? 0} consecutive failures (${state?.lastError ?? 'unknown'})`,
+          durationMs: 0,
+        });
+        continue;
+      }
+      results.push(this.track(list, await this.postOne(list, resolved, token)));
       // polite gap between list posts (postSpacingMs, default 1000ms) keeps
       // the fan-out far away from every per-list rate limit. A list that
       // answered 429 with a big Retry-After adds a cooldown before the NEXT
@@ -174,8 +226,8 @@ export class Botlists extends EventEmitter {
     const report: PostReport = {
       results,
       posted: results.filter((r) => r.ok).length,
-      failed: results.filter((r) => !r.ok && !r.error?.includes('no token')).length,
-      skipped: results.filter((r) => r.error?.includes('no token')).length,
+      failed: results.filter((r) => !r.ok && !r.error?.includes('no token') && !r.error?.startsWith('circuit open')).length,
+      skipped: results.filter((r) => r.error?.includes('no token') || r.error?.startsWith('circuit open')).length,
       durationMs: Date.now() - started,
     };
     this.lastPostAt = Date.now();
@@ -189,7 +241,107 @@ export class Botlists extends EventEmitter {
     const token = this.tokens[list.id];
     if (!token) return noToken(list);
     const resolved = await this.resolveStats(stats);
-    return this.postOne(list, resolved, token);
+    return this.track(list, await this.postOne(list, resolved, token));
+  }
+
+  /**
+   * self-diagnosis: which tokens are set, which are rejected, which env vars
+   * look like typos and which lists are unreachable. Read-only: it only issues
+   * GETs, never posts stats.
+   */
+  public async doctor(): Promise<DoctorReport> {
+    const entries: DoctorEntry[] = [];
+    const problems: string[] = [];
+    if (!this.botId) problems.push('no bot id: pass `botId` or a logged-in `client` so stats and lookups know which bot to use');
+    for (const list of this.lists) {
+      if (list.status === 'shutdown' || list.status === 'deprecated') continue;
+      const token = this.tokenFor(list);
+      const notes: string[] = [];
+      const entry: DoctorEntry = {
+        listId: list.id,
+        listName: list.name,
+        tokenEnvKey: list.tokenEnvKey,
+        tokenConfigured: Boolean(token),
+        auth: token ? 'unverified' : 'no-token',
+        httpStatus: null,
+        notes,
+      };
+      if (token && list.apiGet && this.botId) {
+        try {
+          const res = await this.http.request(applyId(list.apiGet, this.botId), {
+            headers: { [this.authHeaderFor(list)]: this.authValueFor(list, token) },
+          });
+          entry.httpStatus = res.status;
+          if (res.status === 401 || res.status === 403) {
+            entry.auth = 'bad-token';
+            problems.push(`${list.id}: token rejected (HTTP ${res.status}) - regenerate it and update ${list.tokenEnvKey}`);
+          } else if (res.status === null || res.status >= 500) {
+            entry.auth = 'unreachable';
+          } else {
+            entry.auth = 'ok';
+            if (res.status === 404) notes.push('bot not found on this list (token not verifiable, bot may be unlisted)');
+          }
+        } catch (error) {
+          entry.auth = 'unreachable';
+          notes.push(error instanceof Error ? error.message : String(error));
+        }
+        await sleep(250);
+      } else if (token) {
+        notes.push('no read endpoint: the token can only be verified by posting stats');
+      }
+      const open = this.circuitOpenUntil(list);
+      if (open) notes.push(`circuit open until ${new Date(open).toISOString()}`);
+      entries.push(entry);
+    }
+    const known = new Set(this.lists.map((l) => l.tokenEnvKey));
+    const unrecognizedEnv = Object.keys(process.env).filter(
+      (k) => k.startsWith('DBL_') && !known.has(k) && !ENV_KEYS_TO_LISTS.has(k) && !ENV_KEYS_TO_LISTS.has(k.toUpperCase().replace(/[^A-Z0-9]/g, '')),
+    );
+    for (const key of unrecognizedEnv) problems.push(`${key} matches no list (typo? expected one of DBL_TOPGG, DBL_DISCORDBOTLISTCOM, ...)`);
+    return { botId: this.botId, entries, unrecognizedEnv, problems };
+  }
+
+  /** runtime health of every list this client has posted to (breaker view). */
+  public get health(): ListHealth[] {
+    return [...this.breaker.entries()].map(([listId, s]) => ({
+      listId,
+      state: s.openUntil > Date.now() ? 'open' : s.failures > 0 ? 'degraded' : 'healthy',
+      consecutiveFailures: s.failures,
+      openUntil: s.openUntil > Date.now() ? s.openUntil : 0,
+      lastError: s.lastError,
+    }));
+  }
+
+  /** forget breaker state, e.g. after you fixed a token. Omit the id to reset all. */
+  public resetHealth(listQuery?: string): void {
+    if (!listQuery) return this.breaker.clear();
+    this.breaker.delete(this.requireList(listQuery).id);
+  }
+
+  private circuitOpenUntil(list: BotlistRecord): number {
+    const until = this.breaker.get(list.id)?.openUntil ?? 0;
+    return until > Date.now() ? until : 0;
+  }
+
+  /** feed a post result into the breaker. Only systemic failures count. */
+  private track(list: BotlistRecord, result: PostResult): PostResult {
+    const cfg = this.breakerConfig;
+    if (!cfg) return result;
+    if (result.ok) {
+      this.breaker.delete(list.id);
+      return result;
+    }
+    const s = result.status;
+    const systemic = s === null || s >= 500 || s === 404 || s === 410;
+    if (!systemic) return result;
+    const state = this.breaker.get(list.id) ?? { failures: 0, openUntil: 0, lastError: null };
+    state.failures++;
+    state.lastError = result.error ?? `HTTP ${s}`;
+    if (state.failures >= cfg.threshold) {
+      state.openUntil = Date.now() + Math.min(cfg.maxMs, cfg.baseMs * 2 ** (state.failures - cfg.threshold));
+    }
+    this.breaker.set(list.id, state);
+    return result;
   }
 
   /** one request to botblock.org that forwards the count to every list. */
@@ -242,7 +394,7 @@ export class Botlists extends EventEmitter {
     if (!id) throw new BotlistsError('no bot id given and none detected from client', { listId: list.id });
     const url = applyId(list.apiGet, id);
     const token = this.tokenFor(list);
-    const headers = token ? { [this.authHeaderFor(list)]: token } : undefined;
+    const headers = token ? { [this.authHeaderFor(list)]: this.authValueFor(list, token) } : undefined;
     const response = await this.http.requestStrict(url, { headers, listId: list.id });
     return this.parser.parseBot(list, response.json ?? response.text);
   }
@@ -279,7 +431,7 @@ export class Botlists extends EventEmitter {
     const id = this.botId ?? '';
     const base = applyId(list.apiGet, id);
     const url = `${base.replace(/\/$/, '')}/vote/${encodeURIComponent(userId)}`;
-    const response = await this.http.request(url, { headers: { [this.authHeaderFor(list)]: token } });
+    const response = await this.http.request(url, { headers: { [this.authHeaderFor(list)]: this.authValueFor(list, token) } });
     if (!response.ok) return null;
     const json = (response.json ?? {}) as Record<string, unknown>;
     const voted = json['voted'] ?? json['hasVoted'] ?? json['voted'];
@@ -333,6 +485,58 @@ export class Botlists extends EventEmitter {
     return this.statusBoard;
   }
 
+  /**
+   * Hook any Discord library: waits until the bot is ready, posts once, then
+   * keeps posting on an interval. Works with discord.js (v13/v14, sharded or
+   * not), Eris, Oceanic, Fluxer, Discordeno, Seyfert and custom clients - it
+   * listens for `clientReady`/`botReady`/`ready` where they exist and also
+   * polls readiness (guild count appears), so a renamed event can never leave
+   * the bot unlisted. Returns a stop function.
+   */
+  public attach(client: BotClientLike | object = this.client ?? {}, options: { intervalMs?: number; stats?: Partial<StatsPayload> } = {}): () => void {
+    const target = client as Record<string, unknown>;
+    let started = false;
+    let poll: ReturnType<typeof setInterval> | null = null;
+    const deadline = Date.now() + 10 * 60_000;
+    const begin = () => {
+      if (started) return;
+      started = true;
+      if (poll) clearInterval(poll);
+      void this.postStats(options.stats).catch((error: unknown) => this.emit('error', error));
+      this.startAutoPost(options.intervalMs, options.stats);
+    };
+    const handlers: [string, () => void][] = [];
+    const isDjs = typeof target['guilds'] === 'object' && target['guilds'] !== null && 'cache' in (target['guilds'] as object);
+    const events: string[] = [...READY_EVENTS, ...(isDjs ? [] : ['ready'])];
+    if (typeof target['once'] === 'function') {
+      for (const name of events) {
+        try {
+          (target['once'] as (e: string, l: () => void) => unknown).call(target, name, begin);
+          handlers.push([name, begin]);
+        } catch {
+          // exotic emitter: polling below still covers it.
+        }
+      }
+    }
+    if (looksReady(target)) begin();
+    else {
+      poll = setInterval(() => {
+        void readLocalGuildCount(target).then((n) => {
+          if ((n ?? 0) > 0 || looksReady(target)) begin();
+          else if (Date.now() > deadline && poll) clearInterval(poll);
+        });
+      }, 2000);
+      poll.unref?.();
+    }
+    return () => {
+      started = true;
+      if (poll) clearInterval(poll);
+      this.stopAutoPost();
+      const off = target['off'] ?? target['removeListener'];
+      if (typeof off === 'function') for (const [name, fn] of handlers) (off as (e: string, l: () => void) => unknown).call(target, name, fn);
+    };
+  }
+
   /** start periodic stats posting. interval in ms, default 30 minutes. */
   public startAutoPost(intervalMs = 30 * 60_000, stats?: Partial<StatsPayload>): void {
     this.stopAutoPost();
@@ -356,15 +560,15 @@ export class Botlists extends EventEmitter {
    */
   private async resolveStats(stats?: Partial<StatsPayload>): Promise<StatsPayload> {
     const provided = this.statsProvider ? await this.statsProvider() : null;
-    const payload: StatsPayload = {
-      serverCount: stats?.serverCount ?? provided?.serverCount ?? collectServerCount(this.client),
-      shardId: stats?.shardId ?? provided?.shardId,
-      shardCount: stats?.shardCount ?? provided?.shardCount ?? collectShardCount(this.client),
-      shards: stats?.shards ?? provided?.shards ?? collectShards(this.client),
-      users: stats?.users ?? provided?.users,
+    const read = !stats?.serverCount && !provided?.serverCount ? await readClientStats(this.client) : {};
+    return {
+      serverCount: stats?.serverCount ?? provided?.serverCount ?? read.serverCount ?? 0,
+      shardId: stats?.shardId ?? provided?.shardId ?? read.shardId,
+      shardCount: stats?.shardCount ?? provided?.shardCount ?? read.shardCount,
+      shards: stats?.shards ?? provided?.shards ?? read.shards,
+      users: stats?.users ?? provided?.users ?? read.users,
       voiceConnections: stats?.voiceConnections ?? provided?.voiceConnections,
     };
-    return payload;
   }
 
   private pickTargets(only?: string[], skip?: string[]): BotlistRecord[] {
@@ -374,6 +578,8 @@ export class Botlists extends EventEmitter {
       // registry-marked dead lists are skipped on auto post; an explicit
       // `only` above still reaches them when you know what you are doing.
       if (list.status === 'shutdown' || list.status === 'deprecated') return false;
+      // live probe says the host is gone (DNS/refused on every attempt).
+      if (this.statusBoard?.entries.some((e) => e.listId === list.id && e.state === 'shutdown')) return false;
       if (skip?.length && skip.some((q) => matches(list, q))) return false;
       return true;
     });
@@ -386,7 +592,7 @@ export class Botlists extends EventEmitter {
     const init = {
       method: list.postMethod || 'POST',
       body,
-      headers: { [this.authHeaderFor(list)]: token },
+      headers: { [this.authHeaderFor(list)]: this.authValueFor(list, token) },
     };
     try {
       let response = await this.http.request(url, init);
@@ -422,6 +628,11 @@ export class Botlists extends EventEmitter {
     const list = resolveList(query, this.extraLists);
     if (!list) throw new BotlistsError(`unknown list "${query}"`);
     return list;
+  }
+
+  /** token as sent on the wire: lists like TheDiscordList/DiscordForge need "Bearer <token>". */
+  private authValueFor(list: BotlistRecord, token: string): string {
+    return list.authScheme && !token.toLowerCase().startsWith(`${list.authScheme.toLowerCase()} `) ? `${list.authScheme} ${token}` : token;
   }
 
   private authHeaderFor(list: BotlistRecord): string {
@@ -493,24 +704,4 @@ function readTokenEnv(): Record<string, string> {
     if (mapped) tokens[mapped] = value;
   }
   return tokens;
-}
-
-function collectServerCount(client: BotClientLike | null): number {
-  if (!client) return 0;
-  if (client.guilds && typeof client.guilds === 'object') {
-    if ('size' in client.guilds && typeof client.guilds.size === 'number') return client.guilds.size;
-    if (client.guilds instanceof Map) return client.guilds.size;
-    if (Array.isArray(client.guilds)) return client.guilds.length;
-  }
-  return 0;
-}
-
-function collectShardCount(client: BotClientLike | null): number | undefined {
-  if (!client) return undefined;
-  return client.shard?.count ?? client.options?.shardCount ?? client.ws?.shards?.['size' as keyof typeof client.ws.shards] as number | undefined ?? undefined;
-}
-
-function collectShards(client: BotClientLike | null): number[] | undefined {
-  if (!client?.shard?.ids?.length) return undefined;
-  return client.shard.ids;
 }
