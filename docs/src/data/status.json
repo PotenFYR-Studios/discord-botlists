@@ -1,10 +1,10 @@
 {
   "siteUrl": "https://botlists.docs.potenfyr.in/",
   "summary": {
-    "live": 26,
+    "live": 25,
     "deprecated": 1,
     "shutdown": 0,
-    "unknown": 1
+    "unknown": 2
   },
   "entries": [
     {
@@ -107,7 +107,7 @@
       "listId": "disq.ink",
       "listName": "DisQ",
       "website": "https://disq.ink/",
-      "state": "live"
+      "state": "unknown"
     },
     {
       "listId": "dlist.space",
