@@ -422,7 +422,7 @@ Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discor
 ## Live status
 
 <!-- STATUS:START -->
-🟢 25 live | 🟡 1 deprecated | 🔴 0 shutdown | ⚪ 2 unknown
+🟢 26 live | 🟡 1 deprecated | 🔴 0 shutdown | ⚪ 1 unknown
 
 | List | Status |
 | --- | --- |
@@ -435,7 +435,7 @@ Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discor
 | [discord.place](https://discord.place/bots) | 🟢 live |
 | [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live |
 | [Discord Bot List](https://discordbotlist.com/) | 🟢 live |
-| [Discord Bot List XYZ](https://discordbotlist.xyz/) | ⚪ unknown |
+| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live |
 | [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live |
 | [DiscordForge](https://discordforge.org/) | 🟢 live |
 | [dlist.gg](https://discordlist.gg/) | 🟢 live |
