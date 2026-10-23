@@ -1,10 +1,10 @@
 {
   "siteUrl": "https://botlists.docs.potenfyr.in/",
   "summary": {
-    "live": 26,
+    "live": 25,
     "deprecated": 1,
     "shutdown": 0,
-    "unknown": 1
+    "unknown": 2
   },
   "entries": [
     {
@@ -131,7 +131,7 @@
       "listId": "radarcord.net",
       "listName": "Radarcord",
       "website": "https://radarcord.net/",
-      "state": "live"
+      "state": "unknown"
     },
     {
       "listId": "stellarbotlist.com",
