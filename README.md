@@ -422,7 +422,7 @@ Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discor
 ## Live status
 
 <!-- STATUS:START -->
-🟢 27 live | 🟡 1 deprecated | 🔴 0 shutdown | ⚪ 0 unknown
+🟢 26 live | 🟡 1 deprecated | 🔴 0 shutdown | ⚪ 1 unknown
 
 | List | Status |
 | --- | --- |
@@ -448,7 +448,7 @@ Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discor
 | [Omniplex](https://omniplex.gg/) | 🟢 live |
 | [Radarcord](https://radarcord.net/) | 🟢 live |
 | [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live |
-| [TheDiscordList](https://thediscordlist.com/) | 🟢 live |
+| [TheDiscordList](https://thediscordlist.com/) | ⚪ unknown |
 | [Discord Bot List](https://top.gg/) | 🟢 live |
 | [TopBot](https://topbot.gg/) | 🟢 live |
 | [vCodes](https://vcodes.xyz) | 🟢 live |
