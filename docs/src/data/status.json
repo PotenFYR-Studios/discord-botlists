@@ -1,10 +1,10 @@
 {
   "siteUrl": "https://botlists.docs.potenfyr.in/",
   "summary": {
-    "live": 26,
+    "live": 27,
     "deprecated": 1,
     "shutdown": 0,
-    "unknown": 1
+    "unknown": 0
   },
   "entries": [
     {
@@ -29,7 +29,7 @@
       "listId": "carbonitex.net",
       "listName": "Carbonitex",
       "website": "https://www.carbonitex.net/discord/bots",
-      "state": "unknown"
+      "state": "live"
     },
     {
       "listId": "cybralist.com",
