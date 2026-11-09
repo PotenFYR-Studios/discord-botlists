@@ -422,11 +422,11 @@ Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discor
 ## Live status
 
 <!-- STATUS:START -->
-🟢 27 live | 🟡 1 deprecated | 🔴 0 shutdown | ⚪ 0 unknown
+🟢 26 live | 🟡 1 deprecated | 🔴 0 shutdown | ⚪ 1 unknown
 
 | List | Status |
 | --- | --- |
-| [Botlist.me](https://botlist.me/) | 🟢 live |
+| [Botlist.me](https://botlist.me/) | ⚪ unknown |
 | [Discord Labs](https://bots.discordlabs.org/) | 🟡 deprecated |
 | [Bots on Discord](https://bots.ondiscord.xyz/) | 🟢 live |
 | [Carbonitex](https://www.carbonitex.net/discord/bots) | 🟢 live |

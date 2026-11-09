@@ -1,17 +1,17 @@
 {
   "siteUrl": "https://botlists.docs.potenfyr.in/",
   "summary": {
-    "live": 27,
+    "live": 26,
     "deprecated": 1,
     "shutdown": 0,
-    "unknown": 0
+    "unknown": 1
   },
   "entries": [
     {
       "listId": "botlist.me",
       "listName": "Botlist.me",
       "website": "https://botlist.me/",
-      "state": "live"
+      "state": "unknown"
     },
     {
       "listId": "bots.discordlabs.org",
