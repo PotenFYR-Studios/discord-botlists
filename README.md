@@ -435,7 +435,7 @@ Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discor
 | [discord.place](https://discord.place/bots) | 🟢 live |
 | [Rovel Discord List](https://discord.rovelstars.com) | 🟢 live |
 | [Discord Bot List](https://discordbotlist.com/) | 🟢 live |
-| [Discord Bot List XYZ](https://discordbotlist.xyz/) | 🟢 live |
+| [Discord Bot List XYZ](https://discordbotlist.xyz/) | ⚪ unknown |
 | [Discord Extreme List](https://discordextremelist.xyz/) | 🟢 live |
 | [DiscordForge](https://discordforge.org/) | 🟢 live |
 | [dlist.gg](https://discordlist.gg/) | 🟢 live |
@@ -448,7 +448,7 @@ Missing a list? [Open a list request](https://github.com/PotenFYR-Studios/discor
 | [Omniplex](https://omniplex.gg/) | 🟢 live |
 | [Radarcord](https://radarcord.net/) | 🟢 live |
 | [Stellar Bot List](https://stellarbotlist.com/) | 🟢 live |
-| [TheDiscordList](https://thediscordlist.com/) | ⚪ unknown |
+| [TheDiscordList](https://thediscordlist.com/) | 🟢 live |
 | [Discord Bot List](https://top.gg/) | 🟢 live |
 | [TopBot](https://topbot.gg/) | 🟢 live |
 | [vCodes](https://vcodes.xyz) | 🟢 live |

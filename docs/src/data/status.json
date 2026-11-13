@@ -65,7 +65,7 @@
       "listId": "discordbotlist.xyz",
       "listName": "Discord Bot List XYZ",
       "website": "https://discordbotlist.xyz/",
-      "state": "live"
+      "state": "unknown"
     },
     {
       "listId": "discordextremelist.xyz",
@@ -143,7 +143,7 @@
       "listId": "thediscordlist.com",
       "listName": "TheDiscordList",
       "website": "https://thediscordlist.com/",
-      "state": "unknown"
+      "state": "live"
     },
     {
       "listId": "top.gg",
