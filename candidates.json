@@ -1,0 +1,14 @@
+{
+  "generatedAt": 1795253630416,
+  "candidates": [
+    {
+      "id": "discordplace.com",
+      "name": "DiscordPlace",
+      "website": "https://discordplace.com/bots",
+      "apiDocs": "https://discordplace.com/bots/api",
+      "apiPost": "https://discordplace.com/api/v1/bot/stats",
+      "verdict": "viable",
+      "reason": "api answers 401 application/json"
+    }
+  ]
+}
