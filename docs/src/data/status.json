@@ -1,9 +1,9 @@
 {
   "siteUrl": "https://botlists.docs.potenfyr.in/",
   "summary": {
-    "live": 26,
+    "live": 27,
     "deprecated": 1,
-    "shutdown": 1,
+    "shutdown": 0,
     "unknown": 0
   },
   "entries": [
@@ -35,7 +35,7 @@
       "listId": "cybralist.com",
       "listName": "Cybralist",
       "website": "https://cybralist.com/",
-      "state": "shutdown"
+      "state": "live"
     },
     {
       "listId": "discord.bots.gg",
