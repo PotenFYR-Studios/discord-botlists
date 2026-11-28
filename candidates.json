@@ -1,0 +1,23 @@
+{
+  "generatedAt": 1795870277702,
+  "candidates": [
+    {
+      "id": "bumped.gg",
+      "name": "bumped.gg",
+      "website": "https://bumped.gg",
+      "apiDocs": "https://bumped.gg/docs/api",
+      "apiPost": "https://bumped.gg/api/v1/bots/:id/stats",
+      "verdict": "viable",
+      "reason": "api answers 401 application/json"
+    },
+    {
+      "id": "discordplace.com",
+      "name": "DiscordPlace",
+      "website": "https://discordplace.com/bots",
+      "apiDocs": "https://discordplace.com/bots/api",
+      "apiPost": "https://discordplace.com/api/v1/bot/stats",
+      "verdict": "viable",
+      "reason": "api answers 401 application/json"
+    }
+  ]
+}
